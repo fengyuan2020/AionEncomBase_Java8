@@ -5,20 +5,53 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * 系统属性工具类，提供对系统属性的安全访问和类型转换功能
+ * System property utility class providing safe access and type conversion for system properties
+ */
 public final class SystemPropertyUtil {
    private static boolean initializedLogger = true;
    private static final Logger logger = LoggerFactory.getLogger(SystemPropertyUtil.class);
    private static boolean loggedException;
    private static final Pattern INTEGER_PATTERN = Pattern.compile("-?[0-9]+");
 
+   /**
+    * 检查是否存在指定的系统属性
+    * Check if a system property exists
+    *
+    * @param key 属性键名
+    *            Property key
+    * @return 如果属性存在则返回true
+    *         Returns true if the property exists
+    */
    public static boolean contains(String key) {
       return get(key) != null;
    }
 
+   /**
+    * 获取系统属性值
+    * Get system property value
+    *
+    * @param key 属性键名
+    *            Property key
+    * @return 属性值，如果不存在则返回null
+    *         Property value, or null if not exists
+    */
    public static String get(String key) {
       return get(key, (String)null);
    }
 
+   /**
+    * 获取系统属性值，如果不存在则返回默认值
+    * Get system property value with default value
+    *
+    * @param key 属性键名
+    *            Property key
+    * @param def 默认值
+    *            Default value
+    * @return 属性值或默认值
+    *         Property value or default value
+    */
    public static String get(String key, String def) {
       if (key == null) {
          throw new NullPointerException("key");
@@ -40,6 +73,17 @@ public final class SystemPropertyUtil {
       }
    }
 
+   /**
+    * 获取布尔类型的系统属性值
+    * Get boolean system property value
+    *
+    * @param key 属性键名
+    *            Property key
+    * @param def 默认值
+    *            Default value
+    * @return 布尔类型的属性值或默认值
+    *         Boolean property value or default value
+    */
    public static boolean getBoolean(String key, boolean def) {
       String value = get(key);
       if (value == null) {
@@ -61,6 +105,17 @@ public final class SystemPropertyUtil {
       }
    }
 
+   /**
+    * 获取整数类型的系统属性值
+    * Get integer system property value
+    *
+    * @param key 属性键名
+    *            Property key
+    * @param def 默认值
+    *            Default value
+    * @return 整数类型的属性值或默认值
+    *         Integer property value or default value
+    */
    public static int getInt(String key, int def) {
       String value = get(key);
       if (value == null) {
@@ -79,6 +134,17 @@ public final class SystemPropertyUtil {
       }
    }
 
+   /**
+    * 获取长整数类型的系统属性值
+    * Get long integer system property value
+    *
+    * @param key 属性键名
+    *            Property key
+    * @param def 默认值
+    *            Default value
+    * @return 长整数类型的属性值或默认值
+    *         Long integer property value or default value
+    */
    public static long getLong(String key, long def) {
       String value = get(key);
       if (value == null) {

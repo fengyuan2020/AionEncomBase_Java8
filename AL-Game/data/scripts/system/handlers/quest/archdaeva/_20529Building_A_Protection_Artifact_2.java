@@ -46,7 +46,6 @@ public class _20529Building_A_Protection_Artifact_2 extends QuestHandler {
         for (int npc: npcs) {
             qe.registerQuestNpc(npc).addOnTalkEvent(questId);
         }
-        qe.registerQuestNpc(806079).addOnTalkEndEvent(questId);  
 		qe.registerOnLevelUp(questId);
 		qe.registerOnEnterWorld(questId);
 		qe.registerOnEnterZoneMissionEnd(questId);
@@ -156,12 +155,6 @@ public class _20529Building_A_Protection_Artifact_2 extends QuestHandler {
 						return closeDialogWindow(env);
 					} case CHECK_COLLECTED_ITEMS: {
 						return checkQuestItems(env, 2, 3, false, 10000, 10001);
-					} case FINISH_DIALOG: {
-						if (var == 3) {
-							defaultCloseDialog(env, 3, 3);
-						} else if (var == 2) {
-							defaultCloseDialog(env, 2, 2);
-						}
 					}
 				}
             } if (targetId == 806298) { //Wejabobo

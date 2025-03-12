@@ -10,126 +10,160 @@ import java.util.jar.JarFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * 类工具类，提供了类的继承关系判断、包成员判断和类名获取等功能
+ * Class utility for checking inheritance relationships, package membership and class name retrieval
+ */
 public class ClassUtils {
-   private static final Logger log = LoggerFactory.getLogger(ClassUtils.class);
+    private static final Logger log = LoggerFactory.getLogger(ClassUtils.class);
 
-   public static boolean isSubclass(Class<?> a, Class<?> b) {
-      if (a == b) {
-         return true;
-      } else if (a != null && b != null) {
-         for(Class x = a; x != null; x = x.getSuperclass()) {
-            if (x == b) {
-               return true;
+    /**
+     * 判断类a是否是类b的子类或实现了接口b
+     * Check if class a is a subclass of or implements interface b
+     * 
+     * @param a 要检查的类 / Class to check
+     * @param b 目标父类或接口 / Target superclass or interface
+     * @return 如果a是b的子类或实现了接口b则返回true / Returns true if a is subclass of or implements b
+     */
+    public static boolean isSubclass(Class<?> a, Class<?> b) {
+        if (a == b) {
+            return true;
+        } else if (a != null && b != null) {
+            for (Class<?> x = a; x != null; x = x.getSuperclass()) {
+                if (x == b) {
+                    return true;
+                }
+                if (b.isInterface()) {
+                    for (Class<?> anInterface : x.getInterfaces()) {
+                        if (isSubclass(anInterface, b)) {
+                            return true;
+                        }
+                    }
+                }
             }
+            return false;
+        } else {
+            return false;
+        }
+    }
 
-            if (b.isInterface()) {
-               Class<?>[] interfaces = x.getInterfaces();
-               Class[] arr$ = interfaces;
-               int len$ = interfaces.length;
+    /**
+     * 判断类是否属于指定包
+     * Check if class belongs to specified package
+     * 
+     * @param clazz 要检查的类 / Class to check
+     * @param packageName 包名 / Package name
+     * @return 如果类属于指定包则返回true / Returns true if class belongs to package
+     */
+    public static boolean isPackageMember(Class<?> clazz, String packageName) {
+        return isPackageMember(clazz.getName(), packageName);
+    }
 
-               for(int i$ = 0; i$ < len$; ++i$) {
-                  Class<?> anInterface = arr$[i$];
-                  if (isSubclass(anInterface, b)) {
-                     return true;
-                  }
-               }
-            }
-         }
+    /**
+     * 判断类名是否属于指定包
+     * Check if class name belongs to specified package
+     * 
+     * @param className 类名 / Class name
+     * @param packageName 包名 / Package name
+     * @return 如果类名属于指定包则返回true / Returns true if class name belongs to package
+     */
+    public static boolean isPackageMember(String className, String packageName) {
+        if (className.contains(".")) {
+            String classPackage = className.substring(0, className.lastIndexOf('.'));
+            return packageName.equals(classPackage);
+        } else {
+            return packageName == null || packageName.isEmpty();
+        }
+    }
 
-         return false;
-      } else {
-         return false;
-      }
-   }
+    /**
+     * 从目录中获取所有类名
+     * Get all class names from directory
+     * 
+     * @param directory 目录 / Directory
+     * @return 类名集合 / Set of class names
+     * @throws IllegalArgumentException 如果目录不存在或不是目录 / If directory doesn't exist or is not a directory
+     */
+    public static Set<String> getClassNamesFromDirectory(File directory) throws IllegalArgumentException {
+        if (directory.isDirectory() && directory.exists()) {
+            return getClassNamesFromPackage(directory, null, true);
+        } else {
+            throw new IllegalArgumentException("Directory " + directory + " doesn't exists or is not directory");
+        }
+    }
 
-   public static boolean isPackageMember(Class<?> clazz, String packageName) {
-      return isPackageMember(clazz.getName(), packageName);
-   }
+    /**
+     * 从包中获取所有类名
+     * Get all class names from package
+     * 
+     * @param directory 目录 / Directory
+     * @param packageName 包名 / Package name
+     * @param recursive 是否递归搜索子目录 / Whether to search subdirectories recursively
+     * @return 类名集合 / Set of class names
+     */
+    public static Set<String> getClassNamesFromPackage(File directory, String packageName, boolean recursive) {
+        Set<String> classes = new HashSet<String>();
+        if (!directory.exists()) {
+            return classes;
+        }
 
-   public static boolean isPackageMember(String className, String packageName) {
-      if (className.contains(".")) {
-         String classPackage = className.substring(0, className.lastIndexOf(46));
-         return packageName.equals(classPackage);
-      } else {
-         return packageName == null || packageName.isEmpty();
-      }
-   }
-
-   public static Set<String> getClassNamesFromDirectory(File directory) throws IllegalArgumentException {
-      if (directory.isDirectory() && directory.exists()) {
-         return getClassNamesFromPackage(directory, (String)null, true);
-      } else {
-         throw new IllegalArgumentException("Directory " + directory + " doesn't exists or is not directory");
-      }
-   }
-
-   public static Set<String> getClassNamesFromPackage(File directory, String packageName, boolean recursive) {
-      Set<String> classes = new HashSet();
-      if (!directory.exists()) {
-         return classes;
-      } else {
-         File[] files = directory.listFiles();
-         File[] arr$ = files;
-         int len$ = files.length;
-
-         for(int i$ = 0; i$ < len$; ++i$) {
-            File file = arr$[i$];
-            String newPackage;
+        File[] files = directory.listFiles();
+        for (File file : files) {
             if (file.isDirectory()) {
-               if (recursive) {
-                  newPackage = file.getName();
-                  if (!GenericValidator.isBlankOrNull(packageName)) {
-                     newPackage = packageName + "." + newPackage;
-                  }
-
-                  classes.addAll(getClassNamesFromPackage(file, newPackage, recursive));
-               }
+                if (recursive) {
+                    String newPackage = file.getName();
+                    if (!GenericValidator.isBlankOrNull(packageName)) {
+                        newPackage = packageName + "." + newPackage;
+                    }
+                    classes.addAll(getClassNamesFromPackage(file, newPackage, recursive));
+                }
             } else if (file.getName().endsWith(".class")) {
-               newPackage = file.getName().substring(0, file.getName().length() - 6);
-               if (!GenericValidator.isBlankOrNull(packageName)) {
-                  newPackage = packageName + "." + newPackage;
-               }
-
-               classes.add(newPackage);
+                String className = file.getName().substring(0, file.getName().length() - 6);
+                if (!GenericValidator.isBlankOrNull(packageName)) {
+                    className = packageName + "." + className;
+                }
+                classes.add(className);
             }
-         }
+        }
+        return classes;
+    }
 
-         return classes;
-      }
-   }
+    /**
+     * 从JAR文件中获取所有类名
+     * Get all class names from JAR file
+     * 
+     * @param file JAR文件 / JAR file
+     * @return 类名集合 / Set of class names
+     * @throws IOException 如果读取JAR文件失败 / If failed to read JAR file
+     */
+    public static Set<String> getClassNamesFromJarFile(File file) throws IOException {
+        if (!file.exists() || file.isDirectory()) {
+            throw new IllegalArgumentException("File " + file + " is not valid jar file");
+        }
 
-   public static Set<String> getClassNamesFromJarFile(File file) throws IOException {
-      if (file.exists() && !file.isDirectory()) {
-         Set<String> result = new HashSet();
-         JarFile jarFile = null;
-
-         try {
+        Set<String> result = new HashSet<String>();
+        JarFile jarFile = null;
+        try {
             jarFile = new JarFile(file);
-            Enumeration entries = jarFile.entries();
-
-            while(entries.hasMoreElements()) {
-               JarEntry entry = (JarEntry)entries.nextElement();
-               String name = entry.getName();
-               if (name.endsWith(".class")) {
-                  name = name.substring(0, name.length() - 6);
-                  name = name.replace('/', '.');
-                  result.add(name);
-               }
+            Enumeration<JarEntry> entries = jarFile.entries();
+            while (entries.hasMoreElements()) {
+                JarEntry entry = entries.nextElement();
+                String name = entry.getName();
+                if (name.endsWith(".class")) {
+                    name = name.substring(0, name.length() - 6);
+                    name = name.replace('/', '.');
+                    result.add(name);
+                }
             }
-         } finally {
+        } finally {
             if (jarFile != null) {
-               try {
-                  jarFile.close();
-               } catch (IOException var11) {
-                  log.error("Failed to close jar file " + jarFile.getName(), var11);
-               }
+                try {
+                    jarFile.close();
+                } catch (IOException e) {
+                    log.error("Failed to close jar file " + jarFile.getName(), e);
+                }
             }
-
-         }
-
-         return result;
-      } else {
-         throw new IllegalArgumentException("File " + file + " is not valid jar file");
-      }
-   }
+        }
+        return result;
+    }
 }

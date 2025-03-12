@@ -21,123 +21,189 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * 脚本管理器类，负责脚本的加载、卸载和重新加载
+ * Script manager class, responsible for loading, unloading and reloading scripts
+ *
+ * 该类提供以下主要功能：
+ * This class provides the following main features:
+ * 1. 从XML文件加载脚本配置 / Load script configuration from XML file
+ * 2. 从目录加载脚本 / Load scripts from directory
+ * 3. 管理脚本上下文 / Manage script contexts
+ * 4. 支持脚本热重载 / Support script hot reloading
+ *
+ * @author SunAion Team
+ */
 public class ScriptManager {
-   private static final Logger log = LoggerFactory.getLogger(ScriptManager.class);
-   public static final Class<? extends ScriptCompiler> DEFAULT_COMPILER_CLASS = ScriptCompilerImpl.class;
-   private Set<ScriptContext> contexts = new HashSet();
-   private ClassListener globalClassListener;
+    /** 
+     * 日志记录器 / Logger instance 
+     */
+    private static final Logger log = LoggerFactory.getLogger(ScriptManager.class);
+    
+    /** 
+     * 默认脚本编译器类 / Default script compiler class 
+     */
+    public static final Class<? extends ScriptCompiler> DEFAULT_COMPILER_CLASS = ScriptCompilerImpl.class;
+    
+    /** 
+     * 脚本上下文集合 / Collection of script contexts 
+     */
+    private Set<ScriptContext> contexts = new HashSet();
+    
+    /** 
+     * 全局类监听器 / Global class listener 
+     */
+    private ClassListener globalClassListener;
 
-   public synchronized void load(File scriptDescriptor) throws Exception {
-      FileInputStream fin = new FileInputStream(scriptDescriptor);
-      JAXBContext c = JAXBContext.newInstance(ScriptInfo.class, ScriptList.class);
-      Unmarshaller u = c.createUnmarshaller();
-      ScriptList list = null;
+    /**
+     * 从XML文件加载脚本配置
+     * Load script configuration from XML file
+     * @param scriptDescriptor XML配置文件 / XML configuration file
+     * @throws Exception 加载失败时抛出 / Thrown when loading fails
+     */
+    public synchronized void load(File scriptDescriptor) throws Exception {
+        FileInputStream fin = new FileInputStream(scriptDescriptor);
+        JAXBContext c = JAXBContext.newInstance(ScriptInfo.class, ScriptList.class);
+        Unmarshaller u = c.createUnmarshaller();
+        ScriptList list = null;
 
-      try {
-         list = (ScriptList)u.unmarshal(fin);
-      } catch (Exception var11) {
-         throw var11;
-      } finally {
-         if (fin != null) {
-            fin.close();
-         }
-
-      }
-
-      Iterator i$ = list.getScriptInfos().iterator();
-
-      while(i$.hasNext()) {
-         ScriptInfo si = (ScriptInfo)i$.next();
-         ScriptContext context = this.createContext(si, (ScriptContext)null);
-         if (context != null) {
-            this.contexts.add(context);
-            context.init();
-         }
-      }
-
-   }
-
-   public synchronized void loadDirectory(File directory) throws RuntimeException {
-      Collection<File> libraries = FileUtils.listFiles(directory, new String[]{"jar"}, true);
-      ArrayList list = Lists.newArrayList(libraries);
-
-      try {
-         this.loadDirectory(directory, list, DEFAULT_COMPILER_CLASS.getName());
-      } catch (Exception var5) {
-         throw new RuntimeException("Failed to load script context from directory " + directory.getAbsolutePath(), var5);
-      }
-   }
-
-   public synchronized void loadDirectory(File directory, List<File> libraries, String compilerClassName) throws Exception {
-      if (!directory.isDirectory()) {
-         throw new IllegalArgumentException("File should be directory");
-      } else {
-         ScriptInfo si = new ScriptInfo();
-         si.setRoot(directory);
-         si.setCompilerClass(compilerClassName);
-         si.setScriptInfos(Collections.emptyList());
-         si.setLibraries(libraries);
-         ScriptContext sc = this.createContext(si, (ScriptContext)null);
-         this.contexts.add(sc);
-         sc.init();
-      }
-   }
-
-   protected ScriptContext createContext(ScriptInfo si, ScriptContext parent) throws Exception {
-      ScriptContext context = ScriptContextFactory.getScriptContext(si.getRoot(), parent);
-      context.setLibraries(si.getLibraries());
-      context.setCompilerClassName(si.getCompilerClass());
-      if (parent == null && this.contexts.contains(context)) {
-         log.warn("Double root script context definition: " + si.getRoot().getAbsolutePath());
-         return null;
-      } else {
-         if (si.getScriptInfos() != null && !si.getScriptInfos().isEmpty()) {
-            Iterator i$ = si.getScriptInfos().iterator();
-
-            while(i$.hasNext()) {
-               ScriptInfo child = (ScriptInfo)i$.next();
-               this.createContext(child, context);
+        try {
+            list = (ScriptList)u.unmarshal(fin);
+        } catch (Exception var11) {
+            throw var11;
+        } finally {
+            if (fin != null) {
+                fin.close();
             }
-         }
+        }
 
-         if (parent == null && this.globalClassListener != null) {
+        Iterator i$ = list.getScriptInfos().iterator();
+        while(i$.hasNext()) {
+            ScriptInfo si = (ScriptInfo)i$.next();
+            ScriptContext context = this.createContext(si, null);
+            if (context != null) {
+                this.contexts.add(context);
+                context.init();
+            }
+        }
+    }
+
+    /**
+     * 从目录加载脚本，自动搜索JAR文件
+     * Load scripts from directory, automatically search for JAR files
+     * @param directory 脚本目录 / Script directory
+     * @throws RuntimeException 加载失败时抛出 / Thrown when loading fails
+     */
+    public synchronized void loadDirectory(File directory) throws RuntimeException {
+        Collection<File> libraries = FileUtils.listFiles(directory, new String[]{"jar"}, true);
+        ArrayList list = Lists.newArrayList(libraries);
+
+        try {
+            this.loadDirectory(directory, list, DEFAULT_COMPILER_CLASS.getName());
+        } catch (Exception var5) {
+            throw new RuntimeException("Failed to load script context from directory " + directory.getAbsolutePath(), var5);
+        }
+    }
+
+    /**
+     * 从目录加载脚本，使用指定的库文件和编译器
+     * Load scripts from directory with specified libraries and compiler
+     * @param directory 脚本目录 / Script directory
+     * @param libraries 库文件列表 / Library file list
+     * @param compilerClassName 编译器类名 / Compiler class name
+     * @throws Exception 加载失败时抛出 / Thrown when loading fails
+     */
+    public synchronized void loadDirectory(File directory, List<File> libraries, String compilerClassName) throws Exception {
+        if (!directory.isDirectory()) {
+            throw new IllegalArgumentException("File should be directory");
+        }
+        
+        ScriptInfo si = new ScriptInfo();
+        si.setRoot(directory);
+        si.setCompilerClass(compilerClassName);
+        si.setScriptInfos(Collections.emptyList());
+        si.setLibraries(libraries);
+        ScriptContext sc = this.createContext(si, null);
+        this.contexts.add(sc);
+        sc.init();
+    }
+
+    /**
+     * 创建脚本上下文
+     * Create script context
+     * @param si 脚本信息 / Script information
+     * @param parent 父上下文 / Parent context
+     * @return 创建的上下文 / Created context
+     * @throws Exception 创建失败时抛出 / Thrown when creation fails
+     */
+    protected ScriptContext createContext(ScriptInfo si, ScriptContext parent) throws Exception {
+        ScriptContext context = ScriptContextFactory.getScriptContext(si.getRoot(), parent);
+        context.setLibraries(si.getLibraries());
+        context.setCompilerClassName(si.getCompilerClass());
+        
+        if (parent == null && this.contexts.contains(context)) {
+            log.warn("Double root script context definition: " + si.getRoot().getAbsolutePath());
+            return null;
+        }
+        
+        if (si.getScriptInfos() != null && !si.getScriptInfos().isEmpty()) {
+            for (ScriptInfo child : si.getScriptInfos()) {
+                this.createContext(child, context);
+            }
+        }
+
+        if (parent == null && this.globalClassListener != null) {
             context.setClassListener(this.globalClassListener);
-         }
+        }
 
-         return context;
-      }
-   }
+        return context;
+    }
 
-   public synchronized void shutdown() {
-      Iterator i$ = this.contexts.iterator();
+    /**
+     * 关闭所有脚本上下文
+     * Shutdown all script contexts
+     */
+    public synchronized void shutdown() {
+        for (ScriptContext context : this.contexts) {
+            context.shutdown();
+        }
+        this.contexts.clear();
+    }
 
-      while(i$.hasNext()) {
-         ScriptContext context = (ScriptContext)i$.next();
-         context.shutdown();
-      }
+    /**
+     * 重新加载所有脚本上下文
+     * Reload all script contexts
+     */
+    public synchronized void reload() {
+        for (ScriptContext context : this.contexts) {
+            this.reloadContext(context);
+        }
+    }
 
-      this.contexts.clear();
-   }
+    /**
+     * 重新加载指定的脚本上下文
+     * Reload specified script context
+     * @param ctx 要重新加载的上下文 / Context to reload
+     */
+    public void reloadContext(ScriptContext ctx) {
+        ctx.reload();
+    }
 
-   public synchronized void reload() {
-      Iterator i$ = this.contexts.iterator();
+    /**
+     * 获取所有脚本上下文
+     * Get all script contexts
+     * @return 只读的上下文集合 / Unmodifiable collection of contexts
+     */
+    public synchronized Collection<ScriptContext> getScriptContexts() {
+        return Collections.unmodifiableSet(this.contexts);
+    }
 
-      while(i$.hasNext()) {
-         ScriptContext context = (ScriptContext)i$.next();
-         this.reloadContext(context);
-      }
-
-   }
-
-   public void reloadContext(ScriptContext ctx) {
-      ctx.reload();
-   }
-
-   public synchronized Collection<ScriptContext> getScriptContexts() {
-      return Collections.unmodifiableSet(this.contexts);
-   }
-
-   public void setGlobalClassListener(ClassListener instance) {
-      this.globalClassListener = instance;
-   }
+    /**
+     * 设置全局类监听器
+     * Set global class listener
+     * @param instance 监听器实例 / Listener instance
+     */
+    public void setGlobalClassListener(ClassListener instance) {
+        this.globalClassListener = instance;
+    }
 }

@@ -25,18 +25,32 @@ package com.aionemu.commons.scripting.classlistener;
 
 import java.lang.reflect.Modifier;
 import java.util.Map;
-
 import org.quartz.JobDetail;
-
 import com.aionemu.commons.scripting.metadata.Scheduled;
 import com.aionemu.commons.services.CronService;
 import com.aionemu.commons.utils.ClassUtils;
 
+/**
+ * 定时任务类监听器，负责管理带有@Scheduled注解的类的生命周期
+ * Scheduled task class listener that manages lifecycle of classes with @Scheduled annotation
+ *
+ * 该类实现了以下功能：
+ * This class implements the following features:
+ * - 检测和验证定时任务类 (Detect and validate scheduled task classes)
+ * - 管理定时任务的调度 (Manage scheduling of tasks)
+ * - 处理任务的加载和卸载 (Handle task loading and unloading)
+ */
 public class ScheduledTaskClassListener implements ClassListener {
 	
-	@Override
-	@SuppressWarnings({"unchecked"})
-	public void postLoad(Class<?>[] classes) {
+    /**
+     * 处理类加载后的定时任务注册
+     * Process scheduled task registration after class loading
+     *
+     * @param classes 要处理的类数组 / Array of classes to process
+     */
+    @Override
+    @SuppressWarnings({"unchecked"})
+    public void postLoad(Class<?>[] classes) {
 		for (Class<?> clazz : classes) {
 			if (isValidClass(clazz)) {
 				scheduleClass((Class<? extends Runnable>) clazz);
@@ -44,9 +58,15 @@ public class ScheduledTaskClassListener implements ClassListener {
 		}
 	}
 	
-	@Override
-	@SuppressWarnings({"unchecked"})
-	public void preUnload(Class<?>[] classes) {
+    /**
+     * 处理类卸载前的定时任务注销
+     * Process scheduled task deregistration before class unloading
+     *
+     * @param classes 要处理的类数组 / Array of classes to process
+     */
+    @Override
+    @SuppressWarnings({"unchecked"})
+    public void preUnload(Class<?>[] classes) {
 		for (Class<?> clazz : classes) {
 			if (isValidClass(clazz)) {
 				unScheduleClass((Class<? extends Runnable>) clazz);
@@ -54,7 +74,14 @@ public class ScheduledTaskClassListener implements ClassListener {
 		}
 	}
 	
-	public boolean isValidClass(Class<?> clazz) {
+    /**
+     * 验证类是否为有效的定时任务类
+     * Validate if a class is a valid scheduled task class
+     *
+     * @param clazz 要验证的类 / Class to validate
+     * @return 是否为有效的定时任务类 / Whether it's a valid scheduled task class
+     */
+    public boolean isValidClass(Class<?> clazz) {
 		
 		if (!ClassUtils.isSubclass(clazz, Runnable.class)) {
 			return false;
@@ -86,7 +113,13 @@ public class ScheduledTaskClassListener implements ClassListener {
 		return true;
 	}
 	
-	protected void scheduleClass(Class<? extends Runnable> clazz) {
+    /**
+     * 调度定时任务类
+     * Schedule a task class
+     *
+     * @param clazz 要调度的类 / Class to schedule
+     */
+    protected void scheduleClass(Class<? extends Runnable> clazz) {
 		Scheduled metadata = clazz.getAnnotation(Scheduled.class);
 		
 		try {
@@ -105,7 +138,13 @@ public class ScheduledTaskClassListener implements ClassListener {
 		}
 	}
 	
-	protected void unScheduleClass(Class<? extends Runnable> clazz) {
+    /**
+     * 取消定时任务类的调度
+     * Unschedule a task class
+     *
+     * @param clazz 要取消调度的类 / Class to unschedule
+     */
+    protected void unScheduleClass(Class<? extends Runnable> clazz) {
 		Map<Runnable, JobDetail> map = getCronService().getRunnables();
 		for (Map.Entry<Runnable, JobDetail> entry : map.entrySet()) {
 			if (entry.getKey().getClass() == clazz) {
@@ -114,7 +153,13 @@ public class ScheduledTaskClassListener implements ClassListener {
 		}
 	}
 	
-	protected CronService getCronService() {
+    /**
+     * 获取CronService实例
+     * Get CronService instance
+     *
+     * @return CronService实例 / CronService instance
+     */
+    protected CronService getCronService() {
 		if (CronService.getInstance() == null) {
 			throw new RuntimeException("CronService is not initialized");
 		}

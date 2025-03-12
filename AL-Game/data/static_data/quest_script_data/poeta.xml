@@ -8,7 +8,7 @@
 	<report_to id="1101" start_npc_ids="203049" end_npc_ids="203057"/>
 	<!-- Report To Polina (Elyos Only) -->
 	<report_to id="1104" start_npc_ids="203057" end_npc_ids="203059"/>
-	<report_to id="1118" start_npc_ids="203059" end_npc_ids="203070"/>
+	<report_to id="1118" start_npc_ids="203059" end_npc_ids="203079"/>
 	<!-- Helping Kales (Elyos Only) -->
 	<report_to id="1106" start_npc_ids="203050" end_npc_ids="203061" item_id="182200203"/>
 	<!-- A Book For Namus (Elyos Only) -->

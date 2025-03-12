@@ -32,7 +32,7 @@ import com.aionemu.gameserver.utils.PacketSendUtility;
 public class _1467TheFourLeaders extends QuestHandler {
 
 	private final static int questId = 1467;
-
+	private int reward;
 	public _1467TheFourLeaders() {
 		super(questId);
 	}
@@ -64,73 +64,52 @@ public class _1467TheFourLeaders extends QuestHandler {
 						return sendQuestDialog(env, 4);
 					} 
 					case ACCEPT_QUEST: {
-						return sendQuestDialog(env, 1011);
+                        return sendQuestStartDialog(env);
 					}
-					case STEP_TO_1: {
-						if (QuestService.startQuest(env)) {
-							qs.setQuestVarById(0, qs.getQuestVarById(0) + 1);
-							updateQuestStatus(env);
-							PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
-							return true;
-						}
+					case REFUSE_QUEST: {
+				        return closeDialogWindow(env);
 					}
-					case STEP_TO_2: {
-						if (QuestService.startQuest(env)) {
-							qs.setQuestVarById(0, qs.getQuestVarById(0) + 2);
-							updateQuestStatus(env);
-							PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
-							return true;
-						}
-
-					}
-					case STEP_TO_3: {
-						if (QuestService.startQuest(env)) {
-							qs.setQuestVarById(0, qs.getQuestVarById(0) + 3);
-							updateQuestStatus(env);
-							PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
-							return true;
-						}
-					}
-					case STEP_TO_4: {
-						if (QuestService.startQuest(env)) {
-							qs.setQuestVarById(0, qs.getQuestVarById(0) + 4);
-							updateQuestStatus(env);
-							PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
-							return true;
-						}
-					}
-                    return sendQuestStartDialog(env);  
 				}
 			}
 		}
 		if (qs == null)
 			return false;
-		if (qs.getStatus() == QuestStatus.REWARD) {
+		else if (qs.getStatus() == QuestStatus.START) {
 			if (targetId == 204045) {
 				switch (env.getDialog()) {
-					case USE_OBJECT: {
-						switch (qs.getQuestVarById(0)) {
-							case 1: {
-								return sendQuestDialog(env, 5);
-							}
-							case 2: {
-								return sendQuestDialog(env, 6);
-							}
-							case 3: {
-								return sendQuestDialog(env, 7);
-							}
-							case 4: {
-								return sendQuestDialog(env, 8);
-							}
-						}
+					case START_DIALOG: {
+						return sendQuestDialog(env, 1011);
 					}
-					case SELECT_NO_REWARD: {
-						QuestService.finishQuest(env, qs.getQuestVarById(0) - 1);
-						PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
-						return true;
+					case STEP_TO_1: {
+						qs.setQuestVarById(0, qs.getQuestVarById(0) + 1);
+						reward = 0;
+					    updateQuestStatus(env);
+				        return closeDialogWindow(env);
 					}
-				}
-			}
+					case STEP_TO_2: {
+						qs.setQuestVarById(0, qs.getQuestVarById(0) + 2);
+						reward = 1;
+						updateQuestStatus(env);
+				        return closeDialogWindow(env);
+					}
+					case STEP_TO_3: {
+						qs.setQuestVarById(0, qs.getQuestVarById(0) + 3);
+						reward = 2;
+						updateQuestStatus(env);
+				        return closeDialogWindow(env);
+					}
+					case STEP_TO_4: {
+						qs.setQuestVarById(0, qs.getQuestVarById(0) + 4);
+						reward = 3;
+						updateQuestStatus(env);
+				        return closeDialogWindow(env);
+					}
+                }
+            }
+        }
+		if (qs.getStatus() == QuestStatus.REWARD) {
+			if (targetId == 204045)
+               return sendQuestEndDialog(env, reward);
 		}
 		return false;
 	}
@@ -139,7 +118,6 @@ public class _1467TheFourLeaders extends QuestHandler {
 	public boolean onKillEvent(QuestEnv env) {
 		Player player = env.getPlayer();
 		QuestState qs = player.getQuestStateList().getQuestState(questId);
-
 		if (qs == null || qs.getStatus() != QuestStatus.START) {
 			return false;
 		}

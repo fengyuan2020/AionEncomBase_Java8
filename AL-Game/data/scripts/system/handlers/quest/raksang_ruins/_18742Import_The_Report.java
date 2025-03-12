@@ -18,64 +18,59 @@ import com.aionemu.gameserver.questEngine.model.QuestDialog;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
-import com.aionemu.gameserver.services.QuestService;
-import com.aionemu.gameserver.world.zone.ZoneName;
 
 /****/
 /** Author Ghostfur & Unknown (Aion-Unique)
 /****/
 
-public class _18742Import_The_Report extends QuestHandler
-{
+public class _18742Import_The_Report extends QuestHandler {
+
     private final static int questId = 18742;
-	
     public _18742Import_The_Report() {
         super(questId);
     }
 	
 	@Override
 	public void register() {
+		qe.registerQuestNpc(206378).addOnQuestStart(questId);
+		qe.registerQuestNpc(206379).addOnQuestStart(questId);
+		qe.registerQuestNpc(206380).addOnQuestStart(questId);
 		qe.registerQuestNpc(804707).addOnTalkEvent(questId);
-		qe.registerOnEnterZone(ZoneName.get("RAKSANG_ENTRANCE_300610000"), questId);
 	}
 	
 	@Override
 	public boolean onDialogEvent(QuestEnv env) {
 		Player player = env.getPlayer();
 		QuestState qs = player.getQuestStateList().getQuestState(questId);
-		QuestDialog dialog = env.getDialog();
 		int targetId = env.getTargetId();
-		if (qs.getStatus() == QuestStatus.START) {
+		if (qs == null || qs.getStatus() == QuestStatus.NONE) {
+			if (targetId == 206378 || targetId == 206379 || targetId == 206380) {
+				switch (env.getDialog()) {
+					case START_DIALOG: {
+						return sendQuestDialog(env, 4762);
+					}
+					case ACCEPT_QUEST:
+					case ACCEPT_QUEST_SIMPLE:
+						return sendQuestStartDialog(env);
+					case REFUSE_QUEST_SIMPLE:
+				        return closeDialogWindow(env);
+				}
+			}
+		}
+		if (qs == null || qs.getStatus() == QuestStatus.START) {
 			if (targetId == 804707) {
-				switch (dialog) {
+				switch (env.getDialog()) {
 					case START_DIALOG: {
 						return sendQuestDialog(env, 1011);
 				    } case CHECK_COLLECTED_ITEMS: {
-                        return checkQuestItems(env, 0, 1, true, 5, 2716);
-                    } 
-                    case FINISH_DIALOG: {
-                        return sendQuestEndDialog(env);
-					}
+                        return checkQuestItems(env, 0, 1, true, 10000, 10001);
+                    }
 				}
 			}
-		} else if (qs.getStatus() == QuestStatus.REWARD) {
+		} 
+        else if (qs == null || qs.getStatus() == QuestStatus.REWARD) {
 			if (targetId == 804707) {
 				return sendQuestEndDialog(env);
-			}
-		}
-		return false;
-	}
-	
-	@Override
-    public boolean onEnterZoneEvent(QuestEnv env, ZoneName zoneName) {
-        Player player = env.getPlayer();
-        QuestState qs = player.getQuestStateList().getQuestState(questId);
-		if (zoneName == ZoneName.get("RAKSANG_ENTRANCE_300610000")) {
-			if (qs == null || qs.canRepeat()) {
-				env.setQuestId(questId);
-				if (QuestService.startQuest(env)) {
-					return true;
-				}
 			}
 		}
 		return false;

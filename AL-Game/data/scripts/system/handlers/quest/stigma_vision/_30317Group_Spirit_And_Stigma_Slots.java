@@ -44,9 +44,6 @@ public class _30317Group_Spirit_And_Stigma_Slots extends QuestHandler {
 	public boolean onDialogEvent(QuestEnv env) {
 		final Player player = env.getPlayer();
 		QuestState qs = player.getQuestStateList().getQuestState(questId);
-		if (qs == null) {
-			return false;
-		}
 		int targetId = 0;
 		if (env.getVisibleObject() instanceof Npc)
 			targetId = ((Npc) env.getVisibleObject()).getNpcId();
@@ -58,12 +55,16 @@ public class _30317Group_Spirit_And_Stigma_Slots extends QuestHandler {
 					return sendQuestStartDialog(env);
 			}
 		}
+		if (qs == null) {
+			return false;
+		}
+		if (qs.getStatus() == QuestStatus.START) {
 		int var = qs.getQuestVarById(0);
-		if (qs != null && qs.getStatus() == QuestStatus.START) {
 			switch (targetId) {
 				case 799322: {
 					switch (env.getDialog()) {
 						case START_DIALOG:
+							if (var == 0)
 							return sendQuestDialog(env, 1011);
 						case STEP_TO_1:
 							QuestService.addNewSpawn(player.getWorldId(), player.getInstanceId(), 799506, player.getX(), player.getY(), player.getZ(), player.getHeading());

@@ -23,10 +23,9 @@ import com.aionemu.gameserver.questEngine.model.QuestStatus;
 /** Author Ghostfur & Unknown (Aion-Unique)
 /****/
 
-public class _15101Time_For_Your_Close_Up extends QuestHandler
-{
+public class _15101Time_For_Your_Close_Up extends QuestHandler {
+
     private final static int questId = 15101;
-	
     public _15101Time_For_Your_Close_Up() {
         super(questId);
     }
@@ -62,18 +61,8 @@ public class _15101Time_For_Your_Close_Up extends QuestHandler
 					return closeDialogWindow(env);
                 }
             }
-        } else if (qs.getStatus() == QuestStatus.START) {
-            if (targetId == 804715) {
-                if (dialog == QuestDialog.START_DIALOG) {
-                    if (qs.getQuestVarById(0) == 10) {
-                        return sendQuestDialog(env, 2375);
-                    }
-                } if (dialog == QuestDialog.SELECT_REWARD) {
-                    changeQuestStep(env, 10, 11, true);
-                    return sendQuestEndDialog(env);
-                }
-			}
-        } else if (qs.getStatus() == QuestStatus.REWARD) {
+        } 
+        else if (qs == null || qs.getStatus() == QuestStatus.REWARD) {
 			if (targetId == 804715) {
 				if (env.getDialogId() == 1352) {
 					return sendQuestDialog(env, 5);
@@ -89,6 +78,8 @@ public class _15101Time_For_Your_Close_Up extends QuestHandler
         Player player = env.getPlayer();
         QuestState qs = player.getQuestStateList().getQuestState(questId);
         if (qs != null && qs.getStatus() == QuestStatus.START) {
+			int var = qs.getQuestVarById(0);
+			if (var == 1) {
             switch (env.getTargetId()) {
 				case 235939:
 				case 235940:
@@ -96,9 +87,10 @@ public class _15101Time_For_Your_Close_Up extends QuestHandler
 					qs.setQuestVarById(1, qs.getQuestVarById(1) + 1);
 					updateQuestStatus(env);
 				} if (qs.getQuestVarById(1) >= 10) {
-					qs.setQuestVarById(0, 1);
+					qs.setQuestVar(2);
 					qs.setStatus(QuestStatus.REWARD);
 					updateQuestStatus(env);
+                    }
 				}
             }
         }

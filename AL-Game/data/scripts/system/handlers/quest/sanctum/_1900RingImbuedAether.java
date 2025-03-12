@@ -41,72 +41,62 @@ public class _1900RingImbuedAether extends QuestHandler {
 		qe.registerQuestNpc(203766).addOnTalkEvent(questId);
 		qe.registerQuestNpc(203797).addOnTalkEvent(questId);
 		qe.registerQuestNpc(203795).addOnTalkEvent(questId);
-		qe.registerQuestNpc(203830).addOnTalkEndEvent(questId);
+		qe.registerQuestNpc(203830).addOnTalkEvent(questId);
 	}
 
 	@Override
 	public boolean onDialogEvent(QuestEnv env) {
 		final Player player = env.getPlayer();
-		if (sendQuestNoneDialog(env, 203757, 182206003, 1))
-			return true;
-
 		QuestState qs = player.getQuestStateList().getQuestState(questId);
-		if (qs == null)
-			return false;
-
+		if (qs == null || qs.getStatus() == QuestStatus.NONE) {
+		   if (env.getTargetId() == 203757) {
+				if (env.getDialog() == QuestDialog.START_DIALOG)
+					return sendQuestDialog(env, 1011);
+				else
+					return sendQuestStartDialog(env, 182206003, 1);
+			}
+		}
 		if (env.getTargetId() == 203739) {
-			if (qs.getStatus() == QuestStatus.START && qs.getQuestVarById(0) == 0) {
+			if (qs != null && qs.getStatus() == QuestStatus.START && qs.getQuestVarById(0) == 0) {
 				if (env.getDialog() == QuestDialog.START_DIALOG)
 					return sendQuestDialog(env, 1352);
 				else if (env.getDialog() == QuestDialog.STEP_TO_1) {
 					return defaultCloseDialog(env, 0, 1);
 				}
-				else
-					return sendQuestStartDialog(env);
 			}
 		}
 		else if (env.getTargetId() == 203766) {
-			if (qs.getStatus() == QuestStatus.START && qs.getQuestVarById(0) == 1) {
+			if (qs != null && qs.getStatus() == QuestStatus.START && qs.getQuestVarById(0) == 1) {
 				if (env.getDialog() == QuestDialog.START_DIALOG)
 					return sendQuestDialog(env, 1693);
 				else if (env.getDialog() == QuestDialog.STEP_TO_2) {
 					return defaultCloseDialog(env, 1, 2);
 				}
-				else
-					return sendQuestStartDialog(env);
 			}
 		}
 		else if (env.getTargetId() == 203797) {
-			if (qs.getStatus() == QuestStatus.START && qs.getQuestVarById(0) == 2) {
+			if (qs != null && qs.getStatus() == QuestStatus.START && qs.getQuestVarById(0) == 2) {
 				if (env.getDialog() == QuestDialog.START_DIALOG)
 					return sendQuestDialog(env, 2034);
 				else if (env.getDialog() == QuestDialog.STEP_TO_3) {
 					return defaultCloseDialog(env, 2, 3);
 				}
-				else
-					return sendQuestStartDialog(env);
 			}
 		}
 		else if (env.getTargetId() == 203795) {
-			if (qs.getStatus() == QuestStatus.START && qs.getQuestVarById(0) == 3) {
+			if (qs != null && qs.getStatus() == QuestStatus.START && qs.getQuestVarById(0) == 3) {
 				if (env.getDialog() == QuestDialog.START_DIALOG)
 					return sendQuestDialog(env, 2375);
 				else if (env.getDialog() == QuestDialog.STEP_TO_4) {
-					return defaultCloseDialog(env, 3, 0, true, false);
+					return defaultCloseDialog(env, 3, 4, true, false);
 				}
-				else
-					return sendQuestStartDialog(env);
 			}
 		}
 		else if (env.getTargetId() == 203830) {
-			if (env.getDialog() == QuestDialog.START_DIALOG && qs.getStatus() == QuestStatus.REWARD)
-				return sendQuestDialog(env, 2716);
-			else if (env.getDialogId() == 1009) {
+            if (qs != null && qs.getStatus() == QuestStatus.REWARD) {
 				removeQuestItem(env, 182206003, 1);
-				return sendQuestDialog(env, 5);
-			}
-			else
 				return sendQuestEndDialog(env);
+			}
 		}
         return false;
 	}

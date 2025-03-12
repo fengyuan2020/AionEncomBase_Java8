@@ -1,7 +1,7 @@
 @echo off
 TITLE Aion 5.8 - Game Server Console
 
-SET PATH="..\JavaJDK_7\bin"
+SET PATH="..\JavaJDK_8\bin"
 
 :START
 CLS

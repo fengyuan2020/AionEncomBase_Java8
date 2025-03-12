@@ -292,7 +292,15 @@ public class HousingBidService extends AbstractCronTask {
 			log.info("##### Houses auctioned by players #####");
 		}
 		for (Entry<HouseBidEntry, Integer> sellData : successSell.entrySet()) {
+			// 获取房屋对象 / Get house object
 			House soldHouse = HousingService.getInstance().getHouseByAddress(sellData.getKey().getAddress());
+			// 检查房屋对象是否为空 / Check if house object is null
+			if (soldHouse == null) {
+				// 记录警告日志，包含未找到的房屋地址 / Log warning with the address of the missing house
+				log.warn("House not found for address: " + sellData.getKey().getAddress());
+				// 跳过当前循环 / Skip current iteration
+				continue;
+			}
 			PlayerCommonData buyerPcd = getPlayerData(sellData.getValue());
 			PlayerCommonData sellerPcd = getPlayerData(soldHouse.getOwnerId());
 			if (buyerPcd.getPlayerObjId() == soldHouse.getOwnerId()) {
