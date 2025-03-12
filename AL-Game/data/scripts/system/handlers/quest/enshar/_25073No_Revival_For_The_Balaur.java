@@ -34,7 +34,7 @@ public class _25073No_Revival_For_The_Balaur extends QuestHandler {
 		qe.registerQuestNpc(804918).addOnQuestStart(questId);
 		qe.registerQuestNpc(804918).addOnTalkEvent(questId);
 		qe.registerQuestNpc(731556).addOnTalkEvent(questId);
-		qe.registerQuestNpc(804732).addOnTalkEndEvent(questId);
+		qe.registerQuestNpc(804732).addOnTalkEvent(questId);
 	}
 	
 	@Override
@@ -70,7 +70,7 @@ public class _25073No_Revival_For_The_Balaur extends QuestHandler {
 					return closeDialogWindow(env);
 				}
 			}	
-		else if (qs.getStatus() == QuestStatus.REWARD) {
+		else if (qs == null || qs.getStatus() == QuestStatus.REWARD) {
 			if (targetId == 804732) {
 				return sendQuestEndDialog(env);
 			}

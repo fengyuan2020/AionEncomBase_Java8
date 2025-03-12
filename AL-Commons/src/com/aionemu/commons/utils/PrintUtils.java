@@ -4,7 +4,18 @@ import java.nio.ByteBuffer;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
+/**
+ * 打印工具类，提供各种格式化输出和数据转换功能
+ * Print utility class providing various formatting output and data conversion functions
+ */
 public class PrintUtils {
+   /**
+    * 打印带有分隔符的章节标题
+    * Print a section title with separators
+    *
+    * @param sectionName 章节名称
+    *                    Section name to be printed
+    */
    public static void printSection(String sectionName) {
       StringBuilder sb = new StringBuilder();
       sb.append("-[ " + sectionName + " ]");
@@ -16,6 +27,15 @@ public class PrintUtils {
       System.out.println(sb.toString());
    }
 
+   /**
+    * 将十六进制字符串转换为字节数组
+    * Convert hexadecimal string to byte array
+    *
+    * @param string 十六进制字符串
+    *               Hexadecimal string to convert
+    * @return 转换后的字节数组
+    *         Converted byte array
+    */
    public static byte[] hex2bytes(String string) {
       String finalString = string.replaceAll("\\s+", "");
       byte[] bytes = new byte[finalString.length() / 2];
@@ -27,6 +47,15 @@ public class PrintUtils {
       return bytes;
    }
 
+   /**
+    * 将字节数组转换为十六进制字符串
+    * Convert byte array to hexadecimal string
+    *
+    * @param bytes 要转换的字节数组
+    *              Byte array to convert
+    * @return 转换后的十六进制字符串
+    *         Converted hexadecimal string
+    */
    public static String bytes2hex(byte[] bytes) {
       StringBuilder result = new StringBuilder();
       byte[] arr$ = bytes;
@@ -41,6 +70,15 @@ public class PrintUtils {
       return result.toString();
    }
 
+   /**
+    * 反转十六进制字符串
+    * Reverse a hexadecimal string
+    *
+    * @param input 输入的十六进制字符串
+    *              Input hexadecimal string
+    * @return 反转后的十六进制字符串
+    *         Reversed hexadecimal string
+    */
    public static String reverseHex(String input) {
       String[] chunked = new String[input.length() / 2];
       int position = 0;
@@ -54,6 +92,15 @@ public class PrintUtils {
       return StringUtils.join(chunked);
    }
 
+   /**
+    * 将ByteBuffer数据转换为带格式的十六进制字符串
+    * Convert ByteBuffer data to formatted hexadecimal string
+    *
+    * @param data 要转换的ByteBuffer数据
+    *             ByteBuffer data to convert
+    * @return 格式化的十六进制字符串，包含地址、十六进制值和ASCII表示
+    *         Formatted hexadecimal string with address, hex values and ASCII representation
+    */
    public static String toHex(ByteBuffer data) {
       int position = data.position();
       StringBuilder result = new StringBuilder();
@@ -87,6 +134,17 @@ public class PrintUtils {
       return result.toString();
    }
 
+   /**
+    * 将ByteBuffer数据转换为文本表示
+    * Convert ByteBuffer data to text representation
+    *
+    * @param data ByteBuffer数据
+    *             ByteBuffer data
+    * @param result 结果StringBuilder
+    *               Result StringBuilder
+    * @param cnt 要转换的字符数
+    *            Number of characters to convert
+    */
    private static void toText(ByteBuffer data, StringBuilder result, int cnt) {
       int charPos = data.position() - cnt;
 

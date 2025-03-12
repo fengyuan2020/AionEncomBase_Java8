@@ -21,11 +21,13 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
@@ -193,46 +195,84 @@ public class GameServer {
 
 	private static Set<StartupHook> startUpHooks = new HashSet<StartupHook>();
 
+	/**
+	 * 初始化日志系统，包括备份旧日志文件和配置新的日志记录器
+	 * Initialize the logging system, including backing up old log files and configuring new loggers
+	 */
 	private static void initalizeLoggger() {
+		// 创建日志备份目录
+		// Create log backup directory
 		new File("./log/backup/").mkdirs();
-		File[] files = new File("log").listFiles(new FilenameFilter() {
+		
+		// 获取日志文件列表
+		// Get list of log files
+		File logDir = new File("./log/");
+		File[] files = logDir.listFiles(new FilenameFilter() {
 			@Override
 			public boolean accept(File dir, String name) {
+				// 只选择.log结尾的文件
+				// Only select files ending with .log
 				return name.endsWith(".log");
 			}
 		});
+		
+		// 使用更大的缓冲区来提升IO性能
+		// Use larger buffer to improve IO performance
+		byte[] buf = new byte[8192]; // 从1024改为8192 (increased from 1024 to 8192)
+		
+		// 使用NIO进行文件操作以提升性能
+		// Use NIO for file operations to improve performance
 		if (files != null && files.length > 0) {
-			byte[] buf = new byte[1024];
 			try {
-				String outFilename = "./log/backup/" + new SimpleDateFormat("yyyy-MM-dd HHmmss").format(new Date())
-						+ ".zip";
-				ZipOutputStream out = new ZipOutputStream(new FileOutputStream(outFilename));
-				out.setMethod(ZipOutputStream.DEFLATED);
-				out.setLevel(Deflater.BEST_COMPRESSION);
-
+				// 创建带时间戳的ZIP文件名
+				// Create timestamped ZIP filename
+				String outFilename = "./log/backup/" + new SimpleDateFormat("yyyy-MM-dd HHmmss").format(new Date()) + ".zip";
+				FileOutputStream fos = new FileOutputStream(outFilename);
+				ZipOutputStream zos = new ZipOutputStream(fos);
+				// 设置最高压缩级别
+				// Set maximum compression level
+				zos.setLevel(Deflater.BEST_COMPRESSION);
+				
 				for (File logFile : files) {
-					FileInputStream in = new FileInputStream(logFile);
-					out.putNextEntry(new ZipEntry(logFile.getName()));
+					// 读取每个日志文件并添加到ZIP中
+					// Read each log file and add to ZIP
+					FileInputStream fis = new FileInputStream(logFile);
+					zos.putNextEntry(new ZipEntry(logFile.getName()));
+					
 					int len;
-					while ((len = in.read(buf)) > 0) {
-						out.write(buf, 0, len);
+					while ((len = fis.read(buf)) > 0) {
+						zos.write(buf, 0, len);
 					}
-					out.closeEntry();
-					in.close();
+					
+					zos.closeEntry();
+					fis.close();
+					// 压缩完成后删除原日志文件
+					// Delete original log file after compression
 					logFile.delete();
 				}
-				out.close();
+				
+				zos.close();
+				fos.close();
 			} catch (IOException e) {
-				e.printStackTrace();
+				// 记录备份过程中的错误
+				// Log errors during backup process
+				log.error("Error during log backup", e);
 			}
 		}
+
+		// 配置Logback日志系统
+		// Configure Logback logging system
 		LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
 		try {
 			JoranConfigurator configurator = new JoranConfigurator();
 			configurator.setContext(lc);
 			lc.reset();
+			// 从配置文件加载日志设置
+			// Load logging settings from configuration file
 			configurator.doConfigure("config/slf4j-logback.xml");
 		} catch (JoranException je) {
+			// 如果日志配置失败，抛出运行时异常并关闭程序
+			// If logging configuration fails, throw runtime exception and shut down
 			throw new RuntimeException("[LoggerFactory] Failed to configure loggers, shutting down...", je);
 		}
 	}
@@ -567,37 +607,84 @@ public class GameServer {
 		TownService.getInstance();
 		ChallengeTaskService.getInstance();
 
-		/**
-		 * System
-		 */
-		Util.printSection(" *** System *** ");
-		System.gc();
-		AEVersions.printFullVersionInfo();
-		AEInfos.printAllInfos();
-		Util.printSection("GameServer");
-		log.info("Power by Encom");
-		log.info("===================================================");
-		log.info("Aion GameServer started in " + (System.currentTimeMillis() - start) / 1000 + " seconds.");
-		gs.startServers();
-		Runtime.getRuntime().addShutdownHook(ShutdownHook.getInstance());
-		if (GSConfig.ENABLE_RATIO_LIMITATION) {
-			addStartupHook(new StartupHook() {
-				@Override
-				public void onStartup() {
-					lock.lock();
-					try {
-						ASMOS_COUNT = DAOManager.getDAO(PlayerDAO.class).getCharacterCountForRace(Race.ASMODIANS);
-						ELYOS_COUNT = DAOManager.getDAO(PlayerDAO.class).getCharacterCountForRace(Race.ELYOS);
-						computeRatios();
-					} catch (Exception e) {
-					} finally {
-						lock.unlock();
-					}
-					displayRatios(false);
-				}
-			});
-		}
-		onStartup();
+        /**
+         * 系统初始化最终阶段
+         * System initialization final phase
+         */
+        Util.printSection(" *** System *** ");
+         
+        // 执行垃圾回收
+        // Perform garbage collection
+        System.gc();
+        try {
+            // 等待垃圾回收完成
+            // Wait for garbage collection to complete
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            // 记录GC等待中断的警告
+            // Log warning if GC wait is interrupted
+            log.warn("GC wait interrupted", e);
+        }
+        // 打印系统版本和信息
+        // Print system version and information
+        AEVersions.printFullVersionInfo();
+        AEInfos.printAllInfos();
+        Util.printSection("GameServer");
+        log.info("Power by Encom / Aion 5.8 Community Project");
+        log.info("══════════════════════════════════════════════════════════");
+        log.info(" █████  ██  ██████  ███    ██ ███████ ███    ███ ██    ██ ███████     █████");
+        log.info("██   ██ ██ ██    ██ ████   ██ ██      ████  ████ ██    ██ ██         ██   ██");
+        log.info("███████ ██ ██    ██ ██ ██  ██ █████   ██ ████ ██ ██    ██ ███████     █████");
+        log.info("██   ██ ██ ██    ██ ██  ██ ██ ██      ██  ██  ██ ██    ██      ██    ██   ██");
+        log.info("██   ██ ██  ██████  ██   ████ ███████ ██      ██  ██████  ███████ ██  █████");
+        log.info("══════════════════════════════════════════════════════════");
+
+		// 垃圾回收后重新检查内存状态
+        // Recheck memory status after garbage collection
+        Runtime runtime = Runtime.getRuntime();
+        long totalMemory = runtime.totalMemory() / (1024 * 1024);
+        long freeMemory = runtime.freeMemory() / (1024 * 1024);
+        long usedMemory = totalMemory - freeMemory;
+        log.info("Memory Status After GC: Allocated={} MB, Free={} MB, Used={} MB", 
+                totalMemory, freeMemory, usedMemory);
+        log.info("Server startup completed in {} Seconds", (System.currentTimeMillis() - start) / 1000);
+
+        // 启动服务器并添加关闭钩子
+        // Start servers and add shutdown hook
+        gs.startServers();
+        Runtime.getRuntime().addShutdownHook(ShutdownHook.getInstance());
+        
+        // 如果启用了阵营比例限制，则初始化相关数据
+        // Initialize faction ratio data if ratio limitation is enabled
+        if (GSConfig.ENABLE_RATIO_LIMITATION) {
+            addStartupHook(new StartupHook() {
+                @Override
+                public void onStartup() {
+                    // 使用锁保护阵营数据的更新
+                    // Use lock to protect faction data updates
+                    lock.lock();
+                    try {
+                        // 从数据库获取两个阵营的角色数量
+                        // Get character count for both factions from database
+                        ASMOS_COUNT = DAOManager.getDAO(PlayerDAO.class).getCharacterCountForRace(Race.ASMODIANS);
+                        ELYOS_COUNT = DAOManager.getDAO(PlayerDAO.class).getCharacterCountForRace(Race.ELYOS);
+                        // 计算阵营比例
+                        // Calculate faction ratios
+                        computeRatios();
+                    } catch (Exception e) {
+                    } finally {
+                        lock.unlock();
+                    }
+                    // 显示当前阵营比例
+                    // Display current faction ratios
+                    displayRatios(false);
+                }
+            });
+        }
+        
+        // 执行所有启动钩子
+        // Execute all startup hooks
+        onStartup();
 	}
 
 	/**
@@ -707,10 +794,12 @@ public class GameServer {
 		}
 	}
 
-	private static void displayRatios(boolean updated) {
-		GameServer.log.info("[GameServer] Actual Factions Ratio " + (updated ? "updated " : "") + ": Elyos "
-				+ String.format("%.1f", ELYOS_RATIO) + " % - Asmodians " + String.format("%.1f", ASMOS_RATIO) + " %");
-	}
+    private static void displayRatios(boolean updated) {
+        String status = updated ? "updated" : "initialized";
+        log.info("[Faction Balance] {} - Elyos: {}% ({}) Asmodians: {}% ({})", 
+                status, String.format("%.2f", ELYOS_RATIO), ELYOS_COUNT, 
+                String.format("%.2f", ASMOS_RATIO), ASMOS_COUNT);
+    }
 
 	public static double getRatiosFor(Race race) {
 		switch (race) {

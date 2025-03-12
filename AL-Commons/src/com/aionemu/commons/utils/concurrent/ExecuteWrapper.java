@@ -36,40 +36,54 @@ import javolution.text.TextBuilder;
 /**
  * @author NB4L1
  */
+/**
+ * 任务执行包装器，提供运行时间统计和异常处理
+ * Task execution wrapper with runtime statistics and exception handling
+ */
 public class ExecuteWrapper implements Executor {
-	
-	private static final Logger log = LoggerFactory.getLogger(ExecuteWrapper.class);
-	
-	@Override
-	public void execute(Runnable runnable) {
-		execute(runnable, Long.MAX_VALUE);
-	}
-	
-	public static void execute(Runnable runnable, long maximumRuntimeInMillisecWithoutWarning) {
-		long begin = System.nanoTime();
-		
-		try {
-			runnable.run();
-		} catch (Throwable t) {
-			log.warn("Exception in a Runnable execution:", t);
-		} finally {
-			
-			long runtimeInNanosec = System.nanoTime() - begin;
-			Class<? extends Runnable> clazz = runnable.getClass();
-			
-			if (CommonsConfig.RUNNABLESTATS_ENABLE) {
-				RunnableStatsManager.handleStats(clazz, runtimeInNanosec);
-			}
-			
-			long runtimeInMillisec = TimeUnit.NANOSECONDS.toMillis(runtimeInNanosec);
-			if (runtimeInMillisec > maximumRuntimeInMillisecWithoutWarning) {
-				TextBuilder tb = TextBuilder.newInstance();
-				tb.append(clazz);
-				tb.append(" - execution time: ");
-				tb.append(runtimeInMillisec);
-				tb.append("msec");
-				log.warn(tb.toString());
-			}
-		}
-	}
+
+    private static final Logger log = LoggerFactory.getLogger(ExecuteWrapper.class);
+
+    /**
+     * 执行可运行任务（默认无超时警告）
+     * Execute runnable task with default no timeout warning
+     */
+    @Override
+    public void execute(Runnable runnable) {
+        execute(runnable, Long.MAX_VALUE);
+    }
+
+    /**
+     * 执行任务并统计运行时间
+     * Execute task with runtime statistics
+     * 
+     * @param runnable 要执行的任务对象 / Task object to execute
+     * @param maximumRuntimeInMillisecWithoutWarning 触发警告的毫秒阈值 / Warning threshold in milliseconds
+     */
+    public static void execute(Runnable runnable, long maximumRuntimeInMillisecWithoutWarning) {
+        long begin = System.nanoTime();
+        
+        try {
+            runnable.run();
+        } catch (Throwable t) {
+            log.warn("Runnable执行异常:", t);
+        } finally {
+            long runtimeInNanosec = System.nanoTime() - begin;
+            Class<? extends Runnable> clazz = runnable.getClass();
+            
+            if (CommonsConfig.RUNNABLESTATS_ENABLE) {
+                RunnableStatsManager.handleStats(clazz, runtimeInNanosec);
+            }
+            
+            long runtimeInMillisec = TimeUnit.NANOSECONDS.toMillis(runtimeInNanosec);
+            if (runtimeInMillisec > maximumRuntimeInMillisecWithoutWarning) {
+                TextBuilder tb = TextBuilder.newInstance();
+                tb.append(clazz)
+                  .append(" - 执行时间: ")
+                  .append(runtimeInMillisec)
+                  .append("毫秒");
+                log.warn(tb.toString());
+            }
+        }
+    }
 }

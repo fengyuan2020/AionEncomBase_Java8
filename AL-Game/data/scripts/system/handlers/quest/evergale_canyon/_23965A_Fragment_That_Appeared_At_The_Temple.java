@@ -25,20 +25,16 @@ import com.aionemu.gameserver.world.zone.ZoneName;
 /** Author Ghostfur & Unknown (Aion-Unique)
 /****/
 
-public class _23965A_Fragment_That_Appeared_At_The_Temple extends QuestHandler
-{
+public class _23965A_Fragment_That_Appeared_At_The_Temple extends QuestHandler {
+
     private final static int questId = 23965;
-	private final static int[] npcs = {835220};
-	
     public _23965A_Fragment_That_Appeared_At_The_Temple() {
         super(questId);
     }
 	
 	@Override
 	public void register() {
-		for (int npc: npcs) {
-            qe.registerQuestNpc(npc).addOnTalkEvent(questId);
-        }
+        qe.registerQuestNpc(835220).addOnTalkEvent(questId);
 		qe.registerOnEnterWorld(questId);
 		qe.registerOnEnterZone(ZoneName.get("IDETERNITY_WAR_Q13965_302350000"), questId);
 	}
@@ -48,7 +44,7 @@ public class _23965A_Fragment_That_Appeared_At_The_Temple extends QuestHandler
         final Player player = env.getPlayer();
         final QuestState qs = player.getQuestStateList().getQuestState(questId);
         int targetId = env.getTargetId();
-		if (qs.getStatus() == QuestStatus.REWARD) {
+		if (qs == null || qs.getStatus() == QuestStatus.REWARD) {
             if (targetId == 835220) {
                 if (env.getDialog() == QuestDialog.START_DIALOG) {
                     return sendQuestDialog(env, 10002);

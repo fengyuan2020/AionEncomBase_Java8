@@ -44,9 +44,23 @@ import com.aionemu.commons.scripting.ScriptClassLoader;
 import com.aionemu.commons.utils.ClassUtils;
 
 /**
- * This classloader is used to load script classes. <br>
- * <br>
- * Due to JavaCompiler limitations we have to keep list of available classes here.
+ * 脚本类加载器实现类，用于加载和管理脚本类
+ * Script Class Loader Implementation for loading and managing script classes
+ * 
+ * 该类继承自ScriptClassLoader，主要功能包括：
+ * 1. 管理已编译的类文件
+ * 2. 提供类的字节码访问
+ * 3. 支持包级别的类加载
+ * 4. 处理类定义和引用
+ * 
+ * This class extends ScriptClassLoader with main features:
+ * 1. Manages compiled class files
+ * 2. Provides bytecode access
+ * 3. Supports package-level class loading
+ * 4. Handles class definition and references
+ * 
+ * 由于JavaCompiler的限制，需要在此维护可用类的列表
+ * Due to JavaCompiler limitations we have to keep list of available classes here
  *
  * @author SoulKeeper
  */

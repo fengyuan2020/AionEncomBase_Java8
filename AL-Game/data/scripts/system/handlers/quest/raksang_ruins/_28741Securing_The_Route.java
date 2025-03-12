@@ -34,31 +34,19 @@ public class _28741Securing_The_Route extends QuestHandler{
 	
 	@Override
 	public void register() {
-		qe.registerQuestNpc(804732).addOnTalkEndEvent(questId);
+		qe.registerQuestNpc(804732).addOnTalkEvent(questId);
 		for (int mob: embercrackStepsDrillCorps) {
 			qe.registerQuestNpc(mob).addOnKillEvent(questId);
 		}
-		qe.registerOnEnterZone(ZoneName.get("ERIVALE_TERRITORY_VILLAGE_210070000"), questId);
+		qe.registerOnEnterZone(ZoneName.get("BOMIRE_VILLAGE_220080000"), questId);
 	}
 	
 	@Override
 	public boolean onDialogEvent(QuestEnv env) {
 		Player player = env.getPlayer();
 		QuestState qs = player.getQuestStateList().getQuestState(questId);
-		QuestDialog dialog = env.getDialog();
 		int targetId = env.getTargetId();
-		if (qs.getStatus() == QuestStatus.START) {
-            if (targetId == 804732) {
-                if (dialog == QuestDialog.START_DIALOG) {
-                    if (qs.getQuestVarById(0) == 50) {
-                        return sendQuestDialog(env, 2375);
-                    }
-                } if (dialog == QuestDialog.SELECT_REWARD) {
-                    changeQuestStep(env, 50, 51, true);
-                    return sendQuestEndDialog(env);
-                }
-			}
-        } else if (qs.getStatus() == QuestStatus.REWARD) {
+        if (qs == null || qs.getStatus() == QuestStatus.REWARD) {
 			if (targetId == 804732) {
 				if (env.getDialogId() == 1352) {
 					return sendQuestDialog(env, 5);
@@ -74,7 +62,7 @@ public class _28741Securing_The_Route extends QuestHandler{
     public boolean onEnterZoneEvent(QuestEnv env, ZoneName zoneName) {
         Player player = env.getPlayer();
         QuestState qs = player.getQuestStateList().getQuestState(questId);
-		if (zoneName == ZoneName.get("ERIVALE_TERRITORY_VILLAGE_210070000")) {
+		if (zoneName == ZoneName.get("BOMIRE_VILLAGE_220080000")) {
 			if (qs == null || qs.canRepeat()) {
 				env.setQuestId(questId);
 				if (QuestService.startQuest(env)) {

@@ -13,24 +13,21 @@
 package quest.levinshor;
 
 import com.aionemu.gameserver.model.gameobjects.player.Player;
-import com.aionemu.gameserver.network.aion.serverpackets.SM_DIALOG_WINDOW;
 import com.aionemu.gameserver.questEngine.handlers.QuestHandler;
 import com.aionemu.gameserver.questEngine.model.QuestDialog;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
 import com.aionemu.gameserver.services.QuestService;
-import com.aionemu.gameserver.utils.PacketSendUtility;
 import com.aionemu.gameserver.world.zone.ZoneName;
 
 /****/
 /** Author Ghostfur & Unknown (Aion-Unique)
 /****/
 
-public class _23745No_More_In_Levinshor extends QuestHandler
-{
+public class _23745No_More_In_Levinshor extends QuestHandler {
+
     private final static int questId = 23745;
-	
     public _23745No_More_In_Levinshor() {
         super(questId);
     }
@@ -52,7 +49,7 @@ public class _23745No_More_In_Levinshor extends QuestHandler
 		Player player = env.getPlayer();
 		QuestState qs = player.getQuestStateList().getQuestState(questId);
 		int targetId = env.getTargetId();
-		if (qs.getStatus() == QuestStatus.REWARD) {
+		if (qs == null || qs.getStatus() == QuestStatus.REWARD) {
             if (targetId == 802353) {
                 if (env.getDialog() == QuestDialog.START_DIALOG) {
                     return sendQuestDialog(env, 10002);
@@ -76,7 +73,6 @@ public class _23745No_More_In_Levinshor extends QuestHandler
 			QuestState qs = player.getQuestStateList().getQuestState(questId);
 			if (qs == null || qs.getStatus() == QuestStatus.NONE || qs.canRepeat()) {
 				QuestService.startQuest(env);
-				PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(0, 0));
 				return true;
 			}
 		}

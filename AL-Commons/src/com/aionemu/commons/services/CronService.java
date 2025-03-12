@@ -27,17 +27,53 @@ import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * 定时任务调度服务类
+ * Cron Task Scheduling Service Class
+ *
+ * 该类基于Quartz框架实现定时任务的调度管理，采用单例模式。
+ * This class implements scheduled task management based on Quartz framework using Singleton pattern.
+ *
+ * 主要功能:
+ * Main features:
+ * 1. 支持基于cron表达式的任务调度
+ *    Supports cron expression based task scheduling
+ * 2. 支持长短任务的区分执行
+ *    Supports differentiated execution of long and short running tasks
+ * 3. 提供任务的添加、删除、查询等管理功能
+ *    Provides task management functions including add, delete and query
+ */
 public final class CronService {
-   private static final Logger log = LoggerFactory.getLogger(CronService.class);
-   private static CronService instance;
-   private Scheduler scheduler;
-   private Class<? extends RunnableRunner> runnableRunner;
+    /** 日志记录器 Logger instance */
+    private static final Logger log = LoggerFactory.getLogger(CronService.class);
+    
+    /** 单例实例 Singleton instance */
+    private static CronService instance;
+    
+    /** Quartz调度器 Quartz scheduler */
+    private Scheduler scheduler;
+    
+    /** 可运行任务执行器类 Runnable task executor class */
+    private Class<? extends RunnableRunner> runnableRunner;
 
-   public static CronService getInstance() {
-      return instance;
-   }
+    /**
+     * 获取CronService实例
+     * Get CronService instance
+     *
+     * @return CronService单例实例 CronService singleton instance
+     */
+    public static CronService getInstance() {
+        return instance;
+    }
 
-   public static synchronized void initSingleton(Class<? extends RunnableRunner> runableRunner) {
+    /**
+     * 初始化CronService单例
+     * Initialize CronService singleton
+     *
+     * @param runableRunner 任务执行器类 Task executor class
+     * @throws CronServiceException 如果服务已初始化 if service is already initialized
+     */
+    public static synchronized void initSingleton(Class<? extends RunnableRunner> runableRunner) {
       if (instance != null) {
          throw new CronServiceException("CronService is already initialized");
       } else {
@@ -50,7 +86,14 @@ public final class CronService {
    private CronService() {
    }
 
-   public synchronized void init(Class<? extends RunnableRunner> runnableRunner) {
+    /**
+     * 初始化调度器
+     * Initialize scheduler
+     *
+     * @param runnableRunner 任务执行器类 Task executor class
+     * @throws CronServiceException 初始化失败时 when initialization fails
+     */
+    public synchronized void init(Class<? extends RunnableRunner> runnableRunner) {
       if (this.scheduler == null) {
          if (runnableRunner == null) {
             throw new CronServiceException("RunnableRunner class must be defined");
@@ -69,7 +112,11 @@ public final class CronService {
       }
    }
 
-   public void shutdown() {
+    /**
+     * 关闭调度器服务
+     * Shutdown scheduler service
+     */
+    public void shutdown() {
       Scheduler localScheduler;
       synchronized(this) {
          if (this.scheduler == null) {
@@ -89,11 +136,27 @@ public final class CronService {
 
    }
 
-   public void schedule(Runnable r, String cronExpression) {
+    /**
+     * 调度一个定时任务
+     * Schedule a timed task
+     *
+     * @param r 要执行的任务 Task to execute
+     * @param cronExpression cron表达式 Cron expression
+     */
+    public void schedule(Runnable r, String cronExpression) {
       this.schedule(r, cronExpression, false);
    }
 
-   public void schedule(Runnable r, String cronExpression, boolean longRunning) {
+    /**
+     * 调度一个定时任务，可指定是否为长时任务
+     * Schedule a timed task with long-running option
+     *
+     * @param r 要执行的任务 Task to execute
+     * @param cronExpression cron表达式 Cron expression
+     * @param longRunning 是否为长时任务 Whether it's a long-running task
+     * @throws CronServiceException 调度失败时 when scheduling fails
+     */
+    public void schedule(Runnable r, String cronExpression, boolean longRunning) {
       try {
          JobDataMap jdm = new JobDataMap();
          jdm.put("cronservice.scheduled.runnable.instance", r);
@@ -110,13 +173,26 @@ public final class CronService {
       }
    }
 
-   public void cancel(Runnable r) {
+    /**
+     * 取消一个已调度的任务
+     * Cancel a scheduled task
+     *
+     * @param r 要取消的任务 Task to cancel
+     */
+    public void cancel(Runnable r) {
       Map<Runnable, JobDetail> map = this.getRunnables();
       JobDetail jd = (JobDetail)map.get(r);
       this.cancel(jd);
    }
 
-   public void cancel(JobDetail jd) {
+    /**
+     * 取消一个任务详情对应的调度任务
+     * Cancel a scheduled task by job detail
+     *
+     * @param jd 任务详情 Job detail
+     * @throws CronServiceException 取消失败时 when cancellation fails
+     */
+    public void cancel(JobDetail jd) {
       if (jd != null) {
          if (jd.getKey() == null) {
             throw new CronServiceException("JobDetail should have JobKey");
@@ -130,7 +206,14 @@ public final class CronService {
       }
    }
 
-   protected Collection<JobDetail> getJobDetails() {
+    /**
+     * 获取所有任务详情
+     * Get all job details
+     *
+     * @return 任务详情集合 Collection of job details
+     * @throws CronServiceException 获取失败时 when retrieval fails
+     */
+    protected Collection<JobDetail> getJobDetails() {
       if (this.scheduler == null) {
          return Collections.emptySet();
       } else {
@@ -155,7 +238,13 @@ public final class CronService {
       }
    }
 
-   public Map<Runnable, JobDetail> getRunnables() {
+    /**
+     * 获取所有运行中的任务映射
+     * Get all running tasks mapping
+     *
+     * @return 任务与详情的映射 Map of runnable to job detail
+     */
+    public Map<Runnable, JobDetail> getRunnables() {
       Collection<JobDetail> jobDetails = this.getJobDetails();
       if (GenericValidator.isBlankOrNull(jobDetails)) {
          return Collections.emptyMap();
@@ -174,11 +263,26 @@ public final class CronService {
       }
    }
 
-   public List<? extends Trigger> getJobTriggers(JobDetail jd) {
+    /**
+     * 获取任务的触发器列表
+     * Get triggers for a job
+     *
+     * @param jd 任务详情 Job detail
+     * @return 触发器列表 List of triggers
+     */
+    public List<? extends Trigger> getJobTriggers(JobDetail jd) {
       return this.getJobTriggers(jd.getKey());
    }
 
-   public List<? extends Trigger> getJobTriggers(JobKey jk) {
+    /**
+     * 获取任务的触发器列表
+     * Get triggers for a job
+     *
+     * @param jk 任务键 Job key
+     * @return 触发器列表 List of triggers
+     * @throws CronServiceException 获取失败时 when retrieval fails
+     */
+    public List<? extends Trigger> getJobTriggers(JobKey jk) {
       if (this.scheduler == null) {
          return Collections.emptyList();
       } else {

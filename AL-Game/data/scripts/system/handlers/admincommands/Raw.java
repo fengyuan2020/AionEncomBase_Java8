@@ -19,8 +19,8 @@ package admincommands;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_CUSTOM_PACKET;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_CUSTOM_PACKET.PacketElementType;
-import com.aionemu.gameserver.utils.PacketSendUtility;
 import com.aionemu.gameserver.utils.chathandlers.AdminCommand;
+import com.aionemu.gameserver.utils.PacketSendUtility;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +28,8 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.util.List;
 
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 /**
  * Send packet in raw format.
  * 
@@ -50,17 +52,18 @@ public class Raw extends AdminCommand {
 			PacketSendUtility.sendMessage(admin, "Usage: //raw [name]");
 			return;
 		}
-
+	
 		File file = new File(ROOT, params[0] + ".txt");
-
+	
 		if (!file.exists() || !file.canRead()) {
 			PacketSendUtility.sendMessage(admin, "Wrong file selected.");
 			return;
 		}
-
+	
 		try {
-			List<String> lines = FileUtils.readLines(file);
-
+			// 使用JDK 8的Files类读取文件 | Using JDK 8's Files class to read the file
+			List<String> lines = Files.readAllLines(file.toPath(), StandardCharsets.UTF_8);
+	
 			SM_CUSTOM_PACKET packet = null;
 			PacketSendUtility.sendMessage(admin, "lines "+lines.size());
 			boolean init = false;

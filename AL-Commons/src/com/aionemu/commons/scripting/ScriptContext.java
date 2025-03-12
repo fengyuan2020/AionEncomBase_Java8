@@ -4,36 +4,126 @@ import com.aionemu.commons.scripting.classlistener.ClassListener;
 import java.io.File;
 import java.util.Collection;
 
+/**
+ * 脚本上下文接口，定义了脚本生命周期管理和配置的方法
+ * Script context interface that defines methods for script lifecycle management and configuration
+ *
+ * @author SunAion Team
+ */
 public interface ScriptContext {
-   void init();
+    /**
+     * 初始化脚本上下文
+     * Initialize the script context
+     */
+    void init();
 
-   void shutdown();
+    /**
+     * 关闭脚本上下文
+     * Shutdown the script context
+     */
+    void shutdown();
 
-   void reload();
+    /**
+     * 重新加载脚本
+     * Reload the scripts
+     */
+    void reload();
 
-   File getRoot();
+    /**
+     * 获取根目录
+     * Get the root directory
+     *
+     * @return 脚本根目录 / Script root directory
+     */
+    File getRoot();
 
-   CompilationResult getCompilationResult();
+    /**
+     * 获取编译结果
+     * Get the compilation result
+     *
+     * @return 脚本编译结果 / Script compilation result
+     */
+    CompilationResult getCompilationResult();
 
-   boolean isInitialized();
+    /**
+     * 检查是否已初始化
+     * Check if initialized
+     *
+     * @return 是否已初始化 / Whether initialized
+     */
+    boolean isInitialized();
 
-   void setLibraries(Iterable<File> var1);
+    /**
+     * 设置库文件
+     * Set library files
+     *
+     * @param libraries 库文件集合 / Collection of library files
+     */
+    void setLibraries(Iterable<File> libraries);
 
-   Iterable<File> getLibraries();
+    /**
+     * 获取库文件
+     * Get library files
+     *
+     * @return 库文件集合 / Collection of library files
+     */
+    Iterable<File> getLibraries();
 
-   ScriptContext getParentScriptContext();
+    /**
+     * 获取父脚本上下文
+     * Get parent script context
+     *
+     * @return 父脚本上下文 / Parent script context
+     */
+    ScriptContext getParentScriptContext();
 
-   Collection<ScriptContext> getChildScriptContexts();
+    /**
+     * 获取子脚本上下文集合
+     * Get child script contexts
+     *
+     * @return 子脚本上下文集合 / Collection of child script contexts
+     */
+    Collection<ScriptContext> getChildScriptContexts();
 
-   void addChildScriptContext(ScriptContext var1);
+    /**
+     * 添加子脚本上下文
+     * Add child script context
+     *
+     * @param context 子脚本上下文 / Child script context
+     */
+    void addChildScriptContext(ScriptContext context);
 
-   void setClassListener(ClassListener var1);
+    /**
+     * 设置类监听器
+     * Set class listener
+     *
+     * @param listener 类监听器 / Class listener
+     */
+    void setClassListener(ClassListener listener);
 
-   ClassListener getClassListener();
+    /**
+     * 获取类监听器
+     * Get class listener
+     *
+     * @return 类监听器 / Class listener
+     */
+    ClassListener getClassListener();
 
-   void setCompilerClassName(String var1);
+    /**
+     * 设置编译器类名
+     * Set compiler class name
+     *
+     * @param className 编译器类名 / Compiler class name
+     */
+    void setCompilerClassName(String className);
 
-   String getCompilerClassName();
+    /**
+     * 获取编译器类名
+     * Get compiler class name
+     *
+     * @return 编译器类名 / Compiler class name
+     */
+    String getCompilerClassName();
 
    boolean equals(Object var1);
 

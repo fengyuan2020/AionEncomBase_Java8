@@ -55,6 +55,7 @@
 	<!-- Habrok -->
 	<portal_loc world_id="220090000" loc_id="2200900" x="252.773" y="177.981" z="503.511" h="29"/>
 	<!-- Inggison [Master Server] -->
+	<portal_loc world_id="210130000" loc_id="2100517" x="1080.1464" y="1519.1409" z="405.72308"/>
 	<portal_loc world_id="210130000" loc_id="2101300" x="1375.1648" y="366.27975" z="589.6201" h="22"/>
 	<portal_loc world_id="210130000" loc_id="2101301" x="543.21" y="715.02" z="484.0491" h="17"/> 
 	<portal_loc world_id="210130000" loc_id="2101302" x="536.35" y="705.89" z="484.04898" h="76"/>
@@ -190,6 +191,7 @@
 	<portal_loc world_id="220050000" loc_id="2200501" x="1535.1396" y="385.41147" z="231.125" h="8"/> <!-- Theobomos Lab Exit -->
 	<portal_loc world_id="220050000" loc_id="2200502" x="2100.697" y="179.41963" z="218.59442" h="57"/> <!-- Theobomos Lab To Adma Plain -->
 	<!-- Gelkmaros [Master Server] -->
+    <portal_loc world_id="220140000" loc_id="2200717" x="1797.6472" y="1884.7391" z="404.25" h="78"/>
 	<portal_loc world_id="220140000" loc_id="2201400" x="1888.2524" y="2847.2727" z="554.9964" h="98"/>
 	<portal_loc world_id="220140000" loc_id="2201401" x="2657.23" y="2195.18" z="495.9283" h="73"/>
 	<portal_loc world_id="220140000" loc_id="2201402" x="2663.65" y="2200.99" z="495.9283" h="15"/>

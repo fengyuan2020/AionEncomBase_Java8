@@ -32,7 +32,6 @@ public class _15672Eliminating_The_Archon_Howitzer_Kenovikan extends QuestHandle
 	
     public void register() {
 		qe.registerOnEnterWorld(questId);
-        qe.registerQuestNpc(806114).addOnQuestStart(questId);
         qe.registerQuestNpc(806114).addOnTalkEvent(questId);
 		qe.registerQuestNpc(246478).addOnKillEvent(questId);
     }
@@ -42,7 +41,7 @@ public class _15672Eliminating_The_Archon_Howitzer_Kenovikan extends QuestHandle
 		final Player player = env.getPlayer();
         int targetId = env.getTargetId();
         final QuestState qs = player.getQuestStateList().getQuestState(questId);
-		if (qs.getStatus() == QuestStatus.REWARD) {
+		if (qs == null || qs.getStatus() == QuestStatus.REWARD) {
             if (targetId == 806114) {
                 if (env.getDialog() == QuestDialog.START_DIALOG) {
                     return sendQuestDialog(env, 10002);

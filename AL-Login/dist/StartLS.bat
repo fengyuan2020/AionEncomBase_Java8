@@ -1,25 +1,30 @@
 @ECHO off
-TITLE Aion German - Login Server Console
+TITLE Aion 5.8 - Login Emu Console
+@COLOR 1A
+SET PATH="..\JavaJDK_8\bin"
+
 :START
 CLS
-IF "%MODE%" == "" (
-CALL PanelLS.bat
-)
-ECHO Starting Aion German Login Server in %MODE% mode.
-JAVA %JAVA_OPTS% -cp ./libs/*;AL-Login.jar com.aionemu.loginserver.LoginServer
+echo.
+
+echo Starting Aion 5.8 - Login Emu.
+echo.
+REM -------------------------------------
+REM Default parameters for a basic server.
+java -Xms64m -Xmx256m -server -cp ./libs/*;AL-Login.jar com.aionemu.loginserver.LoginServer
+REM
+REM -------------------------------------
+
 SET CLASSPATH=%OLDCLASSPATH%
-IF ERRORLEVEL 2 GOTO START
-IF ERRORLEVEL 1 GOTO ERROR
-IF ERRORLEVEL 0 GOTO END
-:ERROR
-ECHO.
-ECHO Login Server has terminated abnormaly!
-ECHO.
-PAUSE
-EXIT
-:END
-ECHO.
-ECHO Login Server is terminated!
-ECHO.
-PAUSE
-EXIT
+
+if ERRORLEVEL 1 goto error
+goto end
+:error
+echo.
+echo Login Server Terminated Abnormaly, Please Verify Your Files.
+echo.
+:end
+echo.
+echo Login Server Terminated.
+echo.
+pause

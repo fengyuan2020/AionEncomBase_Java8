@@ -131,6 +131,16 @@ public abstract class QuestHandler extends AbstractQuestHandler {
 
 	/** Send default start quest dialog and start it (give the item on start) */
 	public boolean sendQuestStartDialog(QuestEnv env, int itemId, int itemCount) {
+		Player player = env.getPlayer();
+		env.setQuestId(questId);
+		QuestState qs = player.getQuestStateList().getQuestState(questId);
+		if (!QuestService.checkMissionStatConditions(env)) {
+			return false;
+		}
+		if (!QuestService.checkLevelRequirement(questId, player.getCommonData().getLevel())) {
+			QuestService.startMission(env, QuestStatus.LOCKED);
+			return false;
+		}
 		switch (env.getDialog()) {
 		case ASK_ACCEPTION: {
 			return sendQuestDialog(env, 4);
@@ -931,8 +941,7 @@ public abstract class QuestHandler extends AbstractQuestHandler {
 		return sendQuestNoneDialog(env, template, startNpcId, 1011, itemId, itemCout);
 	}
 
-	public boolean sendQuestNoneDialog(QuestEnv env, QuestTemplate template, int startNpcId, int dialogId, int itemId,
-			int itemCout) {
+	public boolean sendQuestNoneDialog(QuestEnv env, QuestTemplate template, int startNpcId, int dialogId, int itemId, int itemCout) {
 		Player player = env.getPlayer();
 		QuestState qs = player.getQuestStateList().getQuestState(questId);
 		if (qs == null || qs.getStatus() == QuestStatus.NONE || qs.canRepeat()) {

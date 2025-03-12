@@ -37,7 +37,21 @@ import com.sun.tools.javac.file.BaseFileObject;
 // import com.sun.tools.javac.file.BaseFileObject;
 
 /**
- * This class is just a hack to make javac compiler work with classes loaded by prevoius classloader. Also it's used as container for loaded class
+ * 二进制类文件对象，用于处理编译后的类文件
+ * Binary Class File Object for handling compiled class files
+ *
+ * 该类是一个特殊的实现，用于使javac编译器能够处理由之前的类加载器加载的类。
+ * 它同时也作为已加载类的容器使用。主要功能包括：
+ * 1. 存储类的二进制数据
+ * 2. 提供类文件的基本操作接口
+ * 3. 管理已定义的类实例
+ *
+ * This is a special implementation to make the javac compiler work with
+ * classes loaded by previous classloader. It also serves as a container
+ * for loaded classes. Main features include:
+ * 1. Store binary data of classes
+ * 2. Provide basic operation interface for class files
+ * 3. Manage defined class instances
  *
  * @author SoulKeeper
  */

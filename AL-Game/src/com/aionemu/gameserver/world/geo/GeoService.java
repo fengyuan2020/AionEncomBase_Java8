@@ -121,50 +121,68 @@ public class GeoService {
 	}
 
 	public boolean canSee(VisibleObject object, VisibleObject target) {
-		if (!GeoDataConfig.CANSEE_ENABLE) {
-			return true;
-		}
-		if (object.getWorldId() == 301110000 || object.getWorldId() == 301360000) {
-			return true;
-		}
-		float limit = (float) (MathUtil.getDistance(object, target)
-				- (double) target.getObjectTemplate().getBoundRadius().getCollision());
-		if (limit <= 0.0f) {
-			return true;
-		}
-		float upperTarget = target.getObjectTemplate().getBoundRadius().getUpper() / 2.0f;
-		if ((double) upperTarget > 2.2) {
-			upperTarget = 2.2f;
-		}
-		float objectUp = object.getObjectTemplate().getBoundRadius().getUpper() / 2.0f;
-		if (object instanceof Player) {
-			objectUp = 1.5f;
-		} else if (target instanceof Player) {
-			upperTarget = 1.5f;
-		}
-		return this.geoData.getMap(object.getWorldId()).canSee(object.getX(), object.getY(), object.getZ() + objectUp,
-				target.getX(), target.getY(), target.getZ() + upperTarget, limit, object.getInstanceId());
-	}
+    // 1. 提前返回优化 / Early return optimization
+    if (!GeoDataConfig.CANSEE_ENABLE) {
+        return true;
+    }
+    
+    int worldId = object.getWorldId();
+    if (worldId == 301110000 || worldId == 301360000) {
+        return true;
+    }
+    
+    // 2. 减少重复计算 / Reduce redundant calculations
+    float distance = (float) MathUtil.getDistance(object, target);
+    float targetCollision = target.getObjectTemplate().getBoundRadius().getCollision();
+    float limit = distance - targetCollision;
+    
+    if (limit <= 0.0f) {
+        return true;
+    }
+    
+    // 3. 提取重复计算 / Extract repeated calculations
+    float upperTarget = Math.min(target.getObjectTemplate().getBoundRadius().getUpper() / 2.0f, 2.2f);
+    float objectUp = object.getObjectTemplate().getBoundRadius().getUpper() / 2.0f;
+    
+    // 4. 特殊对象处理 / Special object handling
+    if (object instanceof Player) {
+        objectUp = 1.5f;
+    } else if (target instanceof Player) {
+        upperTarget = 1.5f;
+    }
+    
+    return this.geoData.getMap(worldId).canSee(
+        object.getX(), object.getY(), object.getZ() + objectUp,
+        target.getX(), target.getY(), target.getZ() + upperTarget, 
+        limit, object.getInstanceId());
+}
 
-	public boolean canPass(VisibleObject object, VisibleObject target) {
-		float limit = (float) (MathUtil.getDistance(object, target)
-				- (double) target.getObjectTemplate().getBoundRadius().getCollision());
-		if (limit <= 0.0f) {
-			return true;
-		}
-		float upperTarget = target.getObjectTemplate().getBoundRadius().getUpper() / 2.0f;
-		if ((double) upperTarget > 2.2) {
-			upperTarget = 2.2f;
-		}
-		float objectUp = object.getObjectTemplate().getBoundRadius().getUpper() / 2.0f;
-		if (object instanceof Player) {
-			objectUp = 1.5f;
-		} else if (target instanceof Player) {
-			upperTarget = 1.5f;
-		}
-		return this.geoData.getMap(object.getWorldId()).canPass(object.getX(), object.getY(), object.getZ() + objectUp,
-				target.getX(), target.getY(), target.getZ() + upperTarget, limit, object.getInstanceId());
-	}
+public boolean canPass(VisibleObject object, VisibleObject target) {
+    // 1. 减少重复计算 / Reduce redundant calculations
+    float distance = (float) MathUtil.getDistance(object, target);
+    float targetCollision = target.getObjectTemplate().getBoundRadius().getCollision();
+    float limit = distance - targetCollision;
+    
+    if (limit <= 0.0f) {
+        return true;
+    }
+    
+    // 2. 提取重复计算 / Extract repeated calculations
+    float upperTarget = Math.min(target.getObjectTemplate().getBoundRadius().getUpper() / 2.0f, 2.2f);
+    float objectUp = object.getObjectTemplate().getBoundRadius().getUpper() / 2.0f;
+    
+    // 3. 特殊对象处理 / Special object handling
+    if (object instanceof Player) {
+        objectUp = 1.5f;
+    } else if (target instanceof Player) {
+        upperTarget = 1.5f;
+    }
+    
+    return this.geoData.getMap(object.getWorldId()).canPass(
+        object.getX(), object.getY(), object.getZ() + objectUp,
+        target.getX(), target.getY(), target.getZ() + upperTarget, 
+        limit, object.getInstanceId());
+}
 
 	public boolean canSee(int worldId, float x, float y, float z, float x1, float y1, float z1, float limit,
 			int instanceId) {

@@ -13,22 +13,19 @@
 package quest.sanctum;
 
 import com.aionemu.gameserver.model.gameobjects.player.Player;
-import com.aionemu.gameserver.network.aion.serverpackets.SM_DIALOG_WINDOW;
 import com.aionemu.gameserver.questEngine.handlers.QuestHandler;
 import com.aionemu.gameserver.questEngine.model.QuestDialog;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
-import com.aionemu.gameserver.utils.PacketSendUtility;
 
 /****/
 /** Author Ghostfur & Unknown (Aion-Unique)
 /****/
 
-public class _19900 extends QuestHandler
-{
+public class _19900 extends QuestHandler {
+
 	private final static int questId = 19900;
-	
 	public _19900() {
 		super(questId);
 	}
@@ -52,9 +49,8 @@ public class _19900 extends QuestHandler
 	public boolean onDialogEvent(QuestEnv env) {
 		final Player player = env.getPlayer();
         final QuestState qs = player.getQuestStateList().getQuestState(questId);
-		int targetId = env.getTargetId();
-		if (qs.getStatus() == QuestStatus.REWARD) {
-            if (targetId == 836073) {
+		if (qs == null || qs.getStatus() == QuestStatus.REWARD) {
+            if (env.getTargetId() == 836073) {
                 if (env.getDialog() == QuestDialog.START_DIALOG) {
                     return sendQuestDialog(env, 10002);
 				} else if (env.getDialog() == QuestDialog.SELECT_REWARD) {
@@ -73,7 +69,6 @@ public class _19900 extends QuestHandler
         final QuestState qs = player.getQuestStateList().getQuestState(questId);
 		if (qs == null || qs.getStatus() == QuestStatus.START) {
 			changeQuestStep(env, 0, 1, true);
-			PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(0, 0));
 			return true;
 		}
 		return false;
