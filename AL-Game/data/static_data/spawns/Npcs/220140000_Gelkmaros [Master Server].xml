@@ -6223,7 +6223,7 @@
 		</spawn>
 		<!-- Meslamtaeda Memorial Tower -->
 		<spawn npc_id="700755" respawn_time="295">
-			<spot x="1867.3936" y="1398.2278" z="333.23917" entity_id="1217"/>
+			<spot x="1405.2904" y="1368.4" z="299.34167" entity_id="1217"/>
 		</spawn>
 		<!-- Ereshkigal Memorial Tower -->
 		<spawn npc_id="700756" respawn_time="295">
