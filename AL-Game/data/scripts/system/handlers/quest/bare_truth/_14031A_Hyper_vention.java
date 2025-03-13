@@ -36,11 +36,10 @@ import com.aionemu.gameserver.world.zone.ZoneName;
 /** Author Ghostfur & Unknown (Aion-Unique)
 /****/
 
-public class _14031A_Hyper_vention extends QuestHandler
-{
+public class _14031A_Hyper_vention extends QuestHandler {
+
     private final static int questId = 14031;
     private final static int[] npc_ids = {203700, 801216, 790001, 203183, 203989, 730888, 730898};
-	
     public _14031A_Hyper_vention() {
         super(questId);
     }
@@ -141,8 +140,6 @@ public class _14031A_Hyper_vention extends QuestHandler
                     return defaultCloseDialog(env, 6, 7);
                 } case STEP_TO_9: {
 					return defaultCloseDialog(env, 8, 9);
-                } case FINISH_DIALOG: {
-                    return closeDialogWindow(env);
                 }
             }
         } else if (targetId == 730888) {

@@ -27,7 +27,6 @@ public class _30751Death_To_The_Dragon_Lord extends QuestHandler {
 
 	private final static int questId = 30751;
 	private final static int npcs [] = {804869, 800430, 800356};
-	
 	public _30751Death_To_The_Dragon_Lord() {
 		super(questId);
 	}
@@ -63,8 +62,8 @@ public class _30751Death_To_The_Dragon_Lord extends QuestHandler {
 		} if (qs == null) {
 			return false;
 		}
-		int var = qs.getQuestVarById(0);
 		if (qs.getStatus() == QuestStatus.START) {
+		int var = qs.getQuestVarById(0);
 			if (targetId == 800430) {
 				switch (dialog) {
 					case START_DIALOG: {

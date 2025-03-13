@@ -103,12 +103,6 @@ public class _10010Gruesome_Truth extends QuestHandler
 						return closeDialogWindow(env);
 					} case CHECK_COLLECTED_ITEMS: {
 						return checkQuestItems(env, 1, 2, false, 10000, 10001);
-					} case FINISH_DIALOG: {
-						if (var == 2) {
-							defaultCloseDialog(env, 2, 2);
-						} else if (var == 1) {
-							defaultCloseDialog(env, 1, 1);
-						}
 					}
                 }
 			} if (targetId == 703429) { //IDAb1_Ere_FOBJ_Broken_Armor_Q10010a.

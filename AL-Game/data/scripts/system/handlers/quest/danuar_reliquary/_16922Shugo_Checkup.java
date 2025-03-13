@@ -23,10 +23,9 @@ import com.aionemu.gameserver.questEngine.model.QuestStatus;
 /** Author Ghostfur & Unknown (Aion-Unique)
 /****/
 
-public class _16922Shugo_Checkup extends QuestHandler
-{
+public class _16922Shugo_Checkup extends QuestHandler {
+
 	public static final int questId = 16922;
-	
 	public _16922Shugo_Checkup() {
 		super(questId);
 	}
@@ -68,7 +67,7 @@ public class _16922Shugo_Checkup extends QuestHandler
 					}
 				}
 			}
-		} else if (qs.getStatus() == QuestStatus.REWARD) {
+		} else if (qs == null || qs.getStatus() == QuestStatus.REWARD) {
 		    if (targetId == 804628) {
 			    return sendQuestEndDialog(env);
 		    }

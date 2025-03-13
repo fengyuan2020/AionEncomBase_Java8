@@ -23,11 +23,10 @@ import com.aionemu.gameserver.questEngine.model.QuestStatus;
 /** Author Ghostfur & Unknown (Aion-Unique)
 /****/
 
-public class _30701The_Lord_Of_Illusion extends QuestHandler
-{
+public class _30701The_Lord_Of_Illusion extends QuestHandler {
+
 	private final static int questId = 30701;
 	private final static int npcs [] = {804868, 800430, 800350};
-	
 	public _30701The_Lord_Of_Illusion() {
 		super(questId);
 	}
@@ -63,8 +62,8 @@ public class _30701The_Lord_Of_Illusion extends QuestHandler
 		} if (qs == null) {
 			return false;
 		}
-		int var = qs.getQuestVarById(0);
 		if (qs.getStatus() == QuestStatus.START) {
+		int var = qs.getQuestVarById(0);
 			if (targetId == 800430) {
 				switch (dialog) {
 					case START_DIALOG: {

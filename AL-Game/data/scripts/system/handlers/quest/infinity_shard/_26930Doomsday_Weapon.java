@@ -24,10 +24,9 @@ import com.aionemu.gameserver.questEngine.model.QuestStatus;
 /** Author Ghostfur & Unknown (Aion-Unique)
 /****/
 
-public class _26930Doomsday_Weapon extends QuestHandler
-{
+public class _26930Doomsday_Weapon extends QuestHandler {
+
 	private static final int questId = 26930;
-	
 	public _26930Doomsday_Weapon() {
 		super(questId);
 	}
@@ -66,12 +65,10 @@ public class _26930Doomsday_Weapon extends QuestHandler
 						return sendQuestDialog(env, 2375);
 					} case CHECK_COLLECTED_ITEMS_SIMPLE: {
 						return checkQuestItems(env, 0, 0, true, 5, 2716);
-					} case FINISH_DIALOG: {
-						return sendQuestSelectionDialog(env);
 					}
 				}
 			}
-		} else if (qs.getStatus() == QuestStatus.REWARD) {
+		} else if (qs == null || qs.getStatus() == QuestStatus.REWARD) {
 			if (targetId == 804627) {
 				return sendQuestEndDialog(env);
 			}

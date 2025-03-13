@@ -24,10 +24,9 @@ import com.aionemu.gameserver.questEngine.model.QuestStatus;
 /** Author Ghostfur & Unknown (Aion-Unique)
 /****/
 
-public class _16930Greater_Than_The_Whole extends QuestHandler
-{
+public class _16930Greater_Than_The_Whole extends QuestHandler {
+
 	private static final int questId = 16930;
-	
 	public _16930Greater_Than_The_Whole() {
 		super(questId);
 	}
@@ -66,12 +65,10 @@ public class _16930Greater_Than_The_Whole extends QuestHandler
 						return sendQuestDialog(env, 2375);
 					} case CHECK_COLLECTED_ITEMS_SIMPLE: {
 						return checkQuestItems(env, 0, 0, true, 5, 2716);
-					} case FINISH_DIALOG: {
-						return sendQuestSelectionDialog(env);
 					}
 				}
 			}
-		} else if (qs.getStatus() == QuestStatus.REWARD) {
+		} else if (qs == null || qs.getStatus() == QuestStatus.REWARD) {
 			if (targetId == 804626) {
 				return sendQuestEndDialog(env);
 			}
