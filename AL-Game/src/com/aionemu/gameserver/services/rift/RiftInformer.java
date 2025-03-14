@@ -32,17 +32,21 @@ import com.aionemu.gameserver.world.knownlist.Visitor;
 import javolution.util.FastMap;
 
 /****/
-/**
+/* Rework: sunbsn
  * Author Rinzler (Encom) /
  ****/
 
 public class RiftInformer {
 	public static List<Npc> getSpawned(int worldId) {
-		List<Npc> rifts = RiftManager.getSpawned();
+		// 使用CopyOnWriteArrayList来保证线程安全 Use CopyOnWriteArrayList to ensure thread safety
+		List<Npc> rifts = new ArrayList<Npc>(RiftManager.getSpawned());  // 创建一个副本 Create a copy
 		List<Npc> worldRifts = new CopyOnWriteArrayList<Npc>();
-		for (Npc rift : rifts) {
-			if (rift.getWorldId() == worldId) {
-				worldRifts.add(rift);
+		
+		synchronized(rifts) {  // 添加同步块 Add synchronization block
+			for (Npc rift : rifts) {
+				if (rift.getWorldId() == worldId) {
+					worldRifts.add(rift);
+				}
 			}
 		}
 		return worldRifts;
@@ -128,9 +132,13 @@ public class RiftInformer {
 		for (int i = 0; i < 8; i++) {
 			localRifts.put(i, 0);
 		}
-		for (Npc rift : getSpawned(worldId)) {
-			RVController rc = (RVController) rift.getController();
-			localRifts = calcRiftsData(rc, localRifts);
+		
+		List<Npc> spawned = new ArrayList<Npc>(getSpawned(worldId));  // 创建副本 Create a copy
+		synchronized(spawned) {  // 添加同步块 Add synchronization block
+			for (Npc rift : spawned) {
+				RVController rc = (RVController) rift.getController();
+				localRifts = calcRiftsData(rc, localRifts);
+			}
 		}
 		return localRifts;
 	}
@@ -152,6 +160,19 @@ public class RiftInformer {
 			}
 		}
 		return local;
+	}
+
+	public List<Npc> getSpawned() {
+		List<Npc> spawned = new ArrayList<Npc>();
+		// 使用 RiftManager 获取 rifts 列表 Use RiftManager to get the list of rifts
+		List<Npc> rifts = RiftManager.getSpawned();  
+		for (Npc npc : rifts) {
+			// 使用 npc 的方法检查是否已死亡 Use npc's method to check if it is already dead
+			if (npc != null && !npc.getLifeStats().isAlreadyDead()) {  
+				spawned.add(npc);
+			}
+		}
+		return spawned;
 	}
 
 	private static int getTwinId(int worldId) {
