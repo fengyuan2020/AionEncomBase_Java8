@@ -621,6 +621,11 @@ public class StatFunctions {
 		}
 		float damages = baseDamages * (knowledge / 100f + magicBoost / 1000f);
 
+		// 在这里应用伤害倍率，确保技能伤害也受到倍率影响
+		if (speller instanceof Player && target instanceof Npc) {
+			damages *= DAMAGE_MULTIPLIER;
+		}
+
 		damages = sgs.getStat(StatEnum.BOOST_SPELL_ATTACK, (int) damages).getCurrent();
 		// add bonus damage
 		damages += bonus;
