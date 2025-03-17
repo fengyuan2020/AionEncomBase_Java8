@@ -59,8 +59,9 @@ public class AggroEventHandler {
 
 	public static boolean onCreatureNeedsSupport(NpcAI2 npcAI, Creature notMyTarget) {
 		Npc owner = npcAI.getOwner();
-		if (notMyTarget.isSupportFrom(owner) && MathUtil.isInRange(owner, notMyTarget, owner.getAggroRange())
-				&& GeoService.getInstance().canSee(owner, notMyTarget)) {
+		// 将支援范围扩大
+		// Double the support range
+		if (notMyTarget.isSupportFrom(owner) && MathUtil.isInRange((VisibleObject) owner, (VisibleObject) notMyTarget, (float) (owner.getAggroRange() * 1.5))){
 			VisibleObject myTarget = notMyTarget.getTarget();
 			if (myTarget != null && myTarget instanceof Creature) {
 				Creature targetCreature = (Creature) myTarget;

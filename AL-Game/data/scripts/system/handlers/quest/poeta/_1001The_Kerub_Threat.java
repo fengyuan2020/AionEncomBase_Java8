@@ -14,21 +14,18 @@ package quest.poeta;
 
 import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
-import com.aionemu.gameserver.network.aion.serverpackets.SM_DIALOG_WINDOW;
 import com.aionemu.gameserver.questEngine.handlers.QuestHandler;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
-import com.aionemu.gameserver.utils.PacketSendUtility;
 
 /****/
 /** Author Ghostfur & Unknown (Aion-Unique)
 /****/
 
-public class _1001The_Kerub_Threat extends QuestHandler
-{
-	private final static int questId = 1001;
+public class _1001The_Kerub_Threat extends QuestHandler {
 
+	private final static int questId = 1001;
 	public _1001The_Kerub_Threat() {
 		super(questId);
 	}
@@ -87,10 +84,6 @@ public class _1001The_Kerub_Threat extends QuestHandler
 		if (qs.getStatus() == QuestStatus.START) {
 			if (targetId == 203071) {
 				switch (env.getDialog()) {
-					case SELECT_ACTION_1012: {
-						playQuestMovie(env, 15);
-					}
-					return false;
 					case START_DIALOG: {
 						if (var == 0) {
 							return sendQuestDialog(env, 1011);
@@ -98,9 +91,12 @@ public class _1001The_Kerub_Threat extends QuestHandler
 							return sendQuestDialog(env, 1352);
 						} else if (var == 7) {
 							return sendQuestDialog(env, 1693);
-						}
+						    } 
+					    }
+                        case SELECT_ACTION_1012: {
+						    playQuestMovie(env, 15);
+						return sendQuestDialog(env, 1012);
 					}
-					return false;
 					case STEP_TO_3:
 					case CHECK_COLLECTED_ITEMS: {
 						if (var == 7) {
@@ -113,8 +109,7 @@ public class _1001The_Kerub_Threat extends QuestHandler
 									qs.setQuestVarById(0, var + 1);
 									qs.setStatus(QuestStatus.REWARD);
 									updateQuestStatus(env);
-									PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
-									return true;
+							        return closeDialogWindow(env);
 								}
 							} else {
 								return sendQuestDialog(env, 1779);
@@ -127,7 +122,7 @@ public class _1001The_Kerub_Threat extends QuestHandler
 						if (var == 0 || var == 6) {
 							qs.setQuestVarById(0, var + 1);
 							updateQuestStatus(env);
-							PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
+							return closeDialogWindow(env);
 						}
 					}
 					return true;

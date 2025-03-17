@@ -282,7 +282,7 @@ public class GameServer {
 	 */
 	public static void main(String[] args) {
 		long start = System.currentTimeMillis();
-
+		
 		Lambda.enableJitting(true);
 		final GameEngine[] parallelEngines = { QuestEngine.getInstance(), InstanceEngine.getInstance(),
 				AI2Engine.getInstance(), ChatProcessor.getInstance() };

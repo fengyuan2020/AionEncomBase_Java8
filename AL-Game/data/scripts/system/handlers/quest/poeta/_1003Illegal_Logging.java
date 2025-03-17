@@ -14,22 +14,19 @@ package quest.poeta;
 
 import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
-import com.aionemu.gameserver.network.aion.serverpackets.SM_DIALOG_WINDOW;
 import com.aionemu.gameserver.questEngine.handlers.QuestHandler;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
-import com.aionemu.gameserver.utils.PacketSendUtility;
 
 /****/
 /** Author Ghostfur & Unknown (Aion-Unique)
 /****/
 
-public class _1003Illegal_Logging extends QuestHandler
-{
+public class _1003Illegal_Logging extends QuestHandler {
+
 	private final static int questId = 1003;
 	private final static int[] mob_ids = {210096, 210149, 210145, 210146, 210150, 210151, 210092, 210160, 210154, 210685};
-	
 	public _1003Illegal_Logging() {
 		super(questId);
 	}
@@ -78,8 +75,7 @@ public class _1003Illegal_Logging extends QuestHandler
 					    if (var == 0 || var == 7) {
 						    qs.setQuestVarById(0, var + 1);
 						    updateQuestStatus(env);
-						    PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
-						    return true;
+							return closeDialogWindow(env);
 					    }
 					}
 				}

@@ -73,19 +73,33 @@ public class SimpleAttackManager {
 		}
 		ThreadPoolManager.getInstance().schedule(new SimpleCheckedAttackAction(npcAI), delay);
 	}
-
+	
 	public static boolean isTargetInAttackRange(Npc npc) {
+		// 检查 NPC 和目标是否为空
+		// Check if NPC and target are null
+		if (npc == null || npc.getTarget() == null) {
+			return false;
+		}
+		//在 isTargetInAttackRange 方法中添加了对 npc 和 npc.getTarget() 的空值检查。
+		//这是为了防止在调用 MathUtil.getDistance 方法时出现 NullPointerException 。
+		//通过确保 npc 和 npc.getTarget() 不为空，可以提高代码的健壮性和稳定性。
+		// 如果启用了日志记录，记录目标距离
+		// Log the distance to the target if logging is enabled
 		if (npc.getAi2().isLogging()) {
 			float distance = npc.getDistanceToTarget();
 			AI2Logger.info((AbstractAI) npc.getAi2(), "isTargetInAttackRange: " + distance);
 		}
-		if (!GeoService.getInstance().canSee(npc, npc.getTarget()) || npc.getTarget() == null
-				|| !(npc.getTarget() instanceof Creature))
+		
+		// 检查 NPC 是否能看到目标，以及目标是否是 Creature 类型
+		// Check if NPC can see the target and if the target is of type Creature
+		if (!GeoService.getInstance().canSee(npc, npc.getTarget()) || !(npc.getTarget() instanceof Creature)) {
 			return false;
+		}
+		
+		// 检查目标是否在攻击范围内
+		// Check if the target is within attack range
 		return MathUtil.isInAttackRange(npc, (Creature) npc.getTarget(),
 				npc.getGameStats().getAttackRange().getCurrent() / 1000f);
-		// return distance <= npc.getController().getAttackDistanceToTarget() +
-		// NpcMoveController.MOVE_CHECK_OFFSET;
 	}
 
 	/**

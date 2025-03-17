@@ -46,19 +46,88 @@ import com.aionemu.gameserver.world.knownlist.Visitor;
 public class AttackUtil {
 
 	/**
+	 * Calculate physical attack result for auto attacks
+	 */
+	public static List<AttackResult> calculateAutoAttackPhysical(Creature attacker, Creature attacked) {
+	    List<AttackResult> attackList = new ArrayList<>();
+	    int damage = StatFunctions.calculateAttackDamage(attacker, attacked, true, SkillElement.NONE);
+	    AttackStatus mainHandStatus = calculateMainHandResult(attacker, attacked, null, damage, attackList);
+
+	    if (attacker instanceof Player && ((Player) attacker).getEquipment().getOffHandWeaponType() != null) {
+	        calculateOffHandResult(attacker, attacked, mainHandStatus, attackList);
+	    }
+	    attacked.getObserveController().checkShieldStatus(attackList, null, attacker);
+	    return attackList;
+	}
+
+	/**
+	 * Calculate magical attack result for auto attacks
+	 */
+	public static List<AttackResult> calculateAutoAttackMagical(Creature attacker, Creature attacked, SkillElement elem) {
+	    List<AttackResult> attackList = new ArrayList<>();
+	    int damage = StatFunctions.calculateAttackDamage(attacker, attacked, true, elem);
+	    AttackStatus status = calculateMagicalStatus(attacker, attacked, 100, false);
+
+	    if (status == AttackStatus.CRITICAL) {
+	        damage = (int) calculateWeaponCritical(attacked, damage,
+	                ((Player) attacker).getEquipment().getMainHandWeaponType(),
+	                StatEnum.MAGICAL_CRITICAL_DAMAGE_REDUCE);
+	    }
+
+	    damage = (int) StatFunctions.adjustDamages(attacker, attacked, damage, 0, false);
+
+	    if (damage <= 0) {
+	        damage = 1;
+	    }
+
+	    switch (status) {
+	    case RESIST:
+	    case CRITICAL_RESIST:
+	        damage = 0;
+	        break;
+	    default:
+	        break;
+	    }
+
+	    attackList.add(new AttackResult(damage, status));
+
+	    if (attacker instanceof Player && ((Player) attacker).getEquipment().getOffHandWeaponType() != null) {
+	        int offHandDamage = StatFunctions.calculateAttackDamage(attacker, attacked, false, elem);
+	        AttackStatus offHandStatus = calculateMagicalStatus(attacker, attacked, 100, false);
+
+	        if (offHandStatus == AttackStatus.CRITICAL) {
+	            offHandDamage = (int) calculateWeaponCritical(attacked, offHandDamage,
+	                    ((Player) attacker).getEquipment().getMainHandWeaponType(),
+	                    StatEnum.MAGICAL_CRITICAL_DAMAGE_REDUCE);
+	        }
+
+	        offHandDamage = (int) StatFunctions.adjustDamages(attacker, attacked, offHandDamage, 0, false);
+
+	        if (offHandDamage <= 0) {
+	            offHandDamage = 1;
+	        }
+
+	        switch (offHandStatus) {
+	        case RESIST:
+	        case CRITICAL_RESIST:
+	            offHandDamage = 0;
+	            break;
+	        default:
+	            break;
+	        }
+
+	        attackList.add(new AttackResult(offHandDamage, offHandStatus));
+	    }
+
+	    attacked.getObserveController().checkShieldStatus(attackList, null, attacker);
+	    return attackList;
+	}
+
+	/**
 	 * Calculate physical attack status and damage
 	 */
 	public static List<AttackResult> calculatePhysicalAttackResult(Creature attacker, Creature attacked) {
-		AttackStatus attackerStatus = null;
-		int damage = StatFunctions.calculateAttackDamage(attacker, attacked, true, SkillElement.NONE);
-		List<AttackResult> attackList = new ArrayList<AttackResult>();
-		AttackStatus mainHandStatus = calculateMainHandResult(attacker, attacked, attackerStatus, damage, attackList);
-
-		if (attacker instanceof Player && ((Player) attacker).getEquipment().getOffHandWeaponType() != null) {
-			calculateOffHandResult(attacker, attacked, mainHandStatus, attackList);
-		}
-		attacked.getObserveController().checkShieldStatus(attackList, null, attacker);
-		return attackList;
+	    return calculateAutoAttackPhysical(attacker, attacked);
 	}
 
 	/**
@@ -440,70 +509,7 @@ public class AttackUtil {
 
 	public static List<AttackResult> calculateMagicalAttackResult(Creature attacker, Creature attacked,
 			SkillElement elem) {
-		List<AttackResult> attackList = new ArrayList<AttackResult>();
-
-		int damage = StatFunctions.calculateAttackDamage(attacker, attacked, true, elem);
-
-		// calculate status
-		AttackStatus status = calculateMagicalStatus(attacker, attacked, 100, false);
-
-		if (status == AttackStatus.CRITICAL) {
-			damage = (int) calculateWeaponCritical(attacked, damage,
-					((Player) attacker).getEquipment().getMainHandWeaponType(),
-					StatEnum.MAGICAL_CRITICAL_DAMAGE_REDUCE);
-		}
-
-		// adjusting baseDamages according to attacker and target level
-		damage = (int) StatFunctions.adjustDamages(attacker, attacked, damage, 0, false);
-
-		if (damage <= 0) {
-			damage = 1;
-		}
-
-		switch (status) {
-		case RESIST:
-		case CRITICAL_RESIST:
-			damage = 0;
-			break;
-		default:
-			break;
-		}
-
-		attackList.add(new AttackResult(damage, status));
-
-		// calculate offhand damage
-		if (attacker instanceof Player && ((Player) attacker).getEquipment().getOffHandWeaponType() != null) {
-			int offHandDamage = StatFunctions.calculateAttackDamage(attacker, attacked, false, elem);
-
-			AttackStatus offHandStatus = calculateMagicalStatus(attacker, attacked, 100, false);
-
-			if (offHandStatus == AttackStatus.CRITICAL) {
-				offHandDamage = (int) calculateWeaponCritical(attacked, damage,
-						((Player) attacker).getEquipment().getMainHandWeaponType(),
-						StatEnum.MAGICAL_CRITICAL_DAMAGE_REDUCE);
-			}
-
-			offHandDamage = (int) StatFunctions.adjustDamages(attacker, attacked, damage, 0, false);
-
-			if (offHandDamage <= 0) {
-				offHandDamage = 1;
-			}
-
-			switch (offHandStatus) {
-			case RESIST:
-			case CRITICAL_RESIST:
-				offHandDamage = 0;
-				break;
-			default:
-				break;
-			}
-
-			attackList.add(new AttackResult(offHandDamage, status));
-		}
-		// check for shield
-		attacked.getObserveController().checkShieldStatus(attackList, null, attacker);
-
-		return attackList;
+	    return calculateAutoAttackMagical(attacker, attacked, elem);
 	}
 
 	public static List<AttackResult> calculateHomingAttackResult(Creature attacker, Creature attacked,

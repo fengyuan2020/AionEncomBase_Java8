@@ -12,28 +12,22 @@
  */
 package quest.poeta;
 
-import com.aionemu.gameserver.model.EmotionId;
-import com.aionemu.gameserver.model.EmotionType;
+
 import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
-import com.aionemu.gameserver.network.aion.serverpackets.SM_EMOTION;
-import com.aionemu.gameserver.network.aion.serverpackets.SM_USE_OBJECT;
 import com.aionemu.gameserver.questEngine.handlers.QuestHandler;
 import com.aionemu.gameserver.questEngine.model.QuestDialog;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
-import com.aionemu.gameserver.utils.PacketSendUtility;
-import com.aionemu.gameserver.utils.ThreadPoolManager;
 
 /****/
 /** Author Ghostfur & Unknown (Aion-Unique)
 /****/
 
-public class _1005Barring_The_Gate extends QuestHandler
-{
+public class _1005Barring_The_Gate extends QuestHandler {
+
 	private final static int questId = 1005;
-	
 	public _1005Barring_The_Gate() {
 		super(questId);
 	}
@@ -81,8 +75,7 @@ public class _1005Barring_The_Gate extends QuestHandler
 					    if (var == 0) {
 						    qs.setQuestVarById(0, var + 1);
 						    updateQuestStatus(env);
-						    sendQuestSelectionDialog(env);
-						    return true;
+						    return closeDialogWindow(env);
 					    }
 					}
 				}
@@ -96,8 +89,7 @@ public class _1005Barring_The_Gate extends QuestHandler
 					    if (var == 1) {
 						    qs.setQuestVarById(0, var + 1);
 						    updateQuestStatus(env);
-						    sendQuestSelectionDialog(env);
-						    return true;
+						    return closeDialogWindow(env);
 					    }
 					}	
 				}
@@ -111,8 +103,7 @@ public class _1005Barring_The_Gate extends QuestHandler
 					    if (var == 2) {
 						    qs.setQuestVarById(0, var + 1);
 						    updateQuestStatus(env);
-						    sendQuestSelectionDialog(env);
-						    return true;
+						    return closeDialogWindow(env);
 					    }
 					}
 				}
@@ -126,8 +117,7 @@ public class _1005Barring_The_Gate extends QuestHandler
 					    if (var == 3) {
 						    qs.setQuestVarById(0, var + 1);
 						    updateQuestStatus(env);
-						    sendQuestSelectionDialog(env);
-						    return true;
+						    return closeDialogWindow(env);
 					    }
 					}
 				}
@@ -141,8 +131,7 @@ public class _1005Barring_The_Gate extends QuestHandler
 					    if (var == 4) {
 						    qs.setQuestVarById(0, var + 1);
 						    updateQuestStatus(env);
-						    sendQuestSelectionDialog(env);
-						    return true;
+						    return closeDialogWindow(env);
 						}
 					}
 				}

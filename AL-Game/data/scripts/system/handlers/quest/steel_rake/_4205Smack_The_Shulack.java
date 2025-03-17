@@ -26,7 +26,7 @@ import com.aionemu.gameserver.questEngine.model.QuestStatus;
 public class _4205Smack_The_Shulack extends QuestHandler {
 
 	private final static int questId = 4205;
-	private final static int[] Steel_Rake_Watcher = {218972, 218974, 218975, 218976, 218979};
+	private final static int[] Steel_Rake_Watcher = {218972, 218974, 218975, 218976, 218979, 218977};
 	public _4205Smack_The_Shulack() {
 		super(questId);
 	}
@@ -51,11 +51,12 @@ public class _4205Smack_The_Shulack extends QuestHandler {
 	public boolean onDialogEvent(QuestEnv env) {
 		Player player = env.getPlayer();
 		QuestState qs = player.getQuestStateList().getQuestState(questId);
-		int var = qs.getQuestVarById(0);
 		int targetId = env.getTargetId();
 		if (env.getVisibleObject() instanceof Npc) {
             targetId = ((Npc) env.getVisibleObject()).getNpcId();
-        } if (qs.getStatus() == QuestStatus.START) {
+        } 
+        if (qs == null || qs.getStatus() == QuestStatus.START) {
+		    int var = qs.getQuestVarById(0);
 			if (targetId == 205233) {
                 switch (env.getDialog()) {
                     case START_DIALOG: {

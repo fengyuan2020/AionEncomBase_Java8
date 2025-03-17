@@ -110,8 +110,6 @@ public class _1002Request_Of_The_Elim extends QuestHandler
 							}
 						} case STEP_TO_4: {
 							return defaultCloseDialog(env, 12, 13);
-						} case FINISH_DIALOG: {
-							return sendQuestSelectionDialog(env);
 						}
 					}
 					break;

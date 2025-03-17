@@ -24,10 +24,9 @@ import com.aionemu.gameserver.services.QuestService;
 /** Author Ghostfur & Unknown (Aion-Unique)
 /****/
 
-public class _1004Neutralizing_Odium extends QuestHandler
-{
+public class _1004Neutralizing_Odium extends QuestHandler {
+
 	private final static int questId = 1004;
-	
 	public _1004Neutralizing_Odium() {
 		super(questId);
 	}
@@ -71,18 +70,16 @@ public class _1004Neutralizing_Odium extends QuestHandler
 					case SELECT_ACTION_1013:
 						if (var == 0)
 							playQuestMovie(env, 19);
-						return false;
+						return sendQuestDialog(env, 1013);
 					case STEP_TO_1:
 						qs.setQuestVarById(0, var + 1);
 						updateQuestStatus(env);
-						sendQuestSelectionDialog(env);
-						return true;
+						return closeDialogWindow(env);
 					case STEP_TO_3:
 						if (var == 5) {
 							qs.setStatus(QuestStatus.REWARD);
 							updateQuestStatus(env);
-							sendQuestSelectionDialog(env);
-							return true;
+							return closeDialogWindow(env);
 						}
 				}
 			} else if (targetId == 700030 && var == 1 || var == 4) {
@@ -113,18 +110,15 @@ public class _1004Neutralizing_Odium extends QuestHandler
 						if (var == 2) {
 							qs.setQuestVarById(0, var + 1);
 							updateQuestStatus(env);
-							sendQuestSelectionDialog(env);
-							return true;
+							return closeDialogWindow(env);
 						}
 					case STEP_TO_3:
 						if (var == 11) {
-							if (!giveQuestItem(env, 182200006, 1))
-								return true;
+							giveQuestItem(env, 182200006, 1);
 							qs.setQuestVarById(0, 4);
 							updateQuestStatus(env);
 							removeQuestItem(env, 182200006, 1);
-							sendQuestSelectionDialog(env);
-							return true;
+							return closeDialogWindow(env);
 						}
 					case CHECK_COLLECTED_ITEMS: {
 						if (QuestService.collectItemCheck(env, true)) {
