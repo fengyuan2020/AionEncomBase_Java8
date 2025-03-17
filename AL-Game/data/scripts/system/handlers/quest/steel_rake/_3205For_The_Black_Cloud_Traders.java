@@ -23,11 +23,10 @@ import com.aionemu.gameserver.questEngine.model.QuestStatus;
 /** Author Ghostfur & Unknown (Aion-Unique)
 /****/
 
-public class _3205For_The_Black_Cloud_Traders extends QuestHandler
-{
+public class _3205For_The_Black_Cloud_Traders extends QuestHandler {
+
 	private final static int questId = 3205;
 	private final static int[] Petrahulk_Sentinel = {215049, 219024};
-	
 	public _3205For_The_Black_Cloud_Traders() {
 		super(questId);
 	}
@@ -52,11 +51,12 @@ public class _3205For_The_Black_Cloud_Traders extends QuestHandler
 	public boolean onDialogEvent(QuestEnv env) {
 		Player player = env.getPlayer();
 		QuestState qs = player.getQuestStateList().getQuestState(questId);
-		int var = qs.getQuestVarById(0);
 		int targetId = env.getTargetId();
 		if (env.getVisibleObject() instanceof Npc) {
             targetId = ((Npc) env.getVisibleObject()).getNpcId();
-        } if (qs.getStatus() == QuestStatus.START) {
+        } 
+        if (qs == null || qs.getStatus() == QuestStatus.START) {
+		   int var = qs.getQuestVarById(0);
 			if (targetId == 804601) {
                 switch (env.getDialog()) {
                     case START_DIALOG: {

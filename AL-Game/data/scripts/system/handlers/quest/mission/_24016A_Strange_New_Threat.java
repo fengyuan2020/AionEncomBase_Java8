@@ -85,6 +85,7 @@ public class _24016A_Strange_New_Threat extends QuestHandler {
                         playQuestMovie(env, 66);
                         return sendQuestDialog(env, 1013);
                     }
+                    break;
                 }
                 case 700140: { // Gate Guardian Stone
                     if (var == 2) {

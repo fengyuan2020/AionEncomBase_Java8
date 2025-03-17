@@ -143,28 +143,65 @@ import com.aionemu.gameserver.world.knownlist.PlayerAwareKnownList;
 public class VisibleObjectSpawner {
 	private static final Logger log = LoggerFactory.getLogger(VisibleObjectSpawner.class);
 
+	/**
+	 * 根据配置文件中的倍率调整NPC的HP和Power属性
+	 * Adjusts NPC's HP and Power attributes based on rates defined in configuration file
+	 * 
+	 * @param objId NPC的模板ID / Template ID of the NPC
+	 * @return 调整后的NPC模板 / Adjusted NPC template
+	 */
 	protected static NpcTemplate RatedTemplate(int objId) {
+		// 获取NPC模板 / Get NPC template
 		NpcTemplate npcTemplate = DataManager.NPC_DATA.getNpcTemplate(objId);
+		if (npcTemplate == null) {
+			log.error("No Template Found For NPC ID: " + objId);
+			return null;
+		}
+		
+		// 检查该NPC是否已经被调整过 / Check if this NPC has already been adjusted
 		if (!com.aionemu.gameserver.GameServer.npcs_count.contains(String.valueOf(objId))) {
+			// 默认倍率为1.0 / Default rate is 1.0
 			double RateHP = 1.0;
 			double RatePW = 1.0;
+			
+			// 根据NPC等级应用不同的倍率 / Apply different rates based on NPC rating
 			switch (npcTemplate.getRating()) {
 			case NORMAL:
+				// 普通怪物的HP和Power倍率 / HP and Power rates for normal monsters
 				RateHP = RateConfig.NORMAL_MOBS_RATE_HP;
 				RatePW = RateConfig.NORMAL_MOBS_RATE_PW;
 				break;
 			case ELITE:
+				// 精英怪物的HP和Power倍率 / HP and Power rates for elite monsters
 				RateHP = RateConfig.ELITE_MOBS_RATE_HP;
 				RatePW = RateConfig.ELITE_MOBS_RATE_PW;
 				break;
+				case HERO:
+				// 英雄怪物的HP和Power倍率 / HP and Power rates for hero monsters
+				RateHP = RateConfig.HERO_MOBS_RATE_HP;
+				RatePW = RateConfig.HERO_MOBS_RATE_PW;
+				break;
+			case LEGENDARY:
+				// 传说怪物的HP和Power倍率 / HP and Power rates for legendary monsters
+				RateHP = RateConfig.LEGENDARY_MOBS_RATE_HP;
+				RatePW = RateConfig.LEGENDARY_MOBS_RATE_PW;
+				break;
 			default:
+				// 其他类型怪物使用默认倍率 / Other types use default rates
 				break;
 			}
-			if (npcTemplate.getLevel() >= 66) {
+			
+			// 只对1级以上的NPC应用倍率 / Only apply rates to NPCs level 1 and above
+			if (npcTemplate.getLevel() >= 1) {
+				// 计算新的HP和Power值 / Calculate new HP and Power values
 				int NewMaxHP = (int) (npcTemplate.getStatsTemplate().getMaxHp() * RateHP);
 				int NewPower = (int) (npcTemplate.getStatsTemplate().getPower() * RatePW);
+				
+				// 设置新的属性值 / Set new attribute values
 				npcTemplate.getStatsTemplate().setMaxHp(NewMaxHP);
 				npcTemplate.getStatsTemplate().setPower(NewPower);
+				
+				// 将NPC ID添加到已处理列表中，避免重复处理 / Add NPC ID to processed list to avoid duplicate processing
 				com.aionemu.gameserver.GameServer.npcs_count.add(String.valueOf(objId));
 			}
 		}
@@ -186,7 +223,7 @@ public class VisibleObjectSpawner {
 			}
 		}
 		
-		NpcTemplate npcTemplate = DataManager.NPC_DATA.getNpcTemplate(objectId);
+		NpcTemplate npcTemplate = RatedTemplate(objectId);
 		if (npcTemplate == null) {
 			log.error("<No Template For NPC> " + String.valueOf(objectId));
 			return null;
@@ -215,7 +252,7 @@ public class VisibleObjectSpawner {
 	public static SummonedHouseNpc spawnHouseNpc(SpawnTemplate spawn, int instanceIndex, House creator,
 			String masterName) {
 		int npcId = spawn.getNpcId();
-		NpcTemplate template = DataManager.NPC_DATA.getNpcTemplate(npcId);
+		NpcTemplate template = RatedTemplate(npcId);
 		SummonedHouseNpc npc = new SummonedHouseNpc(IDFactory.getInstance().nextId(), new NpcController(), spawn,
 				template, creator, masterName);
 		npc.setKnownlist(new PlayerAwareKnownList(npc));
@@ -226,7 +263,7 @@ public class VisibleObjectSpawner {
 
 	protected static VisibleObject spawnBaseNpc(BaseSpawnTemplate spawn, int instanceIndex) {
 		int objectId = spawn.getNpcId();
-		NpcTemplate npcTemplate = DataManager.NPC_DATA.getNpcTemplate(objectId);
+		NpcTemplate npcTemplate = RatedTemplate(objectId);
 		if (npcTemplate == null) {
 			return null;
 		}
@@ -251,7 +288,7 @@ public class VisibleObjectSpawner {
 
 	protected static VisibleObject spawnOutpostNpc(OutpostSpawnTemplate spawn, int instanceIndex) {
 		int objectId = spawn.getNpcId();
-		NpcTemplate npcTemplate = DataManager.NPC_DATA.getNpcTemplate(objectId);
+		NpcTemplate npcTemplate = RatedTemplate(objectId);
 		if (npcTemplate == null) {
 			return null;
 		}
@@ -279,7 +316,7 @@ public class VisibleObjectSpawner {
 			return null;
 		}
 		int objectId = spawn.getNpcId();
-		NpcTemplate npcTemplate = DataManager.NPC_DATA.getNpcTemplate(objectId);
+		NpcTemplate npcTemplate = RatedTemplate(objectId);
 		if (npcTemplate == null) {
 			return null;
 		}
@@ -303,7 +340,7 @@ public class VisibleObjectSpawner {
 			return null;
 		}
 		int objectId = spawn.getNpcId();
-		NpcTemplate npcTemplate = DataManager.NPC_DATA.getNpcTemplate(objectId);
+		NpcTemplate npcTemplate = RatedTemplate(objectId);
 		if (npcTemplate == null) {
 			return null;
 		}
@@ -331,7 +368,7 @@ public class VisibleObjectSpawner {
 			return null;
 		}
 		int objectId = spawn.getNpcId();
-		NpcTemplate npcTemplate = DataManager.NPC_DATA.getNpcTemplate(objectId);
+		NpcTemplate npcTemplate = RatedTemplate(objectId);
 		if (npcTemplate == null) {
 			return null;
 		}
@@ -358,7 +395,7 @@ public class VisibleObjectSpawner {
 			return null;
 		}
 		int objectId = spawn.getNpcId();
-		NpcTemplate npcTemplate = DataManager.NPC_DATA.getNpcTemplate(objectId);
+		NpcTemplate npcTemplate = RatedTemplate(objectId);
 		if (npcTemplate == null) {
 			return null;
 		}
@@ -385,7 +422,7 @@ public class VisibleObjectSpawner {
 			return null;
 		}
 		int objectId = spawn.getNpcId();
-		NpcTemplate npcTemplate = DataManager.NPC_DATA.getNpcTemplate(objectId);
+		NpcTemplate npcTemplate = RatedTemplate(objectId);
 		if (npcTemplate == null) {
 			return null;
 		}
@@ -412,7 +449,7 @@ public class VisibleObjectSpawner {
 			return null;
 		}
 		int objectId = spawn.getNpcId();
-		NpcTemplate npcTemplate = DataManager.NPC_DATA.getNpcTemplate(objectId);
+		NpcTemplate npcTemplate = RatedTemplate(objectId);
 		if (npcTemplate == null) {
 			return null;
 		}
@@ -439,7 +476,7 @@ public class VisibleObjectSpawner {
 			return null;
 		}
 		int objectId = spawn.getNpcId();
-		NpcTemplate npcTemplate = DataManager.NPC_DATA.getNpcTemplate(objectId);
+		NpcTemplate npcTemplate = RatedTemplate(objectId);
 		if (npcTemplate == null) {
 			return null;
 		}
@@ -466,7 +503,7 @@ public class VisibleObjectSpawner {
 			return null;
 		}
 		int objectId = spawn.getNpcId();
-		NpcTemplate npcTemplate = DataManager.NPC_DATA.getNpcTemplate(objectId);
+		NpcTemplate npcTemplate = RatedTemplate(objectId);
 		if (npcTemplate == null) {
 			return null;
 		}
@@ -493,7 +530,7 @@ public class VisibleObjectSpawner {
 			return null;
 		}
 		int objectId = spawn.getNpcId();
-		NpcTemplate npcTemplate = DataManager.NPC_DATA.getNpcTemplate(objectId);
+		NpcTemplate npcTemplate = RatedTemplate(objectId);
 		if (npcTemplate == null) {
 			return null;
 		}
@@ -520,7 +557,7 @@ public class VisibleObjectSpawner {
 			return null;
 		}
 		int objectId = spawn.getNpcId();
-		NpcTemplate npcTemplate = DataManager.NPC_DATA.getNpcTemplate(objectId);
+		NpcTemplate npcTemplate = RatedTemplate(objectId);
 		if (npcTemplate == null) {
 			return null;
 		}
@@ -547,7 +584,7 @@ public class VisibleObjectSpawner {
 			return null;
 		}
 		int objectId = spawn.getNpcId();
-		NpcTemplate npcTemplate = DataManager.NPC_DATA.getNpcTemplate(objectId);
+		NpcTemplate npcTemplate = RatedTemplate(objectId);
 		if (npcTemplate == null) {
 			return null;
 		}
@@ -574,7 +611,7 @@ public class VisibleObjectSpawner {
 			return null;
 		}
 		int objectId = spawn.getNpcId();
-		NpcTemplate npcTemplate = DataManager.NPC_DATA.getNpcTemplate(objectId);
+		NpcTemplate npcTemplate = RatedTemplate(objectId);
 		if (npcTemplate == null) {
 			return null;
 		}
@@ -601,7 +638,7 @@ public class VisibleObjectSpawner {
 			return null;
 		}
 		int objectId = spawn.getNpcId();
-		NpcTemplate npcTemplate = DataManager.NPC_DATA.getNpcTemplate(objectId);
+		NpcTemplate npcTemplate = RatedTemplate(objectId);
 		if (npcTemplate == null) {
 			return null;
 		}
@@ -628,7 +665,7 @@ public class VisibleObjectSpawner {
 			return null;
 		}
 		int objectId = spawn.getNpcId();
-		NpcTemplate npcTemplate = DataManager.NPC_DATA.getNpcTemplate(objectId);
+		NpcTemplate npcTemplate = RatedTemplate(objectId);
 		if (npcTemplate == null) {
 			return null;
 		}
@@ -655,7 +692,7 @@ public class VisibleObjectSpawner {
 			return null;
 		}
 		int objectId = spawn.getNpcId();
-		NpcTemplate npcTemplate = DataManager.NPC_DATA.getNpcTemplate(objectId);
+		NpcTemplate npcTemplate = RatedTemplate(objectId);
 		if (npcTemplate == null) {
 			return null;
 		}
@@ -682,7 +719,7 @@ public class VisibleObjectSpawner {
 			return null;
 		}
 		int objectId = spawn.getNpcId();
-		NpcTemplate npcTemplate = DataManager.NPC_DATA.getNpcTemplate(objectId);
+		NpcTemplate npcTemplate = RatedTemplate(objectId);
 		if (npcTemplate == null) {
 			return null;
 		}
@@ -716,7 +753,7 @@ public class VisibleObjectSpawner {
 
 	public static Trap spawnTrap(SpawnTemplate spawn, int instanceIndex, Creature creator) {
 		int objectId = spawn.getNpcId();
-		NpcTemplate npcTemplate = DataManager.NPC_DATA.getNpcTemplate(objectId);
+		NpcTemplate npcTemplate = RatedTemplate(objectId);
 		Trap trap = new Trap(IDFactory.getInstance().nextId(), new NpcController(), spawn, npcTemplate);
 		trap.setKnownlist(new NpcKnownList(trap));
 		trap.setEffectController(new EffectController(trap));
@@ -729,7 +766,7 @@ public class VisibleObjectSpawner {
 
 	public static GroupGate spawnGroupGate(SpawnTemplate spawn, int instanceIndex, Creature creator) {
 		int objectId = spawn.getNpcId();
-		NpcTemplate npcTemplate = DataManager.NPC_DATA.getNpcTemplate(objectId);
+		NpcTemplate npcTemplate = RatedTemplate(objectId);
 		GroupGate groupgate = new GroupGate(IDFactory.getInstance().nextId(), new NpcController(), spawn, npcTemplate);
 		groupgate.setKnownlist(new PlayerAwareKnownList(groupgate));
 		groupgate.setEffectController(new EffectController(groupgate));
@@ -740,7 +777,7 @@ public class VisibleObjectSpawner {
 
 	public static Kisk spawnKisk(SpawnTemplate spawn, int instanceIndex, Player creator) {
 		int npcId = spawn.getNpcId();
-		NpcTemplate template = DataManager.NPC_DATA.getNpcTemplate(npcId);
+		NpcTemplate template = RatedTemplate(npcId);
 		Kisk kisk = new Kisk(IDFactory.getInstance().nextId(), new NpcController(), spawn, template, creator);
 		kisk.setKnownlist(new PlayerAwareKnownList(kisk));
 		kisk.setCreator(creator);
@@ -794,7 +831,7 @@ public class VisibleObjectSpawner {
 	public static Servant spawnServant(SpawnTemplate spawn, int instanceIndex, Creature creator, int skillId, int level,
 			NpcObjectType objectType) {
 		int objectId = spawn.getNpcId();
-		NpcTemplate npcTemplate = DataManager.NPC_DATA.getNpcTemplate(objectId);
+		NpcTemplate npcTemplate = RatedTemplate(objectId);
 		int creatureLevel = creator.getLevel();
 		level = SkillLearnService.getSkillLearnLevel(skillId, creatureLevel, level);
 		byte servantLevel = (byte) SkillLearnService.getSkillMinLevel(skillId, creatureLevel, level);
@@ -816,7 +853,7 @@ public class VisibleObjectSpawner {
 
 	public static Servant spawnEnemyServant(SpawnTemplate spawn, int instanceIndex, Creature creator, byte servantLvl) {
 		int objectId = spawn.getNpcId();
-		NpcTemplate npcTemplate = DataManager.NPC_DATA.getNpcTemplate(objectId);
+		NpcTemplate npcTemplate = RatedTemplate(objectId);
 		Servant servant = new Servant(IDFactory.getInstance().nextId(), new NpcController(), spawn, npcTemplate,
 				servantLvl);
 		servant.setKnownlist(new NpcKnownList(servant));
@@ -830,7 +867,7 @@ public class VisibleObjectSpawner {
 	public static Homing spawnHoming(SpawnTemplate spawn, int instanceIndex, Creature creator, int attackCount,
 			int skillId, int level) {
 		int objectId = spawn.getNpcId();
-		NpcTemplate npcTemplate = DataManager.NPC_DATA.getNpcTemplate(objectId);
+		NpcTemplate npcTemplate = RatedTemplate(objectId);
 		int creatureLevel = creator.getLevel();
 		level = SkillLearnService.getSkillLearnLevel(skillId, creatureLevel, level);
 		byte homingLevel = (byte) SkillLearnService.getSkillMinLevel(skillId, creatureLevel, level);
@@ -864,7 +901,7 @@ public class VisibleObjectSpawner {
 		int worldId = creator.getWorldId();
 		int instanceId = creator.getInstanceId();
 		SpawnTemplate spawn = SpawnEngine.createSpawnTemplate(worldId, npcId, x, y, z, heading);
-		NpcTemplate npcTemplate = DataManager.NPC_DATA.getNpcTemplate(npcId);
+		NpcTemplate npcTemplate = RatedTemplate(npcId);
 		skillLevel = SkillLearnService.getSkillLearnLevel(skillId, creator.getCommonData().getLevel(), skillLevel);
 		byte level = (byte) SkillLearnService.getSkillMinLevel(skillId, creator.getCommonData().getLevel(), skillLevel);
 		boolean isSiegeWeapon = npcTemplate.getAi().equals("siege_weapon");
@@ -938,7 +975,7 @@ public class VisibleObjectSpawner {
 
 	protected static VisibleObject spawnLandingNpc(LandingSpawnTemplate spawn, int instanceIndex) {
 		int objectId = spawn.getNpcId();
-		NpcTemplate npcTemplate = DataManager.NPC_DATA.getNpcTemplate(objectId);
+		NpcTemplate npcTemplate = RatedTemplate(objectId);
 		if (npcTemplate == null) {
 			return null;
 		}
@@ -962,7 +999,7 @@ public class VisibleObjectSpawner {
 
 	protected static VisibleObject spawnLandingSpecialNpc(LandingSpecialSpawnTemplate spawn, int instanceIndex) {
 		int objectId = spawn.getNpcId();
-		NpcTemplate npcTemplate = DataManager.NPC_DATA.getNpcTemplate(objectId);
+		NpcTemplate npcTemplate = RatedTemplate(objectId);
 		if (npcTemplate == null) {
 			return null;
 		}
@@ -989,7 +1026,7 @@ public class VisibleObjectSpawner {
 			return null;
 		}
 		int objectId = spawn.getNpcId();
-		NpcTemplate npcTemplate = DataManager.NPC_DATA.getNpcTemplate(objectId);
+		NpcTemplate npcTemplate = RatedTemplate(objectId);
 		if (npcTemplate == null) {
 			return null;
 		}

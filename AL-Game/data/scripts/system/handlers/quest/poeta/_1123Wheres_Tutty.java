@@ -25,10 +25,9 @@ import com.aionemu.gameserver.world.zone.ZoneName;
 /** Author Ghostfur & Unknown (Aion-Unique)
 /****/
 
-public class _1123Wheres_Tutty extends QuestHandler
-{
+public class _1123Wheres_Tutty extends QuestHandler {
+
 	private final static int questId = 1123;
-	
 	public _1123Wheres_Tutty() {
 		super(questId);
 	}
@@ -53,7 +52,7 @@ public class _1123Wheres_Tutty extends QuestHandler
 					return sendQuestDialog(env, 1011);
 				else
 					return sendQuestStartDialog(env);
-			} else if (qs.getStatus() == QuestStatus.REWARD) {
+			} else if (qs == null || qs.getStatus() == QuestStatus.REWARD) {
 				if (env.getDialog() == QuestDialog.USE_OBJECT)
 					return sendQuestDialog(env, 1352);
 				return sendQuestEndDialog(env);

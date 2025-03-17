@@ -64,17 +64,22 @@ public class DropGroup implements DropCalculator {
 	}
 
 	@Override
-	public int dropCalculator(Set<DropItem> result, int index, float dropModifier, Race race,
-			Collection<Player> groupMembers) {
-		if (useCategory) {
-			Drop d = drop.get(Rnd.get(0, drop.size() - 1));
-			return d.dropCalculator(result, index, dropModifier, race, groupMembers);
-		}
+    public int dropCalculator(Set<DropItem> result, int index, float dropModifier, Race race,
+        Collection<Player> groupMembers) {
+    if (drop == null || drop.isEmpty()) {
+        System.out.println("The drop list is empty!"); 
+        return index;
+    }
 
-		for (int i = 0; i < drop.size(); i++) {
-			Drop d = drop.get(i);
-			index = d.dropCalculator(result, index, dropModifier, race, groupMembers);
-		}
-		return index;
-	}
+    if (useCategory) {
+        Drop d = drop.get(Rnd.get(0, drop.size() - 1));
+        return d.dropCalculator(result, index, dropModifier, race, groupMembers);
+    }
+
+    for (int i = 0; i < drop.size(); i++) {
+        Drop d = drop.get(i);
+        index = d.dropCalculator(result, index, dropModifier, race, groupMembers);
+    }
+    return index;
+    }
 }

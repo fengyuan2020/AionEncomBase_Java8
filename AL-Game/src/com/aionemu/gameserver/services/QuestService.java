@@ -932,29 +932,48 @@ public final class QuestService {
 		return item;
 	}
 
+	/**
+	 * 检查任务物品是否应该掉落
+	 * Check if quest item should drop
+	 * @param player 玩家对象 / Player object
+	 * @param drop 掉落物品信息 / Drop item information
+	 * @return 是否允许掉落 / Whether dropping is allowed
+	 */
 	private static boolean isQuestDrop(Player player, QuestDrop drop) {
+		// 获取任务ID / Get quest ID
 		int questId = drop.getQuestId();
+		// 获取玩家的任务状态 / Get player's quest state
 		QuestState qs = player.getQuestStateList().getQuestState(questId);
+		// 检查任务是否处于进行状态 / Check if quest is in progress
 		if (qs == null || qs.getStatus() != QuestStatus.START) {
 			return false;
 		}
+		
+		// 检查收集步骤是否匹配 / Check if collecting step matches
 		if (drop.getCollectingStep() != 0) {
 			if (drop.getCollectingStep() != qs.getQuestVarById(0)) {
 				return false;
 			}
 		}
+		
+		// 获取任务模板 / Get quest template
 		QuestTemplate qt = DataManager.QUEST_DATA.getQuestById(questId);
+		
+		// 检查联盟任务限制 / Check alliance quest restrictions
 		if (player.isInAlliance2()) {
 			if (!qt.getTargetType().equals(QuestTargetType.UNION)) { // League.
 				return false;
 			}
 		}
+		
+		// 检查导师任务限制 / Check mentor quest restrictions
 		if (qt.getMentorType() == QuestMentorType.MENTE) {
 			if (!player.isInGroup2()) {
 				return false;
 			}
 			PlayerGroup group = player.getPlayerGroup2();
 			boolean found = false;
+			// 检查组内是否有导师在有效距离内 / Check if there's a mentor within valid distance in group
 			for (Player member : group.getMembers()) {
 				if (member.isMentor() && MathUtil.getDistance(player, member) < GroupConfig.GROUP_MAX_DISTANCE) {
 					found = true;
@@ -965,22 +984,55 @@ public final class QuestService {
 				return false;
 			}
 		}
+		
+		// 处理特殊掉落物品 / Handle special drop items
 		if (drop instanceof HandlerSideDrop) {
 			return ((HandlerSideDrop) drop).getNeededAmount() > player.getInventory()
 					.getItemCountByItemId(drop.getItemId());
 		}
-		CollectItems collectItems = questsData.getQuestById(questId).getCollectItems();
+		
+		// 获取当前掉落物品的ID / Get current drop item ID
+		int dropItemId = drop.getItemId();
+		
+		// 检查是否是任务工作物品 / Check if it's a quest work item
+		QuestWorkItems workItems = qt.getQuestWorkItems();
+		if (workItems != null && workItems.getQuestWorkItem().stream()
+				.anyMatch(workItem -> workItem != null && workItem.getItemId() == dropItemId)) {
+			// 检查玩家背包中是否已有该工作物品 / Check if player already has this work item
+			long count = player.getInventory().getItemCountByItemId(dropItemId);
+			// 如果已有工作物品则不再掉落 / Don't drop if player already has the work item
+			if (count > 0) {
+				return false;
+			}
+			
+			// 检查玩家是否已经完成了相关任务 / Check if player has completed the related quest
+			for (QuestItems workItem : workItems.getQuestWorkItem()) {
+				QuestState questState = player.getQuestStateList().getQuestState(qt.getId());
+				if (questState != null && questState.getStatus() == QuestStatus.COMPLETE) {
+					// 如果任务已完成，则不再掉落工作物品 / Don't drop work item if quest is complete
+					return false;
+				}
+			}
+		}
+		
+		// 检查是否是任务收集物品 / Check if it's a quest collect item
+		CollectItems collectItems = qt.getCollectItems();
 		if (collectItems == null) {
 			return true;
 		}
+		
+		// 检查当前掉落物品是否达到收集上限 / Check if current drop item has reached collection limit
 		for (CollectItem collectItem : collectItems.getCollectItem()) {
-			int collectItemId = collectItem.getItemId();
-			long count = player.getInventory().getItemCountByItemId(collectItemId);
-			if (collectItem.getCount() > count) {
-				return true;
+			if (collectItem.getItemId() == dropItemId) {
+				// 获取玩家当前收集的数量 / Get current collected amount
+				long count = player.getInventory().getItemCountByItemId(dropItemId);
+				// 如果未达到所需数量则允许掉落 / Allow drop if required amount not reached
+				return collectItem.getCount() > count;
 			}
 		}
-		return false;
+		
+		// 如果不是收集物品则允许掉落 / Allow drop if not a collect item
+		return true;
 	}
 
 	public static boolean checkLevelRequirement(int questId, int playerLevel) {

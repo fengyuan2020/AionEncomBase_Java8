@@ -202,14 +202,33 @@ public class RateConfig {
 	public static float PREMIUM_BOOK_RATE;
 	@Property(key = "gameserver.rate.vip.book", defaultValue = "3")
 	public static float VIP_BOOK_RATE;
-	@Property(key = "gameserver.rate.normal.monster.hp", defaultValue = "0.5")
-	public static double NORMAL_MOBS_RATE_HP;
-	@Property(key = "gameserver.rate.normal.monster.pw", defaultValue = "0.5")
-	public static double NORMAL_MOBS_RATE_PW;
-	@Property(key = "gameserver.rate.elite.monster.hp", defaultValue = "1.5")
-	public static double ELITE_MOBS_RATE_HP;
-	@Property(key = "gameserver.rate.elite.monster.pw", defaultValue = "1.5")
-	public static double ELITE_MOBS_RATE_PW;
+    // 普通怪物的HP和Power倍率
+    @Property(key = "gameserver.rate.normal.mobs.hp", defaultValue = "1.0")
+    public static float NORMAL_MOBS_RATE_HP;
+    @Property(key = "gameserver.rate.normal.mobs.pw", defaultValue = "1.0")
+    public static float NORMAL_MOBS_RATE_PW;
+
+    // 精英怪物的HP和Power倍率
+    @Property(key = "gameserver.rate.elite.mobs.hp", defaultValue = "1.0")
+    public static float ELITE_MOBS_RATE_HP;
+    @Property(key = "gameserver.rate.elite.mobs.pw", defaultValue = "1.0")
+    public static float ELITE_MOBS_RATE_PW;
+
+    // 英雄怪物的HP和Power倍率
+    @Property(key = "gameserver.rate.hero.mobs.hp", defaultValue = "1.0")
+    public static float HERO_MOBS_RATE_HP;
+    @Property(key = "gameserver.rate.hero.mobs.pw", defaultValue = "1.0")
+    public static float HERO_MOBS_RATE_PW;
+
+    // 传说怪物的HP和Power倍率
+    @Property(key = "gameserver.rate.legendary.mobs.hp", defaultValue = "1.0")
+    public static float LEGENDARY_MOBS_RATE_HP;
+    @Property(key = "gameserver.rate.legendary.mobs.pw", defaultValue = "1.0")
+    public static float LEGENDARY_MOBS_RATE_PW;
+
+	// Damage Multiplier
+	@Property(key = "gameserver.damage.multiplier", defaultValue = "1.0")
+    public static float DAMAGE_MULTIPLIER;
 
 	// gp get
 	@Property(key = "gameserver.rate.regular.gp.player.gain", defaultValue = "1")

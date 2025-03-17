@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import com.aionemu.commons.utils.Rnd;
 import com.aionemu.gameserver.configs.main.FallDamageConfig;
+import com.aionemu.gameserver.configs.main.RateConfig;
 import com.aionemu.gameserver.controllers.attack.AttackStatus;
 import com.aionemu.gameserver.controllers.observer.AttackerCriticalStatus;
 import com.aionemu.gameserver.model.PlayerClass;
@@ -51,6 +52,12 @@ public class StatFunctions {
 
 	private static final Logger log = LoggerFactory.getLogger(StatFunctions.class);
 	private static SkillElement elements = null;
+	// 从配置文件中读取伤害倍数常量
+    private static float DAMAGE_MULTIPLIER;
+    
+    static {
+		DAMAGE_MULTIPLIER = Math.max(0.1f, RateConfig.DAMAGE_MULTIPLIER);
+	}
 
 	/**
 	 * @param player
@@ -441,7 +448,7 @@ public class StatFunctions {
 		if (resultDamage <= 0) {
 			resultDamage = 1;
 		}
-		return Math.round(resultDamage);
+    	return Math.max(1, Math.round(resultDamage));
 	}
 
 	public static int calculatePhysicalAttackDamageNoDef(Creature attacker, Creature target, boolean isMainHand) {
@@ -526,7 +533,7 @@ public class StatFunctions {
 		if (resultDamage <= 0) {
 			resultDamage = 1;
 		}
-		return Math.round(resultDamage);
+    	return Math.round(resultDamage);
 	}
 
 	public static int calculateMagicalAttackDamage(Creature attacker, Creature target, SkillElement element,
@@ -594,7 +601,7 @@ public class StatFunctions {
 		if (resultDamage <= 0) {
 			resultDamage = 1;
 		}
-		return Math.round(resultDamage);
+    	return Math.max(1, Math.round(resultDamage));
 	}
 
 	public static int calculateMagicalSkillDamage(Creature speller, Creature target, int baseDamages, int bonus,
@@ -604,8 +611,8 @@ public class StatFunctions {
 		int magicBoost = useMagicBoost ? sgs.getMBoost().getCurrent() : 0;
 		int mBResist = tgs.getMBResist().getCurrent();
 		int knowledge = useKnowledge ? sgs.getKnowledge().getCurrent() : 100;
-		if ((magicBoost - mBResist) > 3200) {
-			magicBoost = 3201;
+		if ((magicBoost - mBResist) > 6400) {
+			magicBoost = 6401;
 		} else {
 			magicBoost = magicBoost - mBResist;
 		}
@@ -613,6 +620,11 @@ public class StatFunctions {
 			magicBoost = 0;
 		}
 		float damages = baseDamages * (knowledge / 100f + magicBoost / 1000f);
+
+		// 在这里应用伤害倍率，确保技能伤害也受到倍率影响
+		if (speller instanceof Player && target instanceof Npc) {
+			damages *= DAMAGE_MULTIPLIER;
+		}
 
 		damages = sgs.getStat(StatEnum.BOOST_SPELL_ATTACK, (int) damages).getCurrent();
 		// add bonus damage
@@ -757,6 +769,12 @@ public class StatFunctions {
 					return damages;
 				}
 			}
+		}
+
+		// 在所有计算之前应用伤害倍率，确保它影响所有后续计算
+		// 只对玩家攻击NPC时应用伤害倍率，玩家对玩家不生效
+		if (attacker instanceof Player && target instanceof Npc) {
+			damages *= DAMAGE_MULTIPLIER;
 		}
 
 		if (attacker.isPvpTarget(target)) {
