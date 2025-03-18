@@ -68,7 +68,7 @@ public class AnikikiAI2 extends AggressiveNpcAI2 {
 	protected void handleMoveArrived() {
 		int point = getOwner().getMoveController().getCurrentPoint();
 		super.handleMoveArrived();
-		if (getNpcId() == 219040) { //Tamer Anikiki.
+		if (getNpcId() == 219040) {
 			if (point == 8) {
 				getOwner().setState(64);
 				PacketSendUtility.broadcastPacket(getOwner(), new SM_EMOTION(getOwner(), EmotionType.START_EMOTE2, 0, getObjectId()));
@@ -76,7 +76,7 @@ public class AnikikiAI2 extends AggressiveNpcAI2 {
 				getSpawnTemplate().setWalkerId(null);
 				WalkManager.stopWalking(this);
 				AI2Actions.deleteOwner(this);
-				spawn(219037, 736.2967f, 510.07104f, 941.4781f, (byte) 72); //Tamer Anikiki.
+/* 				spawn(219037, 736.2967f, 510.07104f, 941.4781f, (byte) 72); //Tamer Anikiki. */
 			}
 		}
 	}
@@ -84,7 +84,7 @@ public class AnikikiAI2 extends AggressiveNpcAI2 {
 	@Override
 	protected void handleSpawned() {
 		super.handleSpawned();
-		if (getNpcId() != 219040) { //Tamer Anikiki.
+		if (getNpcId() != 219040) {
 			ThreadPoolManager.getInstance().schedule(new Runnable() {
 				@Override
 				public void run() {

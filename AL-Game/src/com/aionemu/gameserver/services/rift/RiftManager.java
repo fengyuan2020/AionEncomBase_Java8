@@ -35,6 +35,7 @@ import com.aionemu.gameserver.model.vortex.VortexLocation;
 import com.aionemu.gameserver.utils.idfactory.IDFactory;
 import com.aionemu.gameserver.world.World;
 import com.aionemu.gameserver.world.knownlist.NpcKnownList;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.List;
 
 /****/
@@ -45,7 +46,7 @@ import java.util.List;
 public class RiftManager {
 
 	private static Logger log = LoggerFactory.getLogger(RiftManager.class);
-	private static List<Npc> rifts = new ArrayList<Npc>();
+	private static List<Npc> rifts = new CopyOnWriteArrayList<Npc>(); 
 	private static Map<String, SpawnTemplate> riftGroups = new HashMap<String, SpawnTemplate>();
 
 	public static void addRiftSpawnTemplate(SpawnGroup2 spawn) {
@@ -124,8 +125,10 @@ public class RiftManager {
 	}
 
 	public static List<Npc> getSpawned() {
-		return rifts;
-	}
+        synchronized (rifts) { 
+        return new ArrayList<>(rifts); 
+    }
+    }
 
 	public static RiftManager getInstance() {
 		return RiftManagerHolder.INSTANCE;

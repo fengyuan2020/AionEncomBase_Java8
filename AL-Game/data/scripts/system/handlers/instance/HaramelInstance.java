@@ -95,7 +95,7 @@ public class HaramelInstance extends GeneralInstanceHandler
 		switch (npc.getObjectTemplate().getTemplateId()) {
 			case 216915: //Boss Nukiti.
                 sendMsg("<Hamerun The Bleeder> appear");
-				spawn(216922, 224.39445f, 262.08163f, 144.89798f, (byte) 30); //Hamerun The Bleeder.
+/* 				spawn(216922, 224.39445f, 262.08163f, 144.89798f, (byte) 30); //Hamerun The Bleeder. */
             break;
 			case 700855: //Prison Doors.
 			    despawnNpc(npc);

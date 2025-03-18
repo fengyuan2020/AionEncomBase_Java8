@@ -29,8 +29,8 @@ import com.aionemu.gameserver.utils.PacketSendUtility;
 /****/
 
 @AIName("accountant_cabin_exit")
-public class AccountantCabinExitAI2 extends ActionItemNpcAI2
-{
+public class AccountantCabinExitAI2 extends ActionItemNpcAI2 {
+
 	@Override
 	protected void handleUseItemFinish(Player player) {
 		switch (getNpcId()) {
@@ -38,20 +38,20 @@ public class AccountantCabinExitAI2 extends ActionItemNpcAI2
 				switch (player.getWorldId()) {
 					case 300100000: //Steel Rake 1.5
 					    if (player.getCommonData().getRace() == Race.ASMODIANS) {
-						    PacketSendUtility.sendMessage(player, "you enter <Pandaemonium>");
-						    TeleportService2.teleportTo(player, 120010000, 950.000f, 1150.000f, 195.000f, (byte) 60, TeleportAnimation.BEAM_ANIMATION);
+						    PacketSendUtility.sendMessage(player, "you enter <Beluslan>");
+						    TeleportService2.teleportTo(player, 220040000, 2685.6497f, 998.47107f, 378.00754f, (byte) 60, TeleportAnimation.BEAM_ANIMATION);
 			            } else if (player.getCommonData().getRace() == Race.ELYOS) {
-						    PacketSendUtility.sendMessage(player, "you enter <Sanctum>");
-							TeleportService2.teleportTo(player, 110010000, 1867.000f, 2068.000f, 517.000f, (byte) 60, TeleportAnimation.BEAM_ANIMATION);
+						    PacketSendUtility.sendMessage(player, "you enter <Heiron>");
+							TeleportService2.teleportTo(player, 210040000, 1246.5492f, 2557.4895f, 138.75f, (byte) 60, TeleportAnimation.BEAM_ANIMATION);
 						}
 			        break;
 					case 300460000: //Steel Rake Cabin 3.0
 					    if (player.getCommonData().getRace() == Race.ASMODIANS) {
-						    PacketSendUtility.sendMessage(player, "you enter <Pandaemonium>");
-						    TeleportService2.teleportTo(player, 120010000, 950.000f, 1150.000f, 195.000f, (byte) 60, TeleportAnimation.BEAM_ANIMATION);
+						    PacketSendUtility.sendMessage(player, "you enter <Beluslan>");
+						    TeleportService2.teleportTo(player, 220040000, 2685.6497f, 998.47107f, 378.00754f, (byte) 60, TeleportAnimation.BEAM_ANIMATION);
 			            } else if (player.getCommonData().getRace() == Race.ELYOS) {
-						    PacketSendUtility.sendMessage(player, "you enter <Sanctum>");
-							TeleportService2.teleportTo(player, 110010000, 1867.000f, 2068.000f, 517.000f, (byte) 60, TeleportAnimation.BEAM_ANIMATION);
+						    PacketSendUtility.sendMessage(player, "you enter <Heiron>");
+							TeleportService2.teleportTo(player, 210040000, 1246.5492f, 2557.4895f, 138.75f, (byte) 60, TeleportAnimation.BEAM_ANIMATION);
 						}
 			        break;
 				}

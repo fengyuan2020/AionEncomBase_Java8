@@ -203,10 +203,10 @@
 	
 	<!-- STEEL RAKE CABIN -->
 	<!--  Hidden Escape Exit -->
-	<portal_use npc_id="730206">
+<!-- 	<portal_use npc_id="730206">
 		<portal_path loc_id="2100407" race="ELYOS"/>
 		<portal_path loc_id="2200414" race="ASMODIANS"/>
-	</portal_use>
+	</portal_use> -->
 	<!-- STEEL RAKE CABIN END -->
 	
 	<!-- STEEL RAKE -->
@@ -1616,33 +1616,33 @@
 
 	<!-- TIAMARANTA'S EYE [MASTER SERVER] 5.8 -->
 	<!-- TDown_M_Start_L -->
-	<portal_use npc_id="836443">
+<!-- 	<portal_use npc_id="836443">
 		<portal_path loc_id="6000410" race="ELYOS">
 			<portal_req min_level="46" max_level="65"/>
 		</portal_path>
-	</portal_use>
+	</portal_use> -->
 	<!-- TDown_M_Start_D -->
-	<portal_use npc_id="836444">
+<!-- 	<portal_use npc_id="836444">
 		<portal_path loc_id="6000411" race="ASMODIANS">
 			<portal_req min_level="46" max_level="65"/>
 		</portal_path>
-	</portal_use>
+	</portal_use> -->
 	<!-- TDown_M_FOBJ_Teleporter_L -->
-	<portal_use npc_id="836394">
+<!-- 	<portal_use npc_id="836394">
 		<portal_path loc_id="6000412" race="ELYOS"/>
-	</portal_use>
+	</portal_use> -->
 	<!-- TDown_M_FOBJ_Teleporter_D -->
-	<portal_use npc_id="836395">
+<!-- 	<portal_use npc_id="836395">
 		<portal_path loc_id="6000413" race="ASMODIANS"/>
-	</portal_use>
+	</portal_use> -->
 	<!-- Tiamat_Down_M_FOBJ_Telepoter_LDF4B_T2 -->
-	<portal_use npc_id="836409">
+<!-- 	<portal_use npc_id="836409">
 		<portal_path loc_id="1100108" race="ELYOS"/>
-	</portal_use>
+	</portal_use> -->
 	<!-- Tiamat_Down_M_FOBJ_Telepoter_LDF4B_T3 -->
-	<portal_use npc_id="836410">
+<!-- 	<portal_use npc_id="836410">
 		<portal_path loc_id="1200109" race="ASMODIANS"/>
-	</portal_use>
+	</portal_use> -->
 	<!-- TIAMARANTA'S EYE [MASTER SERVER] END 5.8 -->
 	
 	<!-- *********************************************** -->

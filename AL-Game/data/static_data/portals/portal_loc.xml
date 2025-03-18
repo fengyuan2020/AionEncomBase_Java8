@@ -337,10 +337,10 @@
 	<portal_loc world_id="600040000" loc_id="6000402" x="753.8862" y="196.5616" z="1201.5183" h="83"/> <!-- Elyos Breakout In -->
 	<portal_loc world_id="600040000" loc_id="6000403" x="754.4194" y="1341.1023" z="1201.5183" h="91"/> <!-- Asmodians Breakout In -->
 	<!-- Tiamaranta's Eye [Master Server] 5.8 -->
-	<portal_loc world_id="600040000" loc_id="6000410" x="754.08765" y="30.9985" z="1196.8104" h="30"/> <!-- Tiamaranta's Eye Elyos -->
-	<portal_loc world_id="600040000" loc_id="6000411" x="754.55330" y="1506.3683" z="1196.8643" h="90"/> <!-- Tiamaranta's Eye Asmodians -->
-	<portal_loc world_id="600041000" loc_id="6000412" x="753.8862" y="196.5616" z="1201.5183" h="83"/> <!-- Elyos Breakout In -->
-	<portal_loc world_id="600041000" loc_id="6000413" x="754.4194" y="1341.1023" z="1201.5183" h="91"/> <!-- Asmodians Breakout In -->
+<!-- 	<portal_loc world_id="600040000" loc_id="6000410" x="754.08765" y="30.9985" z="1196.8104" h="30"/> --> <!-- Tiamaranta's Eye Elyos -->
+<!-- 	<portal_loc world_id="600040000" loc_id="6000411" x="754.55330" y="1506.3683" z="1196.8643" h="90"/> --> <!-- Tiamaranta's Eye Asmodians -->
+<!-- 	<portal_loc world_id="600041000" loc_id="6000412" x="753.8862" y="196.5616" z="1201.5183" h="83"/> --> <!-- Elyos Breakout In -->
+<!-- 	<portal_loc world_id="600041000" loc_id="6000413" x="754.4194" y="1341.1023" z="1201.5183" h="91"/> --> <!-- Asmodians Breakout In -->
     <!-- Katalam -->
     <portal_loc world_id="600050000" loc_id="6000500" x="2420.8816" y="2282.8577" z="163.25" h="116"/> <!-- Exit A -->
     <portal_loc world_id="600050000" loc_id="6000501" x="2503.7026" y="720.7516" z="195.5" h="107"/> <!-- Exit B -->
@@ -522,7 +522,7 @@
 	<!-- Seized Danuar Sanctuary 4.8 -->
 	<portal_loc world_id="301140000" loc_id="3011400" x="388.0756" y="1185.9813" z="55.30134" h="0"/>
 	<!-- Rukibuki Circus Troop Training Camp 4.3 -->
-	<portal_loc world_id="301160000" loc_id="3011600" x="464.59558" y="566.6469" z="201.64261" h="2"/>
+<!-- 	<portal_loc world_id="301160000" loc_id="3011600" x="464.59558" y="566.6469" z="201.64261" h="2"/> -->
 	<!-- Rukibuki Circus Troupe Camp 4.3 -->
 	<portal_loc world_id="301200000" loc_id="3012000" x="464.59558" y="566.6469" z="201.64261" h="2"/>
 	<!-- Iron Wall Warfront 4.5 -->
