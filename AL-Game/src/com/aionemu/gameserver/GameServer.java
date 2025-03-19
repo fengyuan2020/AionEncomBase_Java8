@@ -94,6 +94,7 @@ import com.aionemu.gameserver.services.HousingBidService;
 import com.aionemu.gameserver.services.IdianDepthsService;
 import com.aionemu.gameserver.services.InstanceRiftService;
 import com.aionemu.gameserver.services.IuService;
+import com.aionemu.gameserver.services.LimitedItemTradeService;
 import com.aionemu.gameserver.services.MoltenusService;
 import com.aionemu.gameserver.services.NightmareCircusService;
 import com.aionemu.gameserver.services.NpcShoutsService;
@@ -282,7 +283,7 @@ public class GameServer {
 	 */
 	public static void main(String[] args) {
 		long start = System.currentTimeMillis();
-		
+
 		Lambda.enableJitting(true);
 		final GameEngine[] parallelEngines = { QuestEngine.getInstance(), InstanceEngine.getInstance(),
 				AI2Engine.getInstance(), ChatProcessor.getInstance() };
@@ -579,7 +580,7 @@ public class GameServer {
 		SpringZoneService.getInstance();
 		BoostEventService.getInstance().onStart();
 		TaskManagerFromDB.getInstance();
-		// LimitedItemTradeService.getInstance().start();
+		LimitedItemTradeService.getInstance().start();
 		GameTimeManager.startClock();
 
 		if (CustomConfig.LIMITS_ENABLED) {

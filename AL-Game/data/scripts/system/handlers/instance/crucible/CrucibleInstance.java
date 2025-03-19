@@ -17,16 +17,12 @@
 package instance.crucible;
 
 import com.aionemu.gameserver.instance.handlers.GeneralInstanceHandler;
-import com.aionemu.gameserver.model.EmotionType;
 import com.aionemu.gameserver.model.Race;
-import com.aionemu.gameserver.model.gameobjects.Creature;
 import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.model.instance.StageType;
 import com.aionemu.gameserver.model.instance.instancereward.InstanceReward;
 import com.aionemu.gameserver.model.instance.playerreward.CruciblePlayerReward;
-import com.aionemu.gameserver.network.aion.serverpackets.SM_DIE;
-import com.aionemu.gameserver.network.aion.serverpackets.SM_EMOTION;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_QUESTION_WINDOW;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_SYSTEM_MESSAGE;
 import com.aionemu.gameserver.services.player.PlayerReviveService;

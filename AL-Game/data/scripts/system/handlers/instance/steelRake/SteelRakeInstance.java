@@ -301,17 +301,17 @@ public class SteelRakeInstance extends GeneralInstanceHandler {
 			break;
 			case 215079: //Golden Eye Mantutu.
 				////sendMsg("[SUCCES]: You have finished <Steel Rake>");
-/* 				spawn(700554, 736.64728f, 493.73834f, 941.4781f, (byte) 45); //Pirate Ship Treasure Box.
+				spawn(700554, 736.64728f, 493.73834f, 941.4781f, (byte) 45); //Pirate Ship Treasure Box.
 				spawn(700554, 720.41028f, 511.63718f, 939.7604f, (byte) 90); //Pirate Ship Treasure Box.
 		        spawn(700554, 739.51251f, 506.14313f, 941.4781f, (byte) 77); //Pirate Ship Treasure Box.
-				spawn(700554, 721.76172f, 491.83142f, 939.6068f, (byte) 32); //Pirate Ship Treasure Box. */
+				spawn(700554, 721.76172f, 491.83142f, 939.6068f, (byte) 32); //Pirate Ship Treasure Box.
 				spawn(730766, 734.18994f, 484.61578f, 941.70868f, (byte) 0, 61); //Hidden Passage.
 			break;
 			case 215081: //Brass-Eye Grogget.
 				////sendMsg("[SUCCES]: You have finished <Steel Rake>");
 				spawn(700509, 403.25793f, 510.25354f, 1071.736f, (byte) 1); //Shining Box.
 				spawn(700555, 426.47424f, 509.34625f, 1075.3801f, (byte) 0); //Captain Treasure Box.
-				spawn(730766, 428.06598f, 486.64233f, 1075.4449f, (byte) 0, 61); //Escape Anchor.
+				spawn(730766, 428.06598f, 486.64233f, 1075.4449f, (byte) 0, 87); //Escape Anchor.
 			break;
 			case 215411: //Zerkin The One-Eyed.
 				//The door is open and you can now access the Large Gun Deck.
