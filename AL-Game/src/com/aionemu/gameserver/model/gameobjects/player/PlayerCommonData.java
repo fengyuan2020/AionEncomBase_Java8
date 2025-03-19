@@ -73,6 +73,7 @@ public class PlayerCommonData extends VisibleObjectTemplate {
 	private int mailboxLetters;
 	private int soulSickness = 0;
 	private boolean noExp = false;
+	private double expMultiplier = 1.0; // 默认100%经验值
 	private long reposteCurrent;
 	private long reposteMax;
 	private long salvationPoint;
@@ -217,6 +218,14 @@ public class PlayerCommonData extends VisibleObjectTemplate {
 		return this.expRecoverable;
 	}
 
+public double getExpMultiplier() {
+        return expMultiplier;
+    }
+
+    public void setExpMultiplier(double expMultiplier) {
+        this.expMultiplier = expMultiplier;
+    }
+
 	/**
 	 * @param value
 	 */
@@ -240,9 +249,9 @@ public class PlayerCommonData extends VisibleObjectTemplate {
 		if (this.noExp) {
 			return;
 		}
-		long reward = value;
+		long reward = (long) (value * expMultiplier);
 		if ((getPlayer() != null) && (rewardType != null)) {
-			reward = rewardType.calcReward(getPlayer(), value);
+			reward = rewardType.calcReward(getPlayer(), reward); 
 		}
 		long repose = 0;
 		if ((isReadyForReposteEnergy()) && (getCurrentReposteEnergy() > 0)) {

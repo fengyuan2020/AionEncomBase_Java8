@@ -29,7 +29,7 @@
 	</monster_hunt>
 	<!-- [Group] Revenge Of Maximus (Elyos Only) -->
 	<monster_hunt id="3213" start_npc_ids="204535">
-		<monster var="0" npc_ids="203735" end_var="20"/>
+		<monster var="0" npc_ids="214982 214983 214977 214978 214979" end_var="20"/>
 	</monster_hunt>
 	<!-- [Group] The Pirates' Pouch (Elyos Only) -->
 	<item_collecting id="3214" start_npc_ids="805835"/>
@@ -64,7 +64,7 @@
 	</monster_hunt>
 	<!-- [Group] Unfortunate Baba Hun (Asmodians Only) -->
 	<monster_hunt id="4213" start_npc_ids="204792">
-		<monster npc_ids="215032" var="0" end_var="4"/>
+		<monster npc_ids="215032 215033 215408" var="0" end_var="4"/>
 		<monster npc_ids="215410" var="1" end_var="4"/>
 	</monster_hunt>
 	<!-- [Group] Black Cloud Ledgers (Asmodians Only) -->
