@@ -12,29 +12,22 @@
  */
 package quest.ishalgen;
 
-import com.aionemu.gameserver.model.EmotionId;
-import com.aionemu.gameserver.model.EmotionType;
 import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
-import com.aionemu.gameserver.network.aion.serverpackets.SM_EMOTION;
-import com.aionemu.gameserver.network.aion.serverpackets.SM_USE_OBJECT;
 import com.aionemu.gameserver.questEngine.handlers.QuestHandler;
 import com.aionemu.gameserver.questEngine.model.QuestDialog;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
-import com.aionemu.gameserver.utils.PacketSendUtility;
 import com.aionemu.gameserver.services.teleport.TeleportService2;
-import com.aionemu.gameserver.utils.ThreadPoolManager;
 
 /****/
 /** Author Ghostfur & Unknown (Aion-Unique)
 /****/
 
-public class _2007Wheres_Rae_This_Time extends QuestHandler
-{
+public class _2007Wheres_Rae_This_Time extends QuestHandler {
+
 	private final static int questId = 2007;
-	
 	public _2007Wheres_Rae_This_Time() {
 		super(questId);
 	}
@@ -84,8 +77,7 @@ public class _2007Wheres_Rae_This_Time extends QuestHandler
 							if (var == 0) {
 								qs.setQuestVarById(0, var + 1);
 								updateQuestStatus(env);
-								closeDialogWindow(env);
-								return true;
+								return closeDialogWindow(env);
 							}
 						break;
 					}
@@ -101,8 +93,7 @@ public class _2007Wheres_Rae_This_Time extends QuestHandler
 							if (var == 1) {
 								qs.setQuestVarById(0, var + 1);
 								updateQuestStatus(env);
-								closeDialogWindow(env);
-								return true;
+								return closeDialogWindow(env);
 							}
 						break;
 					}
@@ -121,8 +112,7 @@ public class _2007Wheres_Rae_This_Time extends QuestHandler
 							if (var == 2) {
 								qs.setQuestVarById(0, var + 1);
 								updateQuestStatus(env);
-								closeDialogWindow(env);
-								return true;
+								return closeDialogWindow(env);
 							}
 						break;
 					}
@@ -138,8 +128,7 @@ public class _2007Wheres_Rae_This_Time extends QuestHandler
 							if (var == 3) {
 								qs.setQuestVarById(0, var + 1);
 								updateQuestStatus(env);
-								closeDialogWindow(env);
-								return true;
+								return closeDialogWindow(env);
 							}
 						break;	
 					}
@@ -157,8 +146,7 @@ public class _2007Wheres_Rae_This_Time extends QuestHandler
 							if (var == 4) {
 								qs.setQuestVar(5);
 								updateQuestStatus(env);
-								closeDialogWindow(env);
-								return true;
+								return closeDialogWindow(env);
 							}
 						break;
 						case STEP_TO_6:

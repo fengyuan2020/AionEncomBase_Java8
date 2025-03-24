@@ -55,7 +55,6 @@ public class _1472GanimerksEspionage extends QuestHandler {
 				else
 					return sendQuestStartDialog(env);
 			}
-
 			else if (qs != null && qs.getStatus() == QuestStatus.REWARD) {
 				return sendQuestEndDialog(env);
 			}

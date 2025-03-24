@@ -18,22 +18,19 @@ package quest.ascension;
 
 import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
-import com.aionemu.gameserver.network.aion.serverpackets.SM_DIALOG_WINDOW;
 import com.aionemu.gameserver.questEngine.handlers.QuestHandler;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
 import com.aionemu.gameserver.services.teleport.TeleportService2;
-import com.aionemu.gameserver.utils.PacketSendUtility;
 
 /****/
 /** Author (Encom)
 /****/
 
-public class _1916Dispatch_To_Verteron_Chanter_Cleric extends QuestHandler
-{
+public class _1916Dispatch_To_Verteron_Chanter_Cleric extends QuestHandler {
+
 	private final static int questId = 1916;
-	
 	public _1916Dispatch_To_Verteron_Chanter_Cleric() {
 		super(questId);
 	}
@@ -76,17 +73,20 @@ public class _1916Dispatch_To_Verteron_Chanter_Cleric extends QuestHandler
 							qs.setQuestVarById(0, var + 1);
 							updateQuestStatus(env);
 							TeleportService2.teleportTo(player, 210030000, player.getInstanceId(), 1643f, 1500f, 120f);
-							PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 0));
-							return true;
+						    return closeDialogWindow(env);
 						}
 					}
 				} case 203097:
 				switch (env.getDialog()) {
 					case START_DIALOG:
 					if (var == 1) {
+						return sendQuestDialog(env, 2375);
+					}
+					case SELECT_REWARD:
+					if (var == 1) {
 						qs.setStatus(QuestStatus.REWARD);
 						updateQuestStatus(env);
-						return sendQuestDialog(env, 2375);
+				        return sendQuestEndDialog(env);
 					}
 				}
 			}

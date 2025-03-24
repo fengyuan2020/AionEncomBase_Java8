@@ -14,22 +14,19 @@ package quest.ishalgen;
 
 import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
-import com.aionemu.gameserver.network.aion.serverpackets.SM_DIALOG_WINDOW;
 import com.aionemu.gameserver.questEngine.handlers.QuestHandler;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
 import com.aionemu.gameserver.services.QuestService;
-import com.aionemu.gameserver.utils.PacketSendUtility;
 
 /****/
 /** Author Ghostfur & Unknown (Aion-Unique)
 /****/
 
-public class _2003Treasure_Of_The_Deceased extends QuestHandler
-{
-	private final static int questId = 2003;
+public class _2003Treasure_Of_The_Deceased extends QuestHandler {
 
+	private final static int questId = 2003;
 	public _2003Treasure_Of_The_Deceased() {
 		super(questId);
 	}
@@ -72,13 +69,12 @@ public class _2003Treasure_Of_The_Deceased extends QuestHandler
 						}
 					case SELECT_ACTION_1012:
 						playQuestMovie(env, 53);
-					break;
+					return sendQuestDialog(env, 1012);
 					case STEP_TO_1:
 						if (var == 0) {
 							qs.setQuestVarById(0, var + 1);
 							updateQuestStatus(env);
-							PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
-							return true;
+							return closeDialogWindow(env);
 						}
 					case CHECK_COLLECTED_ITEMS:
 						if (var == 1) {

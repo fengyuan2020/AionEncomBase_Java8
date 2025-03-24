@@ -62,7 +62,7 @@ public class _14121Splitting_Stones extends QuestHandler {
 					} case STEP_TO_1: {
 						return defaultCloseDialog(env, 0, 1);
 					} case CHECK_COLLECTED_ITEMS_SIMPLE: {
-						return checkQuestItems(env, 1, 1, true, 5, 2716);
+						return checkQuestItems(env, 1, 1, true, 5, 0);
 					}
 				}
 			}

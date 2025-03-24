@@ -79,7 +79,7 @@ public class _1371FlowersForIsson extends QuestHandler {
 						removeQuestItem(env, 152000601, 5);
 						qs.setQuestVar(2);
 						updateQuestStatus(env);
-						return sendQuestSelectionDialog(env);
+				        return closeDialogWindow(env);
 					}
 				}
 			}

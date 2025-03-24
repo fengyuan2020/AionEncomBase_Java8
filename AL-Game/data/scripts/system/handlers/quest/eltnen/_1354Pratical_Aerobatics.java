@@ -78,8 +78,6 @@ public class _1354Pratical_Aerobatics extends QuestHandler {
 		if (env.getVisibleObject() instanceof Npc)
 		targetId = ((Npc) env.getVisibleObject()).getNpcId();
 		QuestState qs = player.getQuestStateList().getQuestState(questId);
-		if (qs == null)
-			return false;
 		if (qs == null || qs.getStatus() == QuestStatus.NONE) {
 			if (targetId == 203983) {
 				if (dialog == QuestDialog.START_DIALOG)
@@ -87,7 +85,10 @@ public class _1354Pratical_Aerobatics extends QuestHandler {
 				else
 					return sendQuestStartDialog(env);
 			}
-		} else if (qs.getStatus() == QuestStatus.START) {
+		}
+		if (qs == null)
+			return false;
+        else if (qs.getStatus() == QuestStatus.START) {
 			if (targetId == 203983) {
 				switch (dialog) {
 					case START_DIALOG:

@@ -81,16 +81,18 @@ public class _1483HarumonerksRequest extends QuestHandler {
 			}
 		}
 		else if (targetId == 798127) {
-			if (qs != null) {
-				if (env.getDialog() == QuestDialog.START_DIALOG && qs.getStatus() == QuestStatus.START)
+			if (qs != null && qs.getStatus() == QuestStatus.START && qs.getQuestVarById(0) == 2) {
+				if (env.getDialog() == QuestDialog.START_DIALOG)
 					return sendQuestDialog(env, 2375);
-				else if (env.getDialogId() == 1009 && qs.getStatus() != QuestStatus.COMPLETE
-					&& qs.getStatus() != QuestStatus.NONE) {
+				else if (env.getDialogId() == 1009) {
 					qs.setQuestVar(3);
 					qs.setStatus(QuestStatus.REWARD);
 					updateQuestStatus(env);
 					return sendQuestEndDialog(env);
 				}
+			}
+			else if (qs != null && qs.getStatus() == QuestStatus.REWARD) {
+				return sendQuestEndDialog(env);
 			}
 		}
 		return false;

@@ -85,13 +85,8 @@ public class _1466RespectForDeltras extends QuestHandler {
 				if (env.getDialog() == QuestDialog.START_DIALOG)
 					return sendQuestDialog(env, 4762);
 				else if (env.getDialogId() == 1002) {
-					if (giveQuestItem(env, 182201385, 1))
-						return sendQuestStartDialog(env);
-					else
-						return true;
+					return sendQuestStartDialog(env, 182201385, 1);
 				}
-				else
-					return sendQuestStartDialog(env);
 			}
 		}
 		else if (targetId == 203903) {

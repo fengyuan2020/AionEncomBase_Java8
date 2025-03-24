@@ -71,9 +71,11 @@ public class _1691TheLittleLeatherSlipper extends QuestHandler {
 							}
 						}
 						case STEP_TO_1: {
+						if (qs.getQuestVarById(0) == 0) {
 							qs.setQuestVarById(0, qs.getQuestVarById(0) + 1);
 							updateQuestStatus(env);
                             return closeDialogWindow(env);
+                            }
 						}
 					}
 				}
@@ -85,9 +87,11 @@ public class _1691TheLittleLeatherSlipper extends QuestHandler {
 							}
 						}
 						case STEP_TO_2: {
+						if (qs.getQuestVarById(0) == 1) {
 							qs.setQuestVarById(0, qs.getQuestVarById(0) + 1);
 							updateQuestStatus(env);
                             return closeDialogWindow(env);
+                            }
 						}
 					}
 				}
@@ -99,10 +103,12 @@ public class _1691TheLittleLeatherSlipper extends QuestHandler {
 							}
 						}
 						case STEP_TO_3: {
+						if (qs.getQuestVarById(0) == 2) {
 							qs.setQuestVarById(0, qs.getQuestVarById(0) + 1);
 							qs.setStatus(QuestStatus.REWARD);
 							updateQuestStatus(env);
                             return closeDialogWindow(env);
+                            }
 						}
 					}
 				}

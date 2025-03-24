@@ -56,6 +56,16 @@
 	<spawn npc_id="805318" respawn_time="295">
       <spot x="2761.8367" y="1883.5164" z="153.75107" entity_id="1770"/>
     </spawn>
+	<!-- Tabrinerk -->
+	<spawn npc_id="798097" respawn_time="295">
+		<temporary_spawn/>
+		<spot x="2360.38" y="2256.56" z="142.39" h="25">
+			<temporary_spawn spawn_time="21.*.*" despawn_time="4.*.*"/>
+		</spot>
+		<spot x="2658.74000" y="1825.85000" z="142.87000" h="20">
+			<temporary_spawn spawn_time="5.*.*" despawn_time="22.*.*"/>
+		</spot>
+	</spawn>
 	<!-- Vengeful Spirit Of Prapero -->
 	<spawn npc_id="204614" respawn_time="295">
 		<spot x="1591.45" y="2774.31" z="127.633" h="94"/>

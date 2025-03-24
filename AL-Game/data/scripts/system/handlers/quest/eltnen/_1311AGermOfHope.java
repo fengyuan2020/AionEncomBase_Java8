@@ -56,8 +56,7 @@ public class _1311AGermOfHope extends QuestHandler {
 					return sendQuestDialog(env, 4);
                 }   
 				else if (env.getDialogId() == 1002) {
-                    giveQuestItem(env, 182201305, 1); 
-					return sendQuestStartDialog(env);
+					return sendQuestStartDialog(env, 182201305, 1);
 				}
 				else if (env.getDialogId() == 1003) {
 					return closeDialogWindow(env);
@@ -75,18 +74,19 @@ public class _1311AGermOfHope extends QuestHandler {
 						return true;
 					}
 				}
-            case 203997: {
-            if (env.getDialog() == QuestDialog.START_DIALOG)
-				return sendQuestDialog(env, 2375);
-				} 
-            if (env.getDialogId() == 1009) {
-				return sendQuestEndDialog(env);
-                }
 		    }
         }
         else if (qs != null && qs.getStatus() == QuestStatus.REWARD) {
-		     return sendQuestEndDialog(env);
-        }
+            if (targetId == 203997) {
+                if (env.getDialog() == QuestDialog.USE_OBJECT) {
+                    return sendQuestDialog(env, 2375);
+				} else if (env.getDialog() == QuestDialog.SELECT_REWARD) {
+					return sendQuestDialog(env, 5);
+				} else {
+					return sendQuestEndDialog(env);
+				}
+			}
+		}
 		return false;
 	}
 }

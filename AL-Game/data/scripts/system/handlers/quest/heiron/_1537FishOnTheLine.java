@@ -30,7 +30,6 @@ import com.aionemu.gameserver.questEngine.model.QuestStatus;
 public class _1537FishOnTheLine extends QuestHandler {
 
 	private final static int questId = 1537;
-
 	public _1537FishOnTheLine() {
 		super(questId);
 	}
@@ -63,27 +62,56 @@ public class _1537FishOnTheLine extends QuestHandler {
 			switch (targetId) {
 				case 730189: {
 					if (env.getDialog() == QuestDialog.USE_OBJECT) {
-						return useQuestObject(env, 0, 1, false, 0); // 1
+					    return sendQuestDialog(env, 1352);
+                    }
+				    else if (env.getDialog() == QuestDialog.SELECT_ACTION_1353) {
+					    return sendQuestDialog(env, 1353);
+				    }
+				    else if (env.getDialog() == QuestDialog.STEP_TO_1) {
+					    qs.setQuestVarById(0, qs.getQuestVarById(0) + 1);
+					    updateQuestStatus(env);
+                       return closeDialogWindow(env);
 					}
-					break;
 				}
 				case 730190: {
 					if (env.getDialog() == QuestDialog.USE_OBJECT) {
-						return useQuestObject(env, 1, 2, false, 0); // 2
+					    return sendQuestDialog(env, 1693);
+                    }
+				    else if (env.getDialog() == QuestDialog.SELECT_ACTION_1694) {
+					    return sendQuestDialog(env, 1694);
+				    }
+				    else if (env.getDialog() == QuestDialog.STEP_TO_2) {
+					    qs.setQuestVarById(0, qs.getQuestVarById(0) + 1);
+					    updateQuestStatus(env);
+                        return closeDialogWindow(env);
 					}
-					break;
 				}
 				case 730191: {
 					if (qs.getQuestVarById(0) == 2 && env.getDialog() == QuestDialog.USE_OBJECT) {
-						qs.setQuestVarById(0, 3);
+					    return sendQuestDialog(env, 2034);
+                    }
+				    else if (env.getDialog() == QuestDialog.SELECT_ACTION_2035) {
+					    return sendQuestDialog(env, 2035);
+				    }
+				    else if (env.getDialog() == QuestDialog.STEP_TO_3) {
+					    qs.setQuestVarById(0, qs.getQuestVarById(0) + 1);
+						updateQuestStatus(env);
+                        return closeDialogWindow(env);
+					}
+				}
+				case 204588: {
+					if (qs.getQuestVarById(0) == 3 && env.getDialog() == QuestDialog.START_DIALOG) {
+					    return sendQuestDialog(env, 2375);
+                    }
+				    else if (env.getDialog() == QuestDialog.SELECT_REWARD) {
+					    qs.setQuestVarById(0, qs.getQuestVarById(0) + 1);
 						qs.setStatus(QuestStatus.REWARD);
 						updateQuestStatus(env);
-						return true;
+				        return sendQuestEndDialog(env);
 					}
 				}
 			}
 		}
-
 		else if (qs.getStatus() == QuestStatus.REWARD) {
 			if (targetId == 204588)
 				return sendQuestEndDialog(env);

@@ -71,13 +71,12 @@ public class _1373WaterTherapy extends QuestHandler {
 			if (targetId == 203949) { //Aerope 
 				if (dialog == QuestDialog.START_DIALOG)
 					return sendQuestDialog(env, 1011);
+				else if (dialog == QuestDialog.ASK_ACCEPTION) {
+					return sendQuestDialog(env, 4);
+                }
 				else if (dialog == QuestDialog.ACCEPT_QUEST) {
-					if (!giveQuestItem(env, 182201372, 1))
-						return true;
-					return sendQuestStartDialog(env); 
-               }
-				else
-					return sendQuestStartDialog(env);
+					return sendQuestStartDialog(env, 182201372, 1); 
+                }
 			}
 		}
 		else if (qs.getStatus() == QuestStatus.START) {
@@ -92,8 +91,6 @@ public class _1373WaterTherapy extends QuestHandler {
 								return checkQuestItems(env, 2, 3, true, 5, 2716);
 							}
 						}
-						else
-							return sendQuestEndDialog(env);
 					}
 				}
 			}

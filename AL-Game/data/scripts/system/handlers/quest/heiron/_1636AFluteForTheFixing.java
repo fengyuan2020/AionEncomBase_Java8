@@ -100,9 +100,6 @@ public class _1636AFluteForTheFixing extends QuestHandler {
 						case STEP_TO_4: {
 							return defaultCloseDialog(env, 2, 3, 182201785, 1, 0, 0); // 3
 						}
-						case FINISH_DIALOG: {
-							return sendQuestSelectionDialog(env);
-						}
 					}
 				}
 			}

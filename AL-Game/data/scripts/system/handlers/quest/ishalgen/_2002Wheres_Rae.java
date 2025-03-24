@@ -43,7 +43,6 @@ public class _2002Wheres_Rae extends QuestHandler {
 
     private final static int questId = 2002;
     private final static int[] npc_ids = {203519, 203534, 203553, 700045, 203516, 203538};
-
     public _2002Wheres_Rae() {
         super(questId);
     }
@@ -63,11 +62,9 @@ public class _2002Wheres_Rae extends QuestHandler {
     public boolean onDialogEvent(QuestEnv env) {
         final Player player = env.getPlayer();
         final QuestState qs = player.getQuestStateList().getQuestState(questId);
-        final QuestEnv qEnv = env;
         if (qs == null) {
             return false;
         }
-
         int var = qs.getQuestVarById(0);
         int targetId = 0;
         if (env.getVisibleObject() instanceof Npc) {
@@ -85,8 +82,7 @@ public class _2002Wheres_Rae extends QuestHandler {
                             if (var == 0) {
                                 qs.setQuestVarById(0, var + 1);
                                 updateQuestStatus(env);
-                                PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
-                                return true;
+				                return closeDialogWindow(env);
                             }
                     }
                 }
@@ -103,8 +99,7 @@ public class _2002Wheres_Rae extends QuestHandler {
                             if (var == 1) {
                                 qs.setQuestVarById(0, var + 1);
                                 updateQuestStatus(env);
-                                PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
-                                return true;
+				                return closeDialogWindow(env);
                             }
                     }
                 }
@@ -128,13 +123,11 @@ public class _2002Wheres_Rae extends QuestHandler {
                             if (var == 2 || var == 10) {
                                 qs.setQuestVarById(0, var + 1);
                                 updateQuestStatus(env);
-                                PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
-                                return true;
+				                return closeDialogWindow(env);
                             } else if (var == 13) {
                                 qs.setQuestVarById(0, 14);
                                 updateQuestStatus(env);
-                                PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
-                                return true;
+				                return closeDialogWindow(env);
                             }
                             break;
                         case STEP_TO_5:
@@ -189,8 +182,7 @@ public class _2002Wheres_Rae extends QuestHandler {
                                 env.getVisibleObject().getController().onDelete();
                                 qs.setStatus(QuestStatus.REWARD);
                                 updateQuestStatus(env);
-                                PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
-                                return true;
+				                return closeDialogWindow(env);
                             }
                     }
                 case 205020:
@@ -206,7 +198,7 @@ public class _2002Wheres_Rae extends QuestHandler {
                                     public void run() {
                                         TeleportService2.teleportTo(player, 220010000, 940.15f, 2295.64f, 265.7f, (byte) 43);
                                         qs.setQuestVar(13);
-                                        updateQuestStatus(qEnv);
+                                        updateQuestStatus(env);
                                     }
                                 }, 40000);
                                 return true;
@@ -237,13 +229,11 @@ public class _2002Wheres_Rae extends QuestHandler {
         if (qs == null) {
             return false;
         }
-
         int var = qs.getQuestVarById(0);
         int targetId = 0;
         if (env.getVisibleObject() instanceof Npc) {
             targetId = ((Npc) env.getVisibleObject()).getNpcId();
         }
-
         if (qs.getStatus() != QuestStatus.START) {
             return false;
         }

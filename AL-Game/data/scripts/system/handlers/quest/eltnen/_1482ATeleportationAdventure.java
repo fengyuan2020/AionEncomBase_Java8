@@ -18,14 +18,12 @@ package quest.eltnen;
 
 import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
-import com.aionemu.gameserver.network.aion.serverpackets.SM_DIALOG_WINDOW;
 import com.aionemu.gameserver.questEngine.handlers.QuestHandler;
 import com.aionemu.gameserver.questEngine.model.QuestDialog;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
 import com.aionemu.gameserver.services.teleport.TeleportService2;
-import com.aionemu.gameserver.utils.PacketSendUtility;
 
 /**
  * @author Balthazar
@@ -90,8 +88,7 @@ public class _1482ATeleportationAdventure extends QuestHandler {
 						case STEP_TO_1: {
 							qs.setQuestVarById(0, qs.getQuestVarById(0) + 1);
 							updateQuestStatus(env);
-							PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
-							return true;
+				            return closeDialogWindow(env);
 						}
 						case STEP_TO_3: {
 							qs.setQuestVar(3);
@@ -99,10 +96,8 @@ public class _1482ATeleportationAdventure extends QuestHandler {
 							updateQuestStatus(env);
 							TeleportService2.teleportTo(player, 220020000, 1, 638, 2337, 425, (byte) 20);
 							removeQuestItem(env, 182201399, 3);
-							return true;
+				            return closeDialogWindow(env);
 						}
-						default:
-							return sendQuestStartDialog(env);
 					}
 				}
 			}
