@@ -23,11 +23,10 @@ import com.aionemu.gameserver.questEngine.model.QuestStatus;
 /** Author Ghostfur & Unknown (Aion-Unique)
 /****/
 
-public class _2001Thinking_Ahead extends QuestHandler
-{
+public class _2001Thinking_Ahead extends QuestHandler {
+
 	private final static int questId = 2001;
 	private int[] mobs = {210369, 210368};
-	
 	public _2001Thinking_Ahead() {
 		super(questId);
 	}
@@ -82,8 +81,6 @@ public class _2001Thinking_Ahead extends QuestHandler
 						return defaultCloseDialog(env, 2, 3);
 					} case CHECK_COLLECTED_ITEMS: {
 						return checkQuestItems(env, 1, 2, false, 1694, 1693);
-					} case FINISH_DIALOG: {
-						return sendQuestSelectionDialog(env);
 					}
 				}
 			} else if (targetId == 700093) {

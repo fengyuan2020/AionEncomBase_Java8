@@ -64,9 +64,7 @@ public class _1393NewFlightPath extends QuestHandler {
 				}
 			}
 		}
-		if (qs == null)
-			return false;
-		if (qs.getStatus() == QuestStatus.START) {
+		else if (qs != null && qs.getStatus() == QuestStatus.START) {
 			if (targetId == 204041) {
 				switch (env.getDialog()) {
 					case START_DIALOG: {
@@ -82,15 +80,18 @@ public class _1393NewFlightPath extends QuestHandler {
 				}
 			}
 		}
-		if (qs.getStatus() == QuestStatus.REWARD) {
+		else if (qs != null && qs.getStatus() == QuestStatus.REWARD) {
 			if (targetId == 204041) {
 				switch (env.getDialog()) {
-					case START_DIALOG: {
-						return sendQuestDialog(env, 5);
+					case USE_OBJECT: {
+                         return sendQuestDialog(env, 1352);
 					}
+					case SELECT_REWARD: {
+                        return sendQuestDialog(env, 5);
+				    }
 					default:
 						return sendQuestEndDialog(env);
-				}
+                 }
 			}
 		}
 		return false;
@@ -98,17 +99,10 @@ public class _1393NewFlightPath extends QuestHandler {
 
 	@Override
 	public boolean onEnterZoneEvent(QuestEnv env, ZoneName zoneName) {
-		if (zoneName != ZoneName.get("LEPHARIST_BASTION_210020000"))
-			return false;
-		final Player player = env.getPlayer();
-		if (player == null)
-			return false;
-		final QuestState qs = player.getQuestStateList().getQuestState(questId);
-		if (qs == null)
-			return false;
-		if (qs.getQuestVarById(0) == 0) {
-			qs.setStatus(QuestStatus.REWARD);
-			updateQuestStatus(env);
+		Player player = env.getPlayer();
+		QuestState qs = player.getQuestStateList().getQuestState(questId);
+		if (qs != null && qs.getStatus() == QuestStatus.START) {
+			changeQuestStep(env, 0, 0, true);
 			return true;
 		}
 		return false;

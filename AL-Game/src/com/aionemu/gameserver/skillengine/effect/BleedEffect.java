@@ -39,23 +39,22 @@ public class BleedEffect extends AbstractOverTimeEffect {
 	public void startEffect(final Effect effect) {
 		int valueWithDelta = value + delta * effect.getSkillLevel();
 		int critAddDmg = this.critAddDmg2 + this.critAddDmg1 * effect.getSkillLevel();
-		int finalDamage = AttackUtil.calculateMagicalOverTimeSkillResult(effect, valueWithDelta, element, this.position,
-				false, this.critProbMod2, critAddDmg);
+		int finalDamage = AttackUtil.calculateMagicalOverTimeSkillResult(effect, valueWithDelta, element, this.position, false, this.critProbMod2, critAddDmg);
 		effect.setReservedInt(position, finalDamage);
 		super.startEffect(effect, AbnormalState.BLEED);
 	}
 
 	@Override
 	public void endEffect(Effect effect) {
-		super.endEffect(effect, AbnormalState.BLEED);
+		// super.endEffect(effect, AbnormalState.BLEED);
+		effect.getEffected().getEffectController().unsetAbnormal(AbnormalState.BLEED.getId());
 	}
 
 	@Override
 	public void onPeriodicAction(Effect effect) {
 		Creature effected = effect.getEffected();
 		Creature effector = effect.getEffector();
-		effected.getController().onAttack(effector, effect.getSkillId(), TYPE.DAMAGE, effect.getReservedInt(position),
-				false, LOG.BLEED);
+		effected.getController().onAttack(effector, effect.getSkillId(), TYPE.DAMAGE, effect.getReservedInt(position), false, LOG.BLEED);
 		effected.getObserveController().notifyDotAttackedObservers(effector, effect);
 	}
 }

@@ -8,11 +8,10 @@ import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
 
-public class _3329Dinners_On_Me extends QuestHandler
-{
+public class _3329Dinners_On_Me extends QuestHandler {
+
 	private final static int questId = 3329;
 	private final static int[] mob_ids = {210887, 210912, 210914, 210932};
-	
 	public _3329Dinners_On_Me() {
 		super(questId);
 	}
@@ -59,10 +58,10 @@ public class _3329Dinners_On_Me extends QuestHandler
 			if (targetId == 203956) {
 				switch (dialog) {
 					case START_DIALOG: {
-						qs.setStatus(QuestStatus.REWARD);
-						updateQuestStatus(env);
 						return sendQuestDialog(env, 2375);
 					} case SELECT_REWARD:
+						qs.setStatus(QuestStatus.REWARD);
+						updateQuestStatus(env);
 						return sendQuestEndDialog(env);
 				}
 			}

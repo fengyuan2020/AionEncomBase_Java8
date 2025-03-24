@@ -56,13 +56,10 @@ public class _4205Smack_The_Shulack extends QuestHandler {
             targetId = ((Npc) env.getVisibleObject()).getNpcId();
         } 
         if (qs == null || qs.getStatus() == QuestStatus.START) {
-		    int var = qs.getQuestVarById(0);
 			if (targetId == 205233) {
                 switch (env.getDialog()) {
                     case START_DIALOG: {
-                        if (var == 15) {
-                            return sendQuestDialog(env, 1352);
-                        }
+                        return sendQuestDialog(env, 1352);
 					} case STEP_TO_2: {
                         changeQuestStep(env, 15, 16, false);
 						return closeDialogWindow(env);
@@ -71,9 +68,7 @@ public class _4205Smack_The_Shulack extends QuestHandler {
             } if (targetId == 204792) {
                 switch (env.getDialog()) {
                     case START_DIALOG: {
-                        if (var == 16) {
-                            return sendQuestDialog(env, 1694);
-                        }
+                        return sendQuestDialog(env, 1693);
 					} case SET_REWARD: {
                         qs.setStatus(QuestStatus.REWARD);
 						updateQuestStatus(env);

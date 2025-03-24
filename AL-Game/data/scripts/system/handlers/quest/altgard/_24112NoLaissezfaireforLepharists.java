@@ -95,7 +95,7 @@ public class _24112NoLaissezfaireforLepharists extends QuestHandler {
 		Player player = env.getPlayer();
 		QuestState qs = player.getQuestStateList().getQuestState(questId);
 		int targetId = env.getTargetId();
-		if (qs.getQuestVarById(0) == 1 && targetId == 210510) {
+		if (qs.getQuestVarById(0) == 0 && targetId == 210510) {
 			qs.setQuestVarById(0, 1);
 			updateQuestStatus(env);
 			return true;

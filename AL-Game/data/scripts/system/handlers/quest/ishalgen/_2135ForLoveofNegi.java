@@ -53,13 +53,8 @@ public class _2135ForLoveofNegi extends QuestHandler {
 				if (env.getDialog() == QuestDialog.START_DIALOG)
 					return sendQuestDialog(env, 1011);
 				else if (env.getDialogId() == 1002) {
-					if (giveQuestItem(env, 182203131, 1))
-						return sendQuestStartDialog(env);
-					else
-						return true;
+					return sendQuestStartDialog(env, 182203131, 1);
 				}
-				else
-					return sendQuestStartDialog(env);
 			}
 			else if (qs != null && qs.getStatus() == QuestStatus.START) {
 				if (env.getDialog() == QuestDialog.START_DIALOG)

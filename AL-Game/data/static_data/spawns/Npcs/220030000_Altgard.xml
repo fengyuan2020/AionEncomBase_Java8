@@ -2972,7 +2972,7 @@
     <spawn npc_id="203602" respawn_time="60">
       <spot x="1727.166870" y="1817.624634" z="204.28271" h="66" />
     </spawn>
-    <spawn npc_id="203682" respawn_time="60">
+    <spawn npc_id="203682" respawn_time="60" pool="1">
       <temporary_spawn spawn_time="8.*.*" despawn_time="20.*.*" />
       <spot x="1591.209961" y="2201.120117" z="248.40125" h="90" />
       <spot x="1657.599976" y="2174.500000" z="257.2125" h="83" />

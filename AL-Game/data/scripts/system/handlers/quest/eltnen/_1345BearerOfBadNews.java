@@ -18,7 +18,6 @@ import com.aionemu.gameserver.world.zone.ZoneName;
 public class _1345BearerOfBadNews extends QuestHandler {
 
 	private final static int questId = 1345;
-
 	public _1345BearerOfBadNews() {
 		super(questId);
 	}
@@ -54,13 +53,14 @@ public class _1345BearerOfBadNews extends QuestHandler {
 			if (targetId == 204006){//Demokritos
 				if (dialog == QuestDialog.START_DIALOG)
 					return sendQuestDialog(env, 1011);
+				else if (dialog == QuestDialog.ASK_ACCEPTION) {
+					return sendQuestDialog(env, 4);
+				}
 				else if (dialog == QuestDialog.ACCEPT_QUEST) {
 					if (player.getInventory().getItemCountByItemId(186000015) == 1)
 					giveQuestItem(env, 182201320, 1);
 					return sendQuestStartDialog(env);
 				}
-				else
-					return sendQuestStartDialog(env);
 			}
 		}
 		else if (qs.getStatus() == QuestStatus.START){

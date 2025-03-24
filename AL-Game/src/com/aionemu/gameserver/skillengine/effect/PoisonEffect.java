@@ -39,23 +39,22 @@ public class PoisonEffect extends AbstractOverTimeEffect {
 	public void startEffect(Effect effect) {
 		int valueWithDelta = value + delta * effect.getSkillLevel();
 		int critAddDmg = this.critAddDmg2 + this.critAddDmg1 * effect.getSkillLevel();
-		int finalDamage = AttackUtil.calculateMagicalOverTimeSkillResult(effect, valueWithDelta, element, this.position,
-				false, this.critProbMod2, critAddDmg);
+		int finalDamage = AttackUtil.calculateMagicalOverTimeSkillResult(effect, valueWithDelta, element, this.position, false, this.critProbMod2, critAddDmg);
 		effect.setReservedInt(position, finalDamage);
 		super.startEffect(effect, AbnormalState.POISON);
 	}
 
 	@Override
 	public void endEffect(Effect effect) {
-		super.endEffect(effect, AbnormalState.POISON);
+		// super.endEffect(effect, AbnormalState.POISON);
+		effect.getEffected().getEffectController().unsetAbnormal(AbnormalState.POISON.getId());
 	}
 
 	@Override
 	public void onPeriodicAction(Effect effect) {
 		Creature effected = effect.getEffected();
 		Creature effector = effect.getEffector();
-		effected.getController().onAttack(effector, effect.getSkillId(), TYPE.DAMAGE, effect.getReservedInt(position),
-				false, LOG.POISON);
+		effected.getController().onAttack(effector, effect.getSkillId(), TYPE.DAMAGE, effect.getReservedInt(position), false, LOG.POISON);
 		effected.getObserveController().notifyDotAttackedObservers(effector, effect);
 	}
 }

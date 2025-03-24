@@ -73,7 +73,9 @@ public class _1364Journey_To_Agairon extends QuestHandler {
 							if (qs.getQuestVarById(0) == 2)
 								return sendQuestDialog(env, 1352);
 						} case SELECT_REWARD: {
-                            qs.setStatus(QuestStatus.REWARD); 
+				            qs.setQuestVar(3);
+                            qs.setStatus(QuestStatus.REWARD);
+				            updateQuestStatus(env);
 							return sendQuestEndDialog(env);
 						}
 					}
@@ -102,7 +104,7 @@ public class _1364Journey_To_Agairon extends QuestHandler {
 	
 	@Override
 	public boolean onNpcReachTargetEvent(QuestEnv env) {
-		return defaultFollowEndEvent(env, 1, 2, false);
+		return defaultFollowEndEvent(env, 1, 2, false, 47);
 	}
 	
 	@Override

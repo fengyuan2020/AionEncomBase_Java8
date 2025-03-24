@@ -50,44 +50,46 @@ public class BaseBossDeathListener extends OnDieEventCallback {
 		this.base = base;
 	}
 
-	@Override
-	public void onBeforeDie(AbstractAI obj) {
-		Race race = null;
-		Npc boss = base.getBoss();
-		AionObject winner = base.getBoss().getAggroList().getMostDamage();
-		if (winner instanceof Creature) {
-			final Creature kill = (Creature) winner;
-			applyBaseBuff();
-			if (CustomConfig.ENABLE_BASE_REWARDS) {
-				giveBaseRewardsToPlayers((Player) kill);
-			}
-			if (kill.getRace().isPlayerRace()) {
-				base.setRace(kill.getRace());
-				race = kill.getRace();
-			}
-			announceCapture(null, kill);
-		} else if (winner instanceof TemporaryPlayerTeam) {
-			final TemporaryPlayerTeam team = (TemporaryPlayerTeam) winner;
-			applyBaseBuff();
-			if (team.getRace().isPlayerRace()) {
-				base.setRace(team.getRace());
-				race = team.getRace();
-			}
-			announceCapture(team, null);
-		} else {
-			base.setRace(Race.NPC);
-		}
-		if (base.getBaseLocation().getWorldId() == 400010000) {
-			if (race == Race.ASMODIANS && boss.getRace() == Race.ELYOS) {
-				AbyssLandingService.getInstance().updateRedemptionLanding(6000, LandingPointsEnum.BASE, false);
-			}
-			if (race == Race.ELYOS && boss.getRace() == Race.ASMODIANS) {
-				AbyssLandingService.getInstance().updateHarbingerLanding(6000, LandingPointsEnum.BASE, false);
-			}
-			landingWinBase(race);
-		}
-		BaseService.getInstance().capture(base.getId(), base.getRace());
-	}
+    @Override
+    public void onBeforeDie(AbstractAI obj) {
+        Race race = null;
+        Npc boss = base.getBoss();
+        AionObject winner = base.getBoss().getAggroList().getMostDamage();
+        if (winner instanceof Creature) {
+            final Creature kill = (Creature) winner;
+            applyBaseBuff();
+            // 检查kill是否为Player类型 Check if kill is of Player type
+            if (CustomConfig.ENABLE_BASE_REWARDS && kill instanceof Player) {
+                giveBaseRewardsToPlayers((Player) kill); // 确保kill是Player类型 Ensure kill is of Player type
+            }
+            if (kill.getRace().isPlayerRace()) {
+                base.setRace(kill.getRace());
+                race = kill.getRace();
+            }
+            announceCapture(null, kill);
+        } else if (winner instanceof TemporaryPlayerTeam) {
+            final TemporaryPlayerTeam team = (TemporaryPlayerTeam) winner;
+            applyBaseBuff();
+            if (team.getRace().isPlayerRace()) {
+                base.setRace(team.getRace());
+                race = team.getRace();
+            }
+            announceCapture(team, null);
+        } else {
+            // 处理其他类型的winner对象 Handle other types of winner objects
+            base.setRace(Race.NPC);
+        }
+        if (base.getBaseLocation().getWorldId() == 400010000) {
+            if (race == Race.ASMODIANS && boss.getRace() == Race.ELYOS) {
+                AbyssLandingService.getInstance().updateRedemptionLanding(6000, LandingPointsEnum.BASE, false);
+            }
+            if (race == Race.ELYOS && boss.getRace() == Race.ASMODIANS) {
+                AbyssLandingService.getInstance().updateHarbingerLanding(6000, LandingPointsEnum.BASE, false);
+            }
+            landingWinBase(race);
+        }
+        BaseService.getInstance().capture(base.getId(), base.getRace());
+    }
 
 	@Override
 	public void onAfterDie(AbstractAI obj) {

@@ -37,7 +37,7 @@ public class _1323Lost_Jewel_Box extends QuestHandler {
 	public void register() {
 		qe.registerQuestNpc(730032).addOnTalkEvent(questId);
 		qe.registerQuestNpc(730019).addOnTalkEvent(questId);
-		qe.registerQuestNpc(203830).addOnTalkEvent(questId);
+		qe.registerQuestNpc(203939).addOnTalkEvent(questId);
 		qe.registerQuestItem(182201309, questId);
 	}
 	
@@ -56,8 +56,6 @@ public class _1323Lost_Jewel_Box extends QuestHandler {
 		int targetId = 0;
 		final Player player = env.getPlayer();
 		final QuestState qs = player.getQuestStateList().getQuestState(questId);
-        if (qs == null)
-			return false;
 		if (env.getVisibleObject() instanceof Npc) {
 			targetId = ((Npc) env.getVisibleObject()).getNpcId();
 		} if (qs == null || qs.getStatus() == QuestStatus.NONE) {
@@ -70,13 +68,15 @@ public class _1323Lost_Jewel_Box extends QuestHandler {
 					return closeDialogWindow(env);
 			    }
 			}	
-		if (targetId == 730032) {
+		    if (targetId == 730032) {
 				switch (env.getDialog()) {
 					case USE_OBJECT: {
 						return giveQuestItem(env, 182201309, 1);
-					}
 				}
-			}	
+			}
+		}
+        if (qs == null)
+			return false;
 		else if (qs.getStatus() == QuestStatus.START) {
 			if (targetId == 730019) {
 				if (env.getDialog() == QuestDialog.START_DIALOG) {

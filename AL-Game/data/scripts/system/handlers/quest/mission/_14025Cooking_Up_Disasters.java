@@ -33,8 +33,8 @@ import com.aionemu.gameserver.services.QuestService;
 public class _14025Cooking_Up_Disasters extends QuestHandler {
 
 	private final static int questId = 14025;
-	private final static int[] npcs = { 203989, 204020, 203901 };
-	private final static int[] mobs = { 211017, 211776, 232133, 217090, };
+	private final static int[] npcs = {203989, 204020, 203901};
+	private final static int[] mobs = {211017, 211776, 232133, 217090,};
 	public _14025Cooking_Up_Disasters() {
 		super(questId);
 	}
@@ -147,8 +147,7 @@ public class _14025Cooking_Up_Disasters extends QuestHandler {
 							return closeDialogWindow(env);
 						}
 					case STEP_TO_4:
-						// playQuestMovie(env, 36); REALY NEEDED?
-						removeQuestItem(env, 182201005, 1);
+						playQuestMovie(env, 36);
 						return defaultCloseDialog(env, 4, 5);
 					case STEP_TO_6:
 						return defaultCloseDialog(env, 5, 6, true, false);
@@ -161,7 +160,6 @@ public class _14025Cooking_Up_Disasters extends QuestHandler {
 							return sendQuestDialog(env, 1693);
 						}
 					case STEP_TO_3: {
-						giveQuestItem(env, 182201005, 1);
 						TeleportService2.teleportTo(player, 210020000, 1759.697f, 905.983f, 427.812f, (byte) 23, TeleportAnimation.BEAM_ANIMATION);
 						return defaultCloseDialog(env, 3, 4);
 					}

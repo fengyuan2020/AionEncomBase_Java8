@@ -60,8 +60,6 @@ public class _1640TeleporterRepairs extends QuestHandler {
 					case STEP_TO_1: {
 				        return sendQuestStartDialog(env);
 					}
-					default:
-						return sendQuestStartDialog(env);
 				}
 			}
 		}

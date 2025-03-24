@@ -60,8 +60,7 @@ public class Reload extends AdminCommand {
 	@Override
 	public void execute(Player admin, String... params) {
 		if (params == null || params.length != 1) {
-			PacketSendUtility.sendMessage(admin,
-				"syntax //reload <quest | skill | portal | spawn | commands | drop | gameshop | events | config | mail>");
+			PacketSendUtility.sendMessage(admin, "syntax //reload <quest | skill | portal | commands | drop | gameshop | events | config | mail>");
 			return;
 		}
 		if (params[0].equals("quest")) {
@@ -176,8 +175,7 @@ public class Reload extends AdminCommand {
 			}
 		}
 		else
-			PacketSendUtility.sendMessage(admin,
-				"syntax //reload <quest | skill | portal | spawn | commands | drop | gameshop | events | config>");
+			PacketSendUtility.sendMessage(admin, "syntax //reload <quest | skill | portal | commands | drop | gameshop | events | config>");
 
 	}
 

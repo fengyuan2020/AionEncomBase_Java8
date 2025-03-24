@@ -59,8 +59,7 @@ public class _1322ALeafFromLodas extends QuestHandler {
 					return sendQuestDialog(env, 4);
 				}
 				if (env.getDialog() == QuestDialog.ACCEPT_QUEST) {
-			        giveQuestItem(env, 182201308, 1);
-					return sendQuestStartDialog(env);
+					return sendQuestStartDialog(env, 182201308, 1);
 				}
 				if (env.getDialog() == QuestDialog.REFUSE_QUEST) {
 				    return closeDialogWindow(env);

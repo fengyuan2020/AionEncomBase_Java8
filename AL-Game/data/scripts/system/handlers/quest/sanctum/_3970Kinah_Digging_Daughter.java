@@ -85,15 +85,22 @@ public class _3970Kinah_Digging_Daughter extends QuestHandler {
 				} else if (dialog == QuestDialog.STEP_TO_3) {
 					removeQuestItem(env, 182206114, 1);
 					giveQuestItem(env, 182206115, 1);
-					return defaultCloseDialog(env, 2, 3, true, false);
+					return defaultCloseDialog(env, 2, 3);
+				}
+			}
+            if (targetId == 798386) {
+				if (dialog == QuestDialog.START_DIALOG) {
+					if(qs.getQuestVarById(0) == 3) {
+						return sendQuestDialog(env, 2375);
+					}
+				} else if (dialog == QuestDialog.SELECT_REWARD) {
+					qs.setStatus(QuestStatus.REWARD);
+					updateQuestStatus(env);
+					return sendQuestEndDialog(env);
 				}
 			}
 		} else if (qs == null || qs.getStatus() == QuestStatus.REWARD) {
 			if (targetId == 798386) {
-				if (dialog == QuestDialog.USE_OBJECT) {
-					return sendQuestDialog(env, 2375);
-				}
-				removeQuestItem(env, 182206115, 1);
 				return sendQuestEndDialog(env);
 			}
 		}

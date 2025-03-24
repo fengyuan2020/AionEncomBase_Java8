@@ -82,27 +82,16 @@ public class _1361FindingDrinkingWater extends QuestHandler {
 			targetId = ((Npc) env.getVisibleObject()).getNpcId();
 		final QuestState qs = player.getQuestStateList().getQuestState(questId);
 		if (qs == null || qs.getStatus() == QuestStatus.NONE) {
-			if (targetId == 203943) { // Turiel
+		    if (targetId == 203943) { // Turiel
 				if (env.getDialog() == QuestDialog.START_DIALOG)
 					return sendQuestDialog(env, 1011);
-				else if (env.getDialogId() == 1002) {
-					if (giveQuestItem(env, 182201326, 1))
-						return sendQuestStartDialog(env);
-					else
-						return true;
+				else if (env.getDialogId() == 1007) {
+					return sendQuestDialog(env, 4);
 				}
-				else
+				else if (env.getDialogId() == 1002) {
+				    giveQuestItem(env, 182201326, 1);
 					return sendQuestStartDialog(env);
-			}
-		}
-		else if (qs != null && qs.getStatus() == QuestStatus.REWARD) { // Reward
-			if (env.getDialog() == QuestDialog.START_DIALOG)
-				return sendQuestDialog(env, 2375);
-			else if (env.getDialogId() == 1009) {
-				qs.setQuestVar(2);
-				qs.setStatus(QuestStatus.REWARD);
-				updateQuestStatus(env);
-				return sendQuestEndDialog(env);
+			    }
 			}
 		}
 		else if (qs != null && qs.getStatus() == QuestStatus.START && qs.getQuestVarById(0) == 1) {
@@ -111,6 +100,17 @@ public class _1361FindingDrinkingWater extends QuestHandler {
 					if (qs.getQuestVarById(0) == 1 && env.getDialog() == QuestDialog.USE_OBJECT) {
 						return useQuestObject(env, 1, 1, true, 0, 0, 0, 182201327, 1); // reward
 					}
+				}
+			}
+		}
+        else if (qs != null && qs.getStatus() == QuestStatus.REWARD) {
+            if (targetId == 203943) {
+                if (env.getDialog() == QuestDialog.USE_OBJECT) {
+                    return sendQuestDialog(env, 1352);
+				} else if (env.getDialog() == QuestDialog.SELECT_REWARD) {
+					return sendQuestDialog(env, 5);
+				} else {
+					return sendQuestEndDialog(env);
 				}
 			}
 		}

@@ -52,14 +52,12 @@ public class _1414OperationWindmill extends QuestHandler {
 			if (targetId == 203989) { // Tumblusen
 				if (env.getDialog() == QuestDialog.START_DIALOG)
 					return sendQuestDialog(env, 1011);
+				else if (env.getDialogId() == 1007) {
+                    return sendQuestDialog(env, 4);
+                }
 				else if (env.getDialogId() == 1002) {
-					if (giveQuestItem(env, 182201349, 1))
-						return sendQuestStartDialog(env);
-					else
-						return true;
+					return sendQuestStartDialog(env, 182201349, 1);
 				}
-				else
-					return sendQuestStartDialog(env);
 			}
 		}
 		else if (qs != null && qs.getStatus() == QuestStatus.REWARD) {

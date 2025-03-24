@@ -104,8 +104,6 @@ public class _1367MabangtahsFeast extends QuestHandler {
 					else
 						return sendQuestDialog(env, 1352);
 				}
-				else
-					return sendQuestStartDialog(env);
 			}
 			else if (qs == null || qs.getStatus() == QuestStatus.REWARD) {
 				return sendQuestEndDialog(env);

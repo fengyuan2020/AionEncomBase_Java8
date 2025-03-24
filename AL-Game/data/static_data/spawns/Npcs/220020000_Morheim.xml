@@ -98,9 +98,6 @@
       <spot x="182.971863" y="1509.606201" z="384.28888" h="60" random_walk="2" />
       <spot x="137.929337" y="1603.024048" z="389.37396" h="0" random_walk="2" />
     </spawn>
-    <spawn npc_id="231608" respawn_time="60">
-      <spot x="1583.091309" y="1676.093018" z="214.75" h="30" />
-    </spawn>
     <spawn npc_id="212516" respawn_time="240">
       <spot x="2798.352051" y="1362.941772" z="112.09555" h="0" random_walk="0" />
       <spot x="2541.783936" y="1214.464722" z="111.85885" h="0" random_walk="2" />
@@ -6022,9 +6019,13 @@
       <spot x="2536.770508" y="2252.228271" z="103.0" h="100" />
     </spawn>
     <spawn npc_id="204348" respawn_time="300">
-      <temporary_spawn spawn_time="9.*.*" despawn_time="17.*.*" />
-      <spot x="2493.000000" y="1713.000000" z="90.1875" h="35" />
-      <spot x="2488.719727" y="1795.955933" z="95.27418" h="110" />
+		<temporary_spawn/>
+		<spot x="2493" y="1713" z="90.1875" h="73">
+			<temporary_spawn spawn_time="5.*.*" despawn_time="21.*.*"/>
+		</spot>
+		<spot x="2488.72" y="1795.96" z="95.2742" h="112">
+			<temporary_spawn spawn_time="21.*.*" despawn_time="5.*.*"/>
+		</spot>
     </spawn>
     <spawn npc_id="212890" respawn_time="240">
       <spot x="2727.340576" y="2632.912354" z="157.20393" h="119" />
@@ -6374,9 +6375,13 @@
       <spot x="2397.109863" y="1734.479858" z="101.875" entity_id="478" />
     </spawn>
     <spawn npc_id="204347" respawn_time="300">
-      <temporary_spawn spawn_time="9.*.*" despawn_time="17.*.*" />
-      <spot x="2522.290039" y="1703.930054" z="92.04063" h="26" />
-      <spot x="2479.464844" y="1801.015015" z="95.692535" h="118" />
+		<temporary_spawn/>
+		<spot x="2522.29" y="1703.93" z="92.0406" h="50">
+			<temporary_spawn spawn_time="5.*.*" despawn_time="21.*.*"/>
+		</spot>
+		<spot x="2479.46" y="1801.02" z="95.6547" h="75">
+			<temporary_spawn spawn_time="21.*.*" despawn_time="5.*.*"/>
+		</spot>
     </spawn>
     <spawn npc_id="212406" respawn_time="240">
       <spot x="1368.642944" y="1312.379639" z="246.22183" h="30" />
@@ -7093,12 +7098,6 @@
     <spawn npc_id="212649" respawn_time="240">
       <spot x="1144.618774" y="910.716125" z="381.36087" h="118" />
     </spawn>
-    <spawn npc_id="801174" respawn_time="180">
-      <spot x="2033.559204" y="731.144653" z="246.0" h="113" />
-    </spawn>
-    <spawn npc_id="801177" respawn_time="180">
-      <spot x="2033.559204" y="731.144653" z="246.0" h="113" />
-    </spawn>
     <spawn npc_id="212851" respawn_time="2100">
       <spot x="2730.077637" y="2974.913574" z="150.92053" h="78" alternate_id="212923" select_prob="6667" />
     </spawn>
@@ -7742,9 +7741,6 @@
     </spawn>
     <spawn npc_id="204361" respawn_time="600">
       <spot x="2704.158203" y="1334.963623" z="107.25" h="30" walker_id="DF2_E1_NPCPath_Hreidmar" />
-    </spawn>
-    <spawn npc_id="231609" respawn_time="60">
-      <spot x="2031.899292" y="722.448242" z="246.0" h="30" />
     </spawn>
     <spawn npc_id="700243" respawn_time="60">
       <spot x="992.530029" y="480.839996" z="512.3271" entity_id="956" />

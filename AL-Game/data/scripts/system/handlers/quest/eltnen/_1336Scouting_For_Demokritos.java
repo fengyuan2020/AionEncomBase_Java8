@@ -65,7 +65,7 @@ public class _1336Scouting_For_Demokritos extends QuestHandler {
                     return sendQuestStartDialog(env);
                 }
 			    if (env.getDialog() == QuestDialog.REFUSE_QUEST) {
-                    return sendQuestStartDialog(env);
+					return closeDialogWindow(env);
                 }
 			}
 		} 

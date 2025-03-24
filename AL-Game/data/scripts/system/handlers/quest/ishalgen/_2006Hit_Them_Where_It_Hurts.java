@@ -23,10 +23,9 @@ import com.aionemu.gameserver.questEngine.model.QuestStatus;
 /** Author Ghostfur & Unknown (Aion-Unique)
 /****/
 
-public class _2006Hit_Them_Where_It_Hurts extends QuestHandler
-{
-	private final static int questId = 2006;
+public class _2006Hit_Them_Where_It_Hurts extends QuestHandler {
 
+	private final static int questId = 2006;
 	public _2006Hit_Them_Where_It_Hurts() {
 		super(questId);
 	}
@@ -73,8 +72,6 @@ public class _2006Hit_Them_Where_It_Hurts extends QuestHandler
 							return defaultCloseDialog(env, 0, 1);
 						} case CHECK_COLLECTED_ITEMS: {
 							return checkQuestItems(env, 1, 1, true, 1438, 1353);
-						} case FINISH_DIALOG: {
-							return sendQuestSelectionDialog(env);
 						}
 					}
 					break;

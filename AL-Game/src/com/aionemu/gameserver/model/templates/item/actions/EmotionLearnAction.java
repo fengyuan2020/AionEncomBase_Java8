@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
 import com.aionemu.gameserver.model.DescriptionId;
+import com.aionemu.gameserver.configs.main.MembershipConfig;
 import com.aionemu.gameserver.model.gameobjects.Item;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.model.templates.item.ItemTemplate;
@@ -48,18 +49,19 @@ public class EmotionLearnAction extends AbstractItemAction {
 			PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_TOOLTIP_LEARNED_EMOTION);
 			return false;
 		}
+        if (player.havePermission(MembershipConfig.EMOTIONS_ALL)) {
+			PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_TOOLTIP_LEARNED_EMOTION);
+			return false;
+        }  
 		return true;
 	}
 
 	@Override
 	public void act(final Player player, final Item parentItem, Item targetItem) {
 		ItemTemplate itemTemplate = parentItem.getItemTemplate();
-		PacketSendUtility.sendPacket(player,
-				SM_SYSTEM_MESSAGE.STR_USE_ITEM(new DescriptionId(itemTemplate.getNameId())));
-		PacketSendUtility.broadcastPacket(player, new SM_ITEM_USAGE_ANIMATION(player.getObjectId(),
-				parentItem.getObjectId(), itemTemplate.getTemplateId()), true);
-		player.getEmotions().add(emotionid,
-				minutes == null ? 0 : (int) (System.currentTimeMillis() / 1000) + minutes * 60, true);
+		PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_USE_ITEM(new DescriptionId(itemTemplate.getNameId())));
+		PacketSendUtility.broadcastPacket(player, new SM_ITEM_USAGE_ANIMATION(player.getObjectId(), parentItem.getObjectId(), itemTemplate.getTemplateId()), true);
+		player.getEmotions().add(emotionid, minutes == null ? 0 : (int) (System.currentTimeMillis() / 1000) + minutes * 60, true);
 		player.getInventory().delete(parentItem);
 	}
 }

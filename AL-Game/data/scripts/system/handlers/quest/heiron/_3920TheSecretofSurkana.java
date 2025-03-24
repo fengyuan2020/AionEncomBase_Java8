@@ -40,8 +40,7 @@ public class _3920TheSecretofSurkana extends QuestHandler {
 					return sendQuestDialog(env, 4);
                 }   
 				else if (env.getDialogId() == 1002) {
-                    giveQuestItem(env, 182206073, 1); 
-					return sendQuestStartDialog(env);
+					return sendQuestStartDialog(env, 182206073, 1);
 				}
 				else if (env.getDialogId() == 1003) {
 					return closeDialogWindow(env);

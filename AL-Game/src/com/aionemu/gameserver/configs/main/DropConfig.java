@@ -30,4 +30,8 @@ public class DropConfig {
 
 	@Property(key = "gameserver.drop.enable.global.drops", defaultValue = "false")
 	public static boolean ENABLE_GLOBAL_DROPS;
+
+	// 在DropConfig类中添加一个新的配置项 | Add a new configuration item in DropConfig class
+	@Property(key = "gameserver.drop.max.global.drops.per.npc", defaultValue = "10")
+	public static int MAX_GLOBAL_DROPS_PER_NPC;
 }

@@ -374,8 +374,7 @@ public class Player extends Creature {
 		this.absStatsHolder = new AbsoluteStatOwner(this, 0);
 	}
 
-	public Player(PlayerController controller, PlayerCommonData plCommonData, PlayerAppearance appereance,
-			Account account) {
+	public Player(PlayerController controller, PlayerCommonData plCommonData, PlayerAppearance appereance, Account account) {
 		super(plCommonData.getPlayerObjId(), controller, null, plCommonData, plCommonData.getPosition());
 		this.playerCommonData = plCommonData;
 		this.playerAppearance = appereance;
@@ -1362,8 +1361,7 @@ public class Player extends Creature {
 		if (player.isBandit() || this.isBandit()) {
 			return true;
 		}
-		return !player.getRace().equals(getRace()) || player.getBattleground() != null
-				|| FFAService.getInstance().isInArena(player) && player.isFFA() || player.isBandit();
+		return !player.getRace().equals(getRace()) || player.getBattleground() != null || FFAService.getInstance().isInArena(player) && player.isFFA() || player.isBandit();
 	}
 
 	private boolean canPvP(Player enemy) {
@@ -1401,8 +1399,7 @@ public class Player extends Creature {
 					worldId != 600090000 && // Kaldor.
 					worldId != 600100000 && // Levinshor.
 					worldId != 600110000) { // Silentera Canyon.
-				return (this.isInsideZoneType(ZoneType.PVP) && enemy.isInsideZoneType(ZoneType.PVP)
-						&& !isInSameTeam(enemy));
+				return (this.isInsideZoneType(ZoneType.PVP) && enemy.isInsideZoneType(ZoneType.PVP) && !isInSameTeam(enemy));
 			}
 		}
 		return false;
@@ -1446,8 +1443,7 @@ public class Player extends Creature {
 		if (((creature instanceof Player)) && (isInSameTeam((Player) creature))) {
 			return true;
 		}
-		if (((creature instanceof Trap))
-				&& (((Creature) ((Trap) creature).getCreator()).getObjectId() == getObjectId())) {
+		if (((creature instanceof Trap)) && (((Creature) ((Trap) creature).getCreator()).getObjectId() == getObjectId())) {
 			return true;
 		}
 		return creature.getVisualState() <= getSeeState();
@@ -1464,9 +1460,7 @@ public class Player extends Creature {
 
 	@Override
 	public boolean isAggroFrom(Npc npc) {
-		return (isAggroIconTo(npc)
-				&& (npc.getTribe().isGuard() || npc.getObjectTemplate().getAbyssNpcType() != AbyssNpcType.NONE
-						|| npc.getLevel() + AIConfig.AGGRO_LEVEL_IMMUNE > getLevel()));
+		return (isAggroIconTo(npc) && (npc.getTribe().isGuard() || npc.getObjectTemplate().getAbyssNpcType() != AbyssNpcType.NONE || (npc.isInInstance() && InstanceService.isAggro(npc.getWorldId())) || npc.getLevel() + AIConfig.AGGRO_LEVEL_IMMUNE > getLevel()));
 	}
 
 	/**
@@ -1495,8 +1489,7 @@ public class Player extends Creature {
 		if (npc.getObjectTemplate().getNpcType().equals(NpcType.INVULNERABLE)) {
 			return false;
 		}
-		if (npc.getObjectTemplate().getNpcType() == NpcType.NON_ATTACKABLE
-				&& (npc.getWorldId() == 310010000 || npc.getWorldId() == 320010000)) {
+		if (npc.getObjectTemplate().getNpcType() == NpcType.NON_ATTACKABLE && (npc.getWorldId() == 310010000 || npc.getWorldId() == 320010000)) {
 			return false;
 		}
 		switch (getTribe()) {
@@ -1832,7 +1825,6 @@ public class Player extends Creature {
 	 */
 	public boolean isCompleteQuest(int questId) {
 		QuestState qs = getQuestStateList().getQuestState(questId);
-
 		if (qs == null) {
 			return false;
 		}
@@ -1868,28 +1860,19 @@ public class Player extends Creature {
 	public void setLastCounterSkill(AttackStatus status) {
 		long time = System.currentTimeMillis();
 		// Dodge
-		if (AttackStatus.getBaseStatus(status) == AttackStatus.DODGE
-				&& PlayerClass.getStartingClassFor(getPlayerClass()) == PlayerClass.WARRIOR
-				|| PlayerClass.getStartingClassFor(getPlayerClass()) == PlayerClass.SCOUT
-				|| PlayerClass.getStartingClassFor(getPlayerClass()) == PlayerClass.TECHNIST) {
+		if (AttackStatus.getBaseStatus(status) == AttackStatus.DODGE && PlayerClass.getStartingClassFor(getPlayerClass()) == PlayerClass.WARRIOR || PlayerClass.getStartingClassFor(getPlayerClass()) == PlayerClass.SCOUT || PlayerClass.getStartingClassFor(getPlayerClass()) == PlayerClass.TECHNIST) {
 			this.lastCounterSkill.put(AttackStatus.DODGE, time);
 		}
 		// Parry
-		else if (AttackStatus.getBaseStatus(status) == AttackStatus.PARRY
-				&& PlayerClass.getStartingClassFor(getPlayerClass()) == PlayerClass.WARRIOR
-				|| PlayerClass.getStartingClassFor(getPlayerClass()) == PlayerClass.PRIEST
-				|| PlayerClass.getStartingClassFor(getPlayerClass()) == PlayerClass.TECHNIST) {
+		else if (AttackStatus.getBaseStatus(status) == AttackStatus.PARRY && PlayerClass.getStartingClassFor(getPlayerClass()) == PlayerClass.WARRIOR || PlayerClass.getStartingClassFor(getPlayerClass()) == PlayerClass.PRIEST || PlayerClass.getStartingClassFor(getPlayerClass()) == PlayerClass.TECHNIST) {
 			this.lastCounterSkill.put(AttackStatus.PARRY, time);
 		}
 		// Block
-		else if (AttackStatus.getBaseStatus(status) == AttackStatus.BLOCK
-				&& PlayerClass.getStartingClassFor(getPlayerClass()) == PlayerClass.WARRIOR) {
+		else if (AttackStatus.getBaseStatus(status) == AttackStatus.BLOCK && PlayerClass.getStartingClassFor(getPlayerClass()) == PlayerClass.WARRIOR) {
 			this.lastCounterSkill.put(AttackStatus.BLOCK, time);
 		}
 		// Resist
-		else if (AttackStatus.getBaseStatus(status) == AttackStatus.RESIST
-				&& PlayerClass.getStartingClassFor(getPlayerClass()) == PlayerClass.WARRIOR
-				|| PlayerClass.getStartingClassFor(getPlayerClass()) == PlayerClass.TECHNIST) {
+		else if (AttackStatus.getBaseStatus(status) == AttackStatus.RESIST && PlayerClass.getStartingClassFor(getPlayerClass()) == PlayerClass.WARRIOR || PlayerClass.getStartingClassFor(getPlayerClass()) == PlayerClass.TECHNIST) {
 			this.lastCounterSkill.put(AttackStatus.RESIST, time);
 		}
 	}
@@ -2451,8 +2434,7 @@ public class Player extends Creature {
 		ChainCondition cond = template.getChainCondition();
 		if (cond != null && cond.getSelfCount() > 0) {
 			int chainCount = getChainSkills().getChainCount(this, template, cond.getCategory());
-			if (chainCount > 0 && chainCount < cond.getSelfCount()
-					&& getChainSkills().chainSkillEnabled(cond.getCategory(), cond.getTime())) {
+			if (chainCount > 0 && chainCount < cond.getSelfCount() && getChainSkills().chainSkillEnabled(cond.getCategory(), cond.getTime())) {
 				return false;
 			}
 		}
@@ -3091,8 +3073,7 @@ public class Player extends Creature {
 		}
 		if (prevPos == null || prevPos.getMapId() != getPosition().getMapId()) {
 			prevPos = new WorldPosition(getPosition().getMapId());
-			prevPos.setXYZH(getPosition().getX(), getPosition().getY(), getPosition().getZ(),
-					getPosition().getHeading());
+			prevPos.setXYZH(getPosition().getX(), getPosition().getY(), getPosition().getZ(), getPosition().getHeading());
 		}
 		return prevPos;
 	}
@@ -3398,12 +3379,7 @@ public class Player extends Creature {
 	}
 
 	public boolean isMagicalTypeClass() {
-		if (playerCommonData.getPlayerClass() == PlayerClass.MUSE
-				|| playerCommonData.getPlayerClass() == PlayerClass.SONGWEAVER
-				|| playerCommonData.getPlayerClass() == PlayerClass.CLERIC
-				|| playerCommonData.getPlayerClass() == PlayerClass.SORCERER
-				|| playerCommonData.getPlayerClass() == PlayerClass.SPIRIT_MASTER
-				|| playerCommonData.getPlayerClass() == PlayerClass.AETHERTECH) {
+		if (playerCommonData.getPlayerClass() == PlayerClass.MUSE || playerCommonData.getPlayerClass() == PlayerClass.SONGWEAVER || playerCommonData.getPlayerClass() == PlayerClass.CLERIC || playerCommonData.getPlayerClass() == PlayerClass.SORCERER || playerCommonData.getPlayerClass() == PlayerClass.SPIRIT_MASTER || playerCommonData.getPlayerClass() == PlayerClass.AETHERTECH) {
 			return true;
 		}
 		return false;

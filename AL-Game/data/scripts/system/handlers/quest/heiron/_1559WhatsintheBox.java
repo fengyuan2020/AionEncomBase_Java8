@@ -81,8 +81,8 @@ public class _1559WhatsintheBox extends QuestHandler {
 					}
 				}
 			}
+		else if (qs == null || qs.getStatus() == QuestStatus.START) {
 		int var = qs.getQuestVarById(0);
-		if (qs.getStatus() != QuestStatus.START) {
 		switch (targetId) {
 		case 798072: {
 			switch (env.getDialog()) {
@@ -115,10 +115,11 @@ public class _1559WhatsintheBox extends QuestHandler {
 						return sendQuestDialog(env, 2034);
 				case STEP_TO_3:
 					if (var == 2)
+					removeQuestItem(env, 182201823, 1);
+					giveQuestItem(env, 182201824, 1);
 					qs.setQuestVarById(0, var + 1);
 					qs.setStatus(QuestStatus.REWARD);
 					updateQuestStatus(env);
-					giveQuestItem(env, 182201824, 1);
                     return closeDialogWindow(env);
                     }
                 }
