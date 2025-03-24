@@ -77,11 +77,13 @@ public class _1559WhatsintheBox extends QuestHandler {
 					case USE_OBJECT: {
 						if (player.getInventory().getItemCountByItemId(182201823) == 0) {
 							return giveQuestItem(env, 182201823, 1);
-						}
 					}
 				}
 			}
-		else if (qs == null || qs.getStatus() == QuestStatus.START) {
+		}
+		if (qs == null)
+			return false;
+		else if (qs.getStatus() == QuestStatus.START) {
 		int var = qs.getQuestVarById(0);
 		switch (targetId) {
 		case 798072: {
@@ -125,7 +127,7 @@ public class _1559WhatsintheBox extends QuestHandler {
                 }
 			}
 		}
-		else if (qs == null || qs.getStatus() == QuestStatus.REWARD) {
+		else if (qs.getStatus() == QuestStatus.REWARD) {
 			if (targetId == 798072) {
 				if (env.getDialog() == QuestDialog.USE_OBJECT)
 					return sendQuestDialog(env, 2375);
