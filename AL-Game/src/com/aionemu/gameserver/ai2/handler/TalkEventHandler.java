@@ -16,8 +16,6 @@
  */
 package com.aionemu.gameserver.ai2.handler;
 
-import java.util.List;
-
 import com.aionemu.gameserver.ai2.AIState;
 import com.aionemu.gameserver.ai2.AISubState;
 import com.aionemu.gameserver.ai2.NpcAI2;
