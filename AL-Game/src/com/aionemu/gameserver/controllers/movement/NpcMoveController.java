@@ -72,7 +72,7 @@ public class NpcMoveController
         HOME,
     }
     private void applyFollow(VisibleObject target) {
-        if ((this._followMotor != null && this._followMotor._target == target)) {
+        if ((this._followMotor != null && this._followMotor.target == target)) {
             return;
         }
         if (this._followMotor != null) {
