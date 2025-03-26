@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="AL-Game" default="dist" basedir=".">
     <description>AL-Game Project Build Script</description>
-    
-    <!-- 环境检测与属性定义 / Environment detection and property definition -->
     <property environment="env"/>
     <fail message="JDK8 is required, please make sure to use JDK 1.8">
         <condition>
@@ -11,8 +9,6 @@
             </not>
         </condition>
     </fail>
-    
-    <!-- 定义属性 / Define properties -->
     <property name="jdk8.home" location="${env.JAVA_HOME}"/>
     <property name="jre" location="${java.home}/lib"/>
     <property name="src" location="src"/>
@@ -22,16 +18,11 @@
     <property name="build.classes" location="${build}/classes"/>
     <property name="build.dist" location="${build}/dist"/>
     <property name="build.dist.gs" location="${build.dist}/AL-Game"/>
-    
-    <!-- 定义依赖版本 / Define dependency versions -->
+
     <property name="guava.version" value="30.1-jre"/>
-    
-    <!-- 时间戳 / Timestamp -->
     <tstamp>
         <format property="build.time" pattern="yyyy-MM-dd HH:mm:ss Z"/>
     </tstamp>
-    
-    <!-- 定义 bootclasspath / Define bootclasspath -->
     <path id="bootclasspath">
         <fileset dir="${lib}">
             <include name="jsr166-1.7.0.jar"/>
@@ -41,29 +32,21 @@
             <include name="jce.jar"/>
         </fileset>
     </path>
-    
-    <!-- 定义 classpath / Define classpath -->
     <path id="classpath">
         <fileset dir="${lib}">
             <include name="*.jar"/>
             <include name="guava-${guava.version}.jar"/>
         </fileset>
     </path>
-    
-    <!-- 清理构建目录 / Clean build directory -->
     <target name="clean" description="Clean build directory.">
         <delete dir="${build}"/>
         <echo message="Build directory has been cleaned."/>
     </target>
-    
-    <!-- 初始化构建目录 / Initialize build directory -->
     <target name="init" depends="clean" description="Create output directory.">
         <mkdir dir="${build}"/>
         <mkdir dir="${build.classes}"/>
         <echo message="Output directory has been created."/>
     </target>
-    
-    <!-- 编译源代码 / Compile source code -->
     <target name="compile" depends="init" description="Compile source code.">
         <javac destdir="${build.classes}" 
                optimize="on" 
@@ -77,7 +60,6 @@
                memorymaximumsize="1024m">
             <compilerarg value="-encoding"/>
             <compilerarg value="UTF8"/>
-            <!-- 添加JDK8优化编译参数 / Add JDK8 optimization compilation parameters -->
             <compilerarg value="-Xlint:all"/>
             <compilerarg value="-Xlint:-deprecation"/>
             <compilerarg value="-Xlint:-unchecked"/>
@@ -90,8 +72,6 @@
         </javac>
         <echo message="Source code compiled successfully."/>
     </target>
-    
-    <!-- 打包成 JAR 文件 / Package into JAR file -->
     <target name="jar" depends="compile" description="Create JAR file.">
         <tstamp>
             <format property="date" pattern="yyyy-MM-dd-HH:mm"/>
@@ -108,8 +88,6 @@
         </jar>
         <echo message="JAR file created: ${build}/AL-Game.jar"/>
     </target>
-    
-    <!-- 创建发布包 / Create distribution package -->
     <target name="dist" depends="jar" description="Create distribution package.">
         <mkdir dir="${build.dist}"/>
         <mkdir dir="${build.dist.gs}"/>
@@ -117,44 +95,36 @@
         <mkdir dir="${build.dist.gs}/data"/>
         <mkdir dir="${build.dist.gs}/libs"/>
         <mkdir dir="${build.dist.gs}/sql"/>
-        
-        <!-- 复制 JAR 文件到发布目录 / Copy JAR file to distribution directory -->
         <copy todir="${build.dist.gs}/libs">
             <fileset dir="${build}">
-                <include name="AL-Game.jar"/>
-            </fileset>
-        </copy>
-        
-        <!-- 复制依赖库到发布目录 / Copy dependencies to distribution directory -->
+				<include name="AL-Game.jar"/>
+			</fileset>
+		</copy>
         <copy todir="${build.dist.gs}/libs">
             <fileset dir="${lib}">
                 <include name="*.jar"/>
             </fileset>
         </copy>
-        
-        <!-- 复制配置文件到发布目录 / Copy configuration files to distribution directory -->
+        <copy todir="${build.dist.gs}">
+            <fileset dir="dist">
+                <include name="*.*"/>
+            </fileset>
+        </copy>
         <copy todir="${build.dist.gs}/config">
             <fileset dir="config">
                 <include name="**/*"/>
             </fileset>
         </copy>
-        
-        <!-- 复制数据文件到发布目录 / Copy data files to distribution directory -->
         <copy todir="${build.dist.gs}/data">
             <fileset dir="data">
                 <include name="**/*"/>
             </fileset>
         </copy>
-        
-        <!-- 复制 SQL 文件到发布目录 / Copy SQL files to distribution directory -->
         <copy todir="${build.dist.gs}/sql">
             <fileset dir="sql">
                 <include name="**/*"/>
             </fileset>
         </copy>
-        
-        <!-- 打包成 ZIP 文件 / Package into ZIP file -->
         <zip destfile="${build}/AL-Game.zip" basedir="${build.dist}"/>
-        <echo message="Distribution package created: ${build}/AL-Game.zip"/>
     </target>
 </project>
