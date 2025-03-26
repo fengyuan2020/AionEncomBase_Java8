@@ -7,5 +7,9 @@
         <spawn custom="true" respawn_time="295" npc_id="703389" difficult_id="0">
             <spot h="7" z="196.88724" y="1117.6854" x="962.7698"/>
         </spawn>
+        <spawn custom="true" respawn_time="1" npc_id="730950" difficult_id="0">
+            <spot h="60" z="208.125" y="1368.0254" x="1225.5471"/>
+            <spot h="69" z="189.24956" y="1436.7039" x="1593.4974"/>
+        </spawn>
     </spawn_map>
 </spawns>
