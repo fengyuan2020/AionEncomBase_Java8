@@ -26,12 +26,17 @@ import com.aionemu.gameserver.model.gameobjects.player.motion.MotionList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+import java.util.ArrayList;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException; // Импортируем класс SQLException
 
 /**
  * @author MrPoke
+ * @rework MATTY
  */
 public class MySQL5MotionDAO extends MotionDAO {
 
@@ -49,50 +54,80 @@ public class MySQL5MotionDAO extends MotionDAO {
 
 	@Override
 	public void loadMotionList(Player player) {
+	    MotionList motions = new MotionList(player);
+		List<Motion> loadedMotions = loadMotions(player.getObjectId());
+		if (loadedMotions != null) {
+			for (Motion motion : loadedMotions) {
+				motions.add(motion, false);
+			}
+		}
+		player.setMotions(motions);
+	}
+	
+	@Override
+	public List<Motion> loadMotions(Integer playerId) {
 		Connection con = null;
-		MotionList motions = new MotionList(player);
+		PreparedStatement stmt = null;
+		ResultSet rset = null;
+		List<Motion> motions = new ArrayList<>();
+
 		try {
 			con = DatabaseFactory.getConnection();
-			PreparedStatement stmt = con.prepareStatement(SELECT_QUERY);
-			stmt.setInt(1, player.getObjectId());
-			ResultSet rset = stmt.executeQuery();
+			stmt = con.prepareStatement(SELECT_QUERY);
+			stmt.setInt(1, playerId);
+			rset = stmt.executeQuery();
+
 			while (rset.next()) {
 				int motionId = rset.getInt("motion_id");
 				int time = rset.getInt("time");
 				boolean isActive = rset.getBoolean("active");
-				motions.add(new Motion(motionId, time, isActive), false);
+				motions.add(new Motion(motionId, time, isActive));
 			}
-			rset.close();
-			stmt.close();
+
+		} catch (SQLException e) {
+			log.error("Could not load motions for playerObjId: " + playerId + " from DB: " + e.getMessage(), e);
+		} finally {
+			try {
+				if (rset != null) rset.close();
+				if (stmt != null) stmt.close();
+				if (con != null) DatabaseFactory.close(con);
+			} catch (SQLException e) {
+				log.error("Error: " + e.getMessage(), e);
+			}
 		}
-		catch (Exception e) {
-			log.error("Could not restore motions for playerObjId: " +player.getObjectId() + " from DB: " + e.getMessage(), e);
-		}
-		finally {
-			DatabaseFactory.close(con);
-		}
-		player.setMotions(motions);
+		return motions;
 	}
 
 	@Override
 	public boolean storeMotion(int objectId, Motion motion) {
+
 		Connection con = null;
+		PreparedStatement stmt = null; // Объявляем PreparedStatement
 		try {
 			con = DatabaseFactory.getConnection();
-			PreparedStatement stmt = con.prepareStatement(INSERT_QUERY);
+			stmt = con.prepareStatement(INSERT_QUERY);
 			stmt.setInt(1, objectId);
 			stmt.setInt(2, motion.getId());
 			stmt.setBoolean(3, motion.isActive());
 			stmt.setInt(4, motion.getExpireTime());
 			stmt.execute();
-			stmt.close();
+
 		}
-		catch (Exception e) {
+		catch (SQLException e) { // Ловим SQLException, а не Exception
 			log.error("Could not store motion for player " + objectId + " from DB: " + e.getMessage(), e);
 			return false;
 		}
 		finally {
-			DatabaseFactory.close(con);
+			try { // Закрываем ресурсы в блоке finally с try-catch
+				if (stmt != null) {
+					stmt.close();
+				}
+				if (con != null) {
+					DatabaseFactory.close(con);
+				}
+			} catch (SQLException e) {
+				log.error("Ошибка при закрытии ресурсов: " + e.getMessage(), e);
+			}
 		}
 		return true;
 	}

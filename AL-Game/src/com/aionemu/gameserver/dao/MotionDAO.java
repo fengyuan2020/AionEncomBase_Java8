@@ -1,5 +1,4 @@
 /*
-
  *
  *  Encom is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser Public License as published by
@@ -20,11 +19,15 @@ import com.aionemu.commons.database.dao.DAO;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.model.gameobjects.player.motion.Motion;
 
+import java.util.List;
+
 /**
  * @author MrPoke
- *
+ * @rework: MATTY
  */
 public abstract class MotionDAO implements DAO {
+
+    public abstract List<Motion> loadMotions(Integer playerId);
 
 	public abstract void loadMotionList(Player player);
 
