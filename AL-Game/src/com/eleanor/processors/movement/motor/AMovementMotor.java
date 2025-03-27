@@ -77,7 +77,7 @@ public abstract class AMovementMotor {
 
         // Вычисляем направление движения.
         if (_targetPosition == null) {
-            log.warn("Target position is null for NPC {}", _owner.getObjectId());
+            // log.warn("Target position is null for NPC {}", _owner.getObjectId());
             return; // Прерываем выполнение, если целевая позиция не задана.
         }
         _targetHeading = (byte) (Math.toDegrees(Math.atan2(_targetPosition.getY() - _owner.getY(),

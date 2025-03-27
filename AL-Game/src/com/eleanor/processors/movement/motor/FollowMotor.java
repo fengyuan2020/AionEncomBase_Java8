@@ -43,7 +43,7 @@ public class FollowMotor extends AMovementMotor {
     @Override
     public void start() {
         if (task != null) {
-            log.warn("FollowMotor already started for NPC {}", _owner.getObjectId());
+            // log.warn("FollowMotor already started for NPC {}", _owner.getObjectId());
             return; // Предотвращаем повторный запуск
         }
         update(); // Запускаем процесс следования
@@ -68,39 +68,79 @@ public class FollowMotor extends AMovementMotor {
      * @return true, если обновление успешно выполнено, false в противном случае.
      */
     public boolean update() {
+	try {
         // Проверяем условия, при которых обновление не требуется.
         if (target == null || (task != null && task.isCancelled()) || _owner.getLifeStats().isAlreadyDead() || _owner.getAi2().getState() == AIState.DIED) {
+            // log.warn("Update: Условия остановки выполнены, останавливаем двигатель. target == {}, task.isCancelled() == {}, isAlreadyDead() == {}, AIState == {}", target, (task != null && task.isCancelled()), _owner.getLifeStats().isAlreadyDead(), _owner.getAi2().getState());
             stop(); // Останавливаем двигатель, если условия не выполнены
             return false;
         }
+        // log.warn("Update:  Проверка before canMove");
+        boolean canMoveResult = canMove();
+        // log.warn("Update: canMove() вернул: {}", canMoveResult);
+        if (!canMoveResult) {
+            // log.warn("Update: canMove() вернул false, остановка.");
+            stop(); // Останавливаем двигатель, если canMove вернул false
+            return false;
+        }
+
+
+        // log.warn("Update: Проходим дальше.  target: {}", target);
 
         boolean directionChanged;
         lastMovePoint = new Vector3f(_owner.getX(), _owner.getY(), _owner.getZ());
+        // log.warn("Update: lastMovePoint установлен в {}", lastMovePoint);
 
         // Проверяем, может ли NPC пройти к цели напрямую.
         boolean canPass = GeoService.getInstance().canPass(_owner, target);
+        // log.warn("Update: canPass() вернул {}", canPass);
 
         // Выбираем следующую точку для движения.
         Vector3f nextTargetPosition = null;
         if (canMove() && !canPass && pathfindRevalidationTime < System.currentTimeMillis()) {
             // Если не может пройти и требуется перепроверка пути, используем PathfindHelper.
+            // log.warn("Update: Используем PathfindHelper");
             nextTargetPosition = PathfindHelper.selectFollowStep(_owner, target);
+            // log.warn("Update: PathfindHelper вернул {}", nextTargetPosition);
         } else if (canMove() && canPass) {
             // Если может пройти, вычисляем следующую точку на основе расстояния и направления.
-            float newZ = GeoService.getInstance().getZ(_owner.getWorldId(), target.getX(), target.getY(), target.getZ(), 100.0f, _owner.getInstanceId());
-            Vector3f getTargetPos = new Vector3f(target.getX(), target.getY(), newZ);
-            float range = (float) _owner.getGameStats().getAttackRange().getCurrent() / 1000.0f;
+            // log.warn("Update: NPC может пройти напрямую к цели");
+            if (target == null) {
+                log.error("target is null!");
+                return false; // Добавлено, чтобы не было NullPointerException
+            }
 
+            float newZ = GeoService.getInstance().getZ(_owner.getWorldId(), target.getX(), target.getY(), target.getZ(), 100.0f, _owner.getInstanceId());
+            // log.warn("Update: newZ: {}", newZ);
+            Vector3f getTargetPos = new Vector3f(target.getX(), target.getY(), newZ);
+            // log.warn("Update: getTargetPos: {}", getTargetPos);
+            float range = (float) _owner.getGameStats().getAttackRange().getCurrent() / 1000.0f;
+            // log.warn("Update: range: {}", range);
+
+            // log.warn("Update: before GeomUtil.getDistance3D");
             double distance = GeomUtil.getDistance3D(lastMovePoint, getTargetPos.x, getTargetPos.y, getTargetPos.z) - Math.max(range, _owner.getCollision());
+            // log.warn("Update: distance: {}", distance);
+            // log.warn("Update: before GeomUtil.getDirection3D");
             Vector3f dir = GeomUtil.getDirection3D(lastMovePoint, getTargetPos);
-            nextTargetPosition = GeomUtil.getNextPoint3D(lastMovePoint, dir, (float) distance);
+            // log.warn("Update: dir: {}", dir);
+            if (dir != null) { // Добавляем проверку на null
+                // log.warn("Update: before GeomUtil.getNextPoint3D");
+                nextTargetPosition = GeomUtil.getNextPoint3D(lastMovePoint, dir, (float) distance); //Строка 91!
+                // log.warn("Update: nextTargetPosition: {}", nextTargetPosition);
+            } else {
+                // log.warn("Update: dir == null, остаемся на месте");
+                nextTargetPosition = lastMovePoint; // Если направление не определено, остаемся на месте
+            }
         } else if (pathfindRevalidationTime < System.currentTimeMillis()) {
             // Если не может двигаться и требуется перепроверка, устанавливаем целевую позицию в null.
+            // log.warn("Update: Перепроверка пути не требуется, устанавливаем целевую позицию в null.");
             nextTargetPosition = null;
         }
+        // log.warn("Update: nextTargetPosition: {}", nextTargetPosition);
 
         // Отправляем пакет движения, если целевая позиция была изменена.
         if (nextTargetPosition != null) {
+            // log.warn("Update: nextTargetPosition != null, отправляем SM_MOVE");
             directionChanged = nextTargetPosition.x != this.targetDestX || nextTargetPosition.y != this.targetDestY || nextTargetPosition.z != this.targetDestZ;
             this.targetDestX = nextTargetPosition.x;
             this.targetDestY = nextTargetPosition.y;
@@ -119,6 +159,8 @@ public class FollowMotor extends AMovementMotor {
             }
 
             lastMoveMs = System.currentTimeMillis();
+        } else {
+            // // log.warn("Update: nextTargetPosition == null, не отправляем SM_MOVE");
         }
 
         // Планируем следующее обновление движения.
@@ -161,9 +203,12 @@ public class FollowMotor extends AMovementMotor {
                     }
                 }, 0L);
             }
-        }, TARGET_REVALIDATE_TIME);
-
-        return true;
+            }, TARGET_REVALIDATE_TIME);
+				return true;
+			} catch (NullPointerException e) {
+				// // log.warn("NullPointerException caught in FollowMotor.update(): " + e.getMessage());
+				return false;
+        }
     }
 
     /**
@@ -172,6 +217,9 @@ public class FollowMotor extends AMovementMotor {
      * @return true, если NPC может двигаться, false в противном случае.
      */
     private boolean canMove() {
-        return !_owner.getEffectController().isUnderFear() && _owner.canPerformMove() && _owner.getAi2().getSubState() != AISubState.CAST;
+        boolean canMove = !_owner.getEffectController().isUnderFear() && _owner.canPerformMove() && _owner.getAi2().getSubState() != AISubState.CAST;
+        // log.warn("canMove() - Под страхом: {},  canPerformMove(): {},  getSubState(): {}, canMove: {}", _owner.getEffectController().isUnderFear(), _owner.canPerformMove(), _owner.getAi2().getSubState(), canMove);
+
+        return canMove;
     }
 }

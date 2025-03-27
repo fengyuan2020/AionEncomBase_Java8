@@ -42,6 +42,10 @@ import org.slf4j.LoggerFactory;
 import com.eleanor.Global;
 import com.eleanor.processors.movement.motor.FollowMotor;
 
+/*
+ * @rework: MATTY
+ */
+
 public class NpcMoveController
         extends CreatureMoveController<Npc> {
     private static final Logger log = LoggerFactory.getLogger(NpcMoveController.class);
@@ -71,22 +75,24 @@ public class NpcMoveController
         POINT,
         HOME,
     }
-    private void applyFollow(VisibleObject target) {
-        if ((this._followMotor != null && this._followMotor.target == target)) {
-            return;
-        }
-        if (this._followMotor != null) {
-            this._followMotor.stop();
-        }
-        this._followMotor = new FollowMotor(Global.MovementProcessor, (Npc)this.owner, target);
-        this._followMotor.start();
-    }
-    private void cancelFollow() {
-        if ((this._followMotor != null)) {
-            this._followMotor.stop();
-            this._followMotor = null;
-        }
-    }
+	
+	private synchronized void applyFollow(VisibleObject target) { // Синхронизируем
+		if ((this._followMotor != null && this._followMotor.target == target)) {
+			return;
+		}
+		if (this._followMotor != null) {
+			this._followMotor.stop();
+		}
+		this._followMotor = new FollowMotor(Global.MovementProcessor, (Npc)this.owner, target);
+		this._followMotor.start();
+	}
+	
+	private synchronized void cancelFollow() { // Синхронизируем
+		if ((this._followMotor != null)) {
+			this._followMotor.stop();
+			this._followMotor = null;
+		}
+	}
 
     public void moveToTargetObject() {
         if (started.compareAndSet(false, true)) {
@@ -155,7 +161,9 @@ public class NpcMoveController
                 AI2Logger.moveinfo(owner, "moveToDestination can't perform move");
             }
             if (started.compareAndSet(true, false)) {
-                cancelFollow();
+                synchronized (this) {
+                    cancelFollow();
+                }
                 setAndSendStopMove(owner);
             }
             updateLastMove();
@@ -170,88 +178,87 @@ public class NpcMoveController
                 AI2Logger.moveinfo(owner, "moveToDestination not started");
             }
         }
-        switch (destination) {
-            case TARGET_OBJECT:
-                if (GeoDataConfig.GEO_NAV_ENABLE) {
-                    returnAttempts = 0;
-                    VisibleObject target = owner.getTarget();// todo no target
-                    if (target == null) { //This check is not needed, but I'll leave it for clarity.
-                        return;
-                    }
-                    if (!(target instanceof Creature)) { //instanceof returns false if target is null.
-                        return;
-                    }
-                    if ((MathUtil.getDistance(target.getX(), target.getY(), pointZ, pointX, pointY, pointZ) > MOVE_CHECK_OFFSET)) {
-                        Creature creature = (Creature) target;
-                        offset = owner.getController().getAttackDistanceToTarget();
-                        pointX = target.getX();
-                        pointY = target.getY();
-                        pointZ = getTargetZ(owner, creature);
-                        cachedPathValid = false;
-                    }
-                    if (!cachedPathValid || cachedPath == null) {
-                        cachedPath = NavService.getInstance().navigateToTarget(owner, (Creature) target);
-                        if (cachedPath != null) { //Add a bit of randomness to the last point to prevent entities from stacking directly ontop of eachother.
-                            //TODO: Move to NavService and make sure this random point is on the navmesh!
-                            if (cachedPath.length != 1) {
-                                if (Rnd.nextBoolean()) {
-                                    cachedPath[cachedPath.length - 1][0] += Rnd.nextDouble() * owner.getObjectTemplate().getBoundRadius().getSide();
-                                } else {
-                                    cachedPath[cachedPath.length - 1][0] -= Rnd.nextDouble() * owner.getObjectTemplate().getBoundRadius().getSide();
-                                }
-                                if (Rnd.nextBoolean()) {
-                                    cachedPath[cachedPath.length - 1][1] += Rnd.nextDouble() * owner.getObjectTemplate().getBoundRadius().getSide();
-                                } else {
-                                    cachedPath[cachedPath.length - 1][1] -= Rnd.nextDouble() * owner.getObjectTemplate().getBoundRadius().getSide();
-                                }
-                            }
-                        }
-                        cachedPathValid = true;
-                    }
-                    if (cachedPath != null && cachedPath.length > 0) {
-                        float[] p1 = cachedPath[0];
-                        assert p1.length == 3;
-                        moveToLocation(p1[0], p1[1], getTargetZ(owner, p1[0], p1[1], p1[2]), offset);
-                    } else {
-                        if (cachedPath != null) cachedPath = null;
-                        moveToLocation(pointX, pointY, pointZ, offset);
-                    }
-                } else {
-                    Npc npc = owner;
-                    VisibleObject target = owner.getTarget();
+
+        synchronized (this) {
+            switch (destination) {
+                case TARGET_OBJECT:
+                    VisibleObject target = owner.getTarget(); // todo no target
                     if (target == null) {
                         cancelFollow();
                         return;
                     }
-                    if (!(target instanceof Creature)) {
+
+                    if (!(target instanceof Creature)) { // instanceof returns false if target is null.
                         cancelFollow();
                         return;
                     }
-                    if (owner.getAi2().getState() == AIState.FOLLOWING) {
-                        cancelFollow();
-                        offset = npc.getController().getAttackDistanceToTarget();
-                        moveToLocation(target.getX(), target.getY(), target.getZ(), offset);
-                        break;
+
+                    if (GeoDataConfig.GEO_NAV_ENABLE) {
+                        returnAttempts = 0;
+                        if ((MathUtil.getDistance(target.getX(), target.getY(), pointZ, pointX, pointY, pointZ) > MOVE_CHECK_OFFSET)) {
+                            Creature creature = (Creature) target;
+                            offset = owner.getController().getAttackDistanceToTarget();
+                            pointX = target.getX();
+                            pointY = target.getY();
+                            pointZ = getTargetZ(owner, creature);
+                            cachedPathValid = false;
+                        }
+                        if (!cachedPathValid || cachedPath == null) {
+                            cachedPath = NavService.getInstance().navigateToTarget(owner, (Creature) target);
+                            if (cachedPath != null) { //Add a bit of randomness to the last point to prevent entities from stacking directly ontop of eachother.
+                                //TODO: Move to NavService and make sure this random point is on the navmesh!
+                                if (cachedPath.length != 1) {
+                                    if (Rnd.nextBoolean()) {
+                                        cachedPath[cachedPath.length - 1][0] += Rnd.nextDouble() * owner.getObjectTemplate().getBoundRadius().getSide();
+                                    } else {
+                                        cachedPath[cachedPath.length - 1][0] -= Rnd.nextDouble() * owner.getObjectTemplate().getBoundRadius().getSide();
+                                    }
+                                    if (Rnd.nextBoolean()) {
+                                        cachedPath[cachedPath.length - 1][1] += Rnd.nextDouble() * owner.getObjectTemplate().getBoundRadius().getSide();
+                                    } else {
+                                        cachedPath[cachedPath.length - 1][1] -= Rnd.nextDouble() * owner.getObjectTemplate().getBoundRadius().getSide();
+                                    }
+                                }
+                            }
+                            cachedPathValid = true;
+                        }
+                        if (cachedPath != null && cachedPath.length > 0) {
+                            float[] p1 = cachedPath[0];
+                            assert p1.length == 3;
+                            moveToLocation(p1[0], p1[1], getTargetZ(owner, p1[0], p1[1], p1[2]), offset);
+                        } else {
+                            if (cachedPath != null) cachedPath = null;
+                            moveToLocation(pointX, pointY, pointZ, offset);
+                        }
+                    } else {
+                        Npc npc = owner;
+
+                        if (owner.getAi2().getState() == AIState.FOLLOWING) {
+                            cancelFollow();
+                            offset = npc.getController().getAttackDistanceToTarget();
+                            moveToLocation(target.getX(), target.getY(), target.getZ(), offset);
+                            break;
+                        }
+                        applyFollow(target);
                     }
-                    applyFollow(target);
-                }
-                break;
-            case POINT: {
-                cancelFollow();
-                moveToLocation(pointX, pointY, pointZ, offset);
-                break;
-            }
-            case HOME: {
-                if ((!cachedPathValid || cachedPath == null) && (returnAttempts<3)) {
-                    cachedPath = NavService.getInstance().navigateToLocation(owner, pointX, pointY, pointZ);
-                    returnAttempts++;
-                    cachedPathValid = true;
-                }
-                if ((cachedPath != null) && (cachedPath.length > 0) && (returnAttempts<3)) {
-                    float[] p1 = cachedPath[0];
-                    moveToLocation(p1[0], p1[1], getTargetZ(owner, p1[0], p1[1], p1[2]), offset);
-                } else{
+                    break;
+                case POINT: {
+                    cancelFollow();
                     moveToLocation(pointX, pointY, pointZ, offset);
+                    break;
+                }
+                case HOME: {
+                    if ((!cachedPathValid || cachedPath == null) && (returnAttempts < 3)) {
+                        cachedPath = NavService.getInstance().navigateToLocation(owner, pointX, pointY, pointZ);
+                        returnAttempts++;
+                        cachedPathValid = true;
+                    }
+                    if ((cachedPath != null) && (cachedPath.length > 0) && (returnAttempts < 3)) {
+                        float[] p1 = cachedPath[0];
+                        moveToLocation(p1[0], p1[1], getTargetZ(owner, p1[0], p1[1], p1[2]), offset);
+                    } else {
+                        moveToLocation(pointX, pointY, pointZ, offset);
+                    }
                 }
             }
         }
@@ -397,19 +404,19 @@ public class NpcMoveController
         this.setAndSendStopMove((Creature)this.owner);
     }
 
-    public void resetMove() {
-        if (owner.getAi2().isLogging()) {
-            AI2Logger.moveinfo(owner, "MC perform stop");
-        }
-        cancelFollow();
-        started.set(false);
-        targetDestX = 0;
-        targetDestY = 0;
-        targetDestZ = 0;
-        pointX = 0;
-        pointY = 0;
-        pointZ = 0;
-    }
+	public void resetMove() {
+		if (owner.getAi2().isLogging()) {
+			AI2Logger.moveinfo(owner, "MC perform stop");
+		}
+		cancelFollow();
+		started.set(false);
+		targetDestX = 0;
+		targetDestY = 0;
+		targetDestZ = 0;
+		pointX = 0;
+		pointY = 0;
+		pointZ = 0;
+	}
 
     public void setCurrentRoute(List<RouteStep> currentRoute) {
         if (currentRoute == null) {
