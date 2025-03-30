@@ -293,14 +293,14 @@
 	    <spawn npc_id="700498">
 			<spot x="485.34122" y="817.6004" z="416.68781" entity_id="26"/>
 	    </spawn>
-		<!-- Portside Defense Shield (Object Normal lvl:3) -->
+		<!-- Portside Defense Shield (Object Normal lvl:3)
 	    <spawn npc_id="700501">
 			<spot x="448.39151" y="493.64182" z="394.13174" entity_id="12"/>
-	    </spawn>
-		<!-- Starboard Defense Shield (Object Normal lvl:3) -->
+	    </spawn> -->
+		<!-- Starboard Defense Shield (Object Normal lvl:3) 
 	    <spawn npc_id="700502">
 			<spot x="520.87555" y="493.40115" z="394.43292" entity_id="16"/>
-	    </spawn>
+	    </spawn> -->
 		<!-- Portside Door Of Captain's Cabin (Object Normal lvl:3) -->
 	    <spawn npc_id="700503">
 			<spot x="512.87292" y="812.52319" z="419.43478" entity_id="1"/>

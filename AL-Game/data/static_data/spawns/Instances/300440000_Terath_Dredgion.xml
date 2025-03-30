@@ -222,10 +222,10 @@
 			<spot x="483.29904" y="294.43115" z="402.2051" h="30"/>
 		</spawn>
                 <!-- Captain Anusa
-		<Terath Legion> -->
+		<Terath Legion> 
 		<spawn custom="true" respawn_time="295" npc_id="219264" difficult_id="0">
            		<spot h="26" z="405.13498" y="903.6746" x="487.65887"/>
-        	</spawn>
+        </spawn> -->
 		<!-- Archivist Davorkar
 		<Terath Legion> -->
 		<spawn npc_id="219266">
@@ -318,14 +318,14 @@
 		<spawn npc_id="701454">
 			<spot x="485.167" y="817.515" z="416.672" entity_id="26"/>
 		</spawn>
-		<!-- Portside Defense Shield (Object Normal lvl:3) -->
+		<!-- Portside Defense Shield (Object Normal lvl:3) 
 	    <spawn npc_id="730566">
 			<spot x="448.39151" y="493.64182" z="394.13174" entity_id="12"/>
-	    </spawn>
-		<!-- Starboard Defense Shield (Object Normal lvl:3) -->
+	    </spawn> -->
+		<!-- Starboard Defense Shield (Object Normal lvl:3) 
 	    <spawn npc_id="730567">
 			<spot x="520.87555" y="493.40115" z="394.43292" entity_id="133"/>
-	    </spawn>
+	    </spawn> -->
 		<!-- Portside Teleporter Generator (Object Normal lvl:3) -->
 		<spawn npc_id="730570">
 			<spot x="467.42523" y="586.23065" z="391.53033" entity_id="40"/>
