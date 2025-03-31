@@ -45,9 +45,6 @@ public class _3969SexiestManAlive extends QuestHandler {
 	public boolean onDialogEvent(QuestEnv env) {
 		final Player player = env.getPlayer();
 		int targetId = 0;
-		QuestState qs2 = player.getQuestStateList().getQuestState(3968);
-		if (qs2 == null || qs2.getStatus() != QuestStatus.COMPLETE)
-			return false;
 		if (env.getVisibleObject() instanceof Npc)
 			targetId = ((Npc) env.getVisibleObject()).getNpcId();
 		QuestState qs = player.getQuestStateList().getQuestState(questId);
@@ -55,15 +52,13 @@ public class _3969SexiestManAlive extends QuestHandler {
 			if (qs == null || qs.getStatus() == QuestStatus.NONE) {
 				if (env.getDialog() == QuestDialog.START_DIALOG)
 					return sendQuestDialog(env, 1011);
-				else if (env.getDialogId() == 1002) {
-					if (giveQuestItem(env, 182206126, 1)) {
-						return sendQuestStartDialog(env);
-					}
-					return true;
+				else if (env.getDialogId() == 1007) {
+					return sendQuestDialog(env, 4);
 				}
-				else
-					return sendQuestStartDialog(env);
-			    }
+				else if (env.getDialogId() == 1002) {
+				    return sendQuestStartDialog(env, 182206126, 1);
+				}
+			}
 			else if (qs != null && qs.getStatus() == QuestStatus.START && qs.getQuestVarById(0) == 1) {
 				if (env.getDialog() == QuestDialog.START_DIALOG)
 					return sendQuestDialog(env, 2375);

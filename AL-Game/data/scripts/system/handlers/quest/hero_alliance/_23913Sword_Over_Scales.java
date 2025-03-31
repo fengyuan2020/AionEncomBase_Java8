@@ -42,9 +42,7 @@ public class _23913Sword_Over_Scales extends QuestHandler {
 		Player player = env.getPlayer();
 		QuestState qs = player.getQuestStateList().getQuestState(questId);
 		int targetId = env.getTargetId();
-		if (qs == null || qs.getStatus() == QuestStatus.NONE) {
-			return false;
-		} else if (qs == null || qs.getStatus() == QuestStatus.REWARD) {
+        if (qs == null || qs.getStatus() == QuestStatus.REWARD) {
 			if (targetId == 798719) { //Eldran.
 				return sendQuestEndDialog(env);
 			}

@@ -6019,7 +6019,6 @@
       <spot x="2536.770508" y="2252.228271" z="103.0" h="100" />
     </spawn>
     <spawn npc_id="204348" respawn_time="300">
-		<temporary_spawn/>
 		<spot x="2493" y="1713" z="90.1875" h="73">
 			<temporary_spawn spawn_time="5.*.*" despawn_time="21.*.*"/>
 		</spot>
@@ -6375,7 +6374,6 @@
       <spot x="2397.109863" y="1734.479858" z="101.875" entity_id="478" />
     </spawn>
     <spawn npc_id="204347" respawn_time="300">
-		<temporary_spawn/>
 		<spot x="2522.29" y="1703.93" z="92.0406" h="50">
 			<temporary_spawn spawn_time="5.*.*" despawn_time="21.*.*"/>
 		</spot>

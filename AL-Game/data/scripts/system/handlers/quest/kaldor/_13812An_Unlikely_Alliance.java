@@ -25,10 +25,9 @@ import com.aionemu.gameserver.services.QuestService;
 /** Author Ghostfur & Unknown (Aion-Unique)
 /****/
 
-public class _13812An_Unlikely_Alliance extends QuestHandler
-{
+public class _13812An_Unlikely_Alliance extends QuestHandler {
+
 	private final static int questId = 13812;
-	
 	public _13812An_Unlikely_Alliance() {
 		super(questId);
 	}
@@ -44,9 +43,7 @@ public class _13812An_Unlikely_Alliance extends QuestHandler
 		Player player = env.getPlayer();
 		QuestState qs = player.getQuestStateList().getQuestState(questId);
 		int targetId = env.getTargetId();
-		if (qs == null || qs.getStatus() == QuestStatus.NONE) {
-			return false;
-		} else if (qs.getStatus() == QuestStatus.REWARD) {
+        if (qs == null || qs.getStatus() == QuestStatus.REWARD) {
 			if (targetId == 802428) { //Milda.
 				return sendQuestEndDialog(env);
 			}

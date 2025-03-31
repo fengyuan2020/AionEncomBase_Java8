@@ -388,13 +388,15 @@ public class BaranathDredgion extends GeneralInstanceHandler
 				despawnNpc(npc);
 				//The Portside Defense Shield has been generated in Ready Room 1.
 				sendMsgByRace(1400226, Race.PC_ALL, 0);
-				spawn(700501, 448.39151f, 493.64182f, 394.13174f, (byte) 0, 10);  // spawn barier
+				spawn(700501, 448.39151f, 493.64182f, 394.13174f, (byte) 0, 12);  // spawn barier
+	
 			break;
 			case 700508: //Starboard Defense Shield Generator.
 				despawnNpc(npc);
 				//The Starboard Defense Shield has been generated in Ready Room 2.
 				sendMsgByRace(1400227, Race.PC_ALL, 0);
-				spawn(700502, 520.87555f, 493.40115f, 394.43292f, (byte) 0, 10);  // spawn barier
+				spawn(700502, 520.87555f, 493.40115f, 394.43292f, (byte) 0, 16);  // spawn barier
+				
 			break;
 		   /**
 			* The Bulkhead:

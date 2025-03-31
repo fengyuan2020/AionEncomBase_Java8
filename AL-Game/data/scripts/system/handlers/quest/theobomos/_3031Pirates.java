@@ -56,7 +56,7 @@ public class _3031Pirates extends QuestHandler {
 						return sendQuestDialog(env, 4762);
 					} case STEP_TO_1: {
 						QuestService.startQuest(env);
-						return true;
+						return closeDialogWindow(env);
 					} default:
 						return sendQuestStartDialog(env);
 				}

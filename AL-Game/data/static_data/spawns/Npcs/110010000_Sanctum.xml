@@ -422,7 +422,6 @@
     </spawn>
     <spawn npc_id="806142" respawn_time="60">
       <spot x="1510.254639" y="1485.984253" z="566.7518" h="105" />
-      <spot x="1510.254639" y="1485.984253" z="566.7518" h="105" />
     </spawn>
     <spawn npc_id="203772" respawn_time="60">
       <spot x="1732.150879" y="1501.703003" z="587.05743" h="90" />
@@ -492,7 +491,6 @@
 		<spot x="1810.58" y="2133.26" z="527.93" h="37"/>
 	</spawn>
     <spawn npc_id="806141" respawn_time="60">
-      <spot x="1511.854248" y="1484.467651" z="566.7518" h="45" />
       <spot x="1511.854248" y="1484.467651" z="566.7518" h="45" />
     </spawn>
     <spawn npc_id="203878" respawn_time="60">
@@ -656,7 +654,6 @@
       <spot x="1846.635010" y="1511.119629" z="590.06964" h="0" />
     </spawn>
     <spawn npc_id="798026" respawn_time="60">
-	<temporary_spawn/>
 	  <spot x="1818.54" y="2192.09" z="528.766" h="91">
 	  <temporary_spawn spawn_time="21.*.*" despawn_time="9.*.*"/>
 	  </spot>

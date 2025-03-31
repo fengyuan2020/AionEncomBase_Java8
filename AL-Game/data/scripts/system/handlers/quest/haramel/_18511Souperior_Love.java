@@ -11,10 +11,9 @@ import com.aionemu.gameserver.questEngine.model.QuestStatus;
 /** Remake Rinzler (Encom)
 /****/
 
-public class _18511Souperior_Love extends QuestHandler
-{
-    private static final int questId = 18511;
+public class _18511Souperior_Love extends QuestHandler {
 
+    private static final int questId = 18511;
     public _18511Souperior_Love() {
         super(questId);
     }
@@ -58,8 +57,6 @@ public class _18511Souperior_Love extends QuestHandler
                             return checkQuestItems(env, 0, 0, false, 1352, 10001);
                         } case STEP_TO_2: {
                             giveQuestItem(env, 182212011, 1);
-                            return closeDialogWindow(env);
-                        } case FINISH_DIALOG: {
                             return closeDialogWindow(env);
                         }
                     }

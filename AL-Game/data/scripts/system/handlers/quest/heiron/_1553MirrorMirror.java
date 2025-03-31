@@ -81,7 +81,7 @@ public class _1553MirrorMirror extends QuestHandler {
 			}
 		}
 		else if (targetId == 204584) {
-			if (qs != null && qs.getStatus() == QuestStatus.START && qs.getQuestVarById(0) == 1) {
+			if (qs != null && qs.getStatus() == QuestStatus.START && qs.getQuestVarById(0) == 2) {
 				if (env.getDialog() == QuestDialog.START_DIALOG)
 					return sendQuestDialog(env, 2375);
 				else if (env.getDialogId() == 1009) {

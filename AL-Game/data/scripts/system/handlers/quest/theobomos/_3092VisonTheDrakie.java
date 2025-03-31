@@ -70,12 +70,7 @@ public class _3092VisonTheDrakie extends QuestHandler {
 				case 798214: { // Vison
 					switch (env.getDialog()) {
 						case START_DIALOG: {
-							if (qs.getQuestVarById(0) == 0) {
-								long itemCount = player.getInventory().getItemCountByItemId(182208066);
-								if (itemCount >= 25) {
-									return sendQuestDialog(env, 1352);
-								}
-							}
+							return sendQuestDialog(env, 1352);
 						}
 						case STEP_TO_1: {
 							return defaultCloseDialog(env, 0, 1); // 1
@@ -83,24 +78,23 @@ public class _3092VisonTheDrakie extends QuestHandler {
 					}
 				}
 				case 798191: {
-					if (env.getDialog() == QuestDialog.START_DIALOG)
+				    switch (env.getDialog()) {
+					case START_DIALOG: {
 						return sendQuestDialog(env, 2375);
-					if(env.getDialog() == QuestDialog.CHECK_COLLECTED_ITEMS) {
-							return checkQuestItems(env, 1, 2, true, 5, 2716); // reward
+                    }
+					case CHECK_COLLECTED_ITEMS: {
+						return checkQuestItems(env, 1, 2, true, 5, 2716); // reward
 					}
-					if (env.getDialogId() == 1008)
-						return defaultCloseDialog(env, 1, 1);
+					case SELECT_ACTION_2716: {
+						return closeDialogWindow(env);
+					    }
+					}
 				}
 			}
 		}
 		else if (qs == null || qs.getStatus() == QuestStatus.REWARD) {
-			if (targetId == 798191) { 
-				if (env.getDialog() == QuestDialog.USE_OBJECT) {
-					return sendQuestDialog(env, 5);
-				}
-				else {
-					return sendQuestEndDialog(env);
-				}
+			if (targetId == 798191) {
+				return sendQuestEndDialog(env);
 			}
 		}
 		return false;

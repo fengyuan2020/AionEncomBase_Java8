@@ -58,43 +58,46 @@ public class CreatureEventHandler {
 	}
 
 	/**
-	 * @param ai
-	 * @param creature
+	 * 处理生物移动事件
+	 * @param npcAI 非玩家角色的AI实例
+	 * @param creature 移动的生物对象
 	 */
 	protected static void checkAggro(NpcAI2 ai, Creature creature) {
-		Npc owner = ai.getOwner();
+        Npc owner = ai.getOwner();
 
-		if (ai.isInState(AIState.FIGHT)) {
-			return;
-		}
-		if (creature.getLifeStats().isAlreadyDead()) {
-			return;
-		}
-		if (!owner.canSee(creature)) {
-			return;
-		}
-		if (!owner.getActiveRegion().isMapRegionActive()) {
-			return;
-		}
-		boolean isInAggroRange = false;
-		if (ai.poll(AIQuestion.CAN_SHOUT)) {
-			int shoutRange = owner.getObjectTemplate().getMinimumShoutRange();
-			double distance = MathUtil.getDistance(owner, creature);
-			if (distance <= shoutRange) {
-				ShoutEventHandler.onSee(ai, creature);
-				isInAggroRange = shoutRange <= owner.getObjectTemplate().getAggroRange();
-			}
-		}
-		if (!ai.isInState(AIState.FIGHT) && (isInAggroRange
-				|| MathUtil.isIn3dRange(owner, creature, owner.getObjectTemplate().getAggroRange()))) {
-			if (owner.isAggressiveTo(creature) && GeoService.getInstance().canSee(owner, creature)) {
-				if (!ai.isInState(AIState.RETURNING)) {
-					ai.getOwner().getMoveController().storeStep();
-				}
-				if (ai.canThink()) {
-					ai.onCreatureEvent(AIEventType.CREATURE_AGGRO, creature);
-				}
-			}
-		}
-	}
+        if (ai.isInState(AIState.FIGHT)) {
+            return;
+        }
+        if (creature.getLifeStats().isAlreadyDead()) {
+            return;
+        }
+        if (!owner.canSee(creature)) {
+            return;
+        }
+        if (!owner.getActiveRegion().isMapRegionActive()) {
+            return;
+        }
+        
+        boolean isInAggroRange = false;
+        if (ai.poll(AIQuestion.CAN_SHOUT)) {
+            int shoutRange = owner.getObjectTemplate().getMinimumShoutRange();
+            double distance = MathUtil.getDistance(owner, creature);
+            if (distance <= shoutRange) {
+                ShoutEventHandler.onSee(ai, creature);
+                isInAggroRange = shoutRange <= owner.getObjectTemplate().getAggroRange();
+            }
+        }
+        
+        if (!ai.isInState(AIState.FIGHT) && (isInAggroRange 
+                || MathUtil.isIn3dRange(owner, creature, (float) (owner.getObjectTemplate().getAggroRange() * 1.6)))) { // 1.6 is for aggro range correction
+            if (owner.isAggressiveTo(creature) && GeoService.getInstance().canSee(owner, creature)) {
+                if (!ai.isInState(AIState.RETURNING)) {
+                    ai.getOwner().getMoveController().storeStep();
+                }
+                if (ai.canThink()) {
+                    ai.onCreatureEvent(AIEventType.CREATURE_AGGRO, creature);
+                }
+            }
+        }
+    }
 }
