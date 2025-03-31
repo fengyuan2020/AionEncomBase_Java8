@@ -26,24 +26,26 @@ public class _19047Just_Between_Me_And_Fasimedes extends QuestHandler {
 		QuestDialog dialog = env.getDialog();
 		int targetId = env.getTargetId();
 		if (qs == null || qs.getStatus() == QuestStatus.NONE) {
-			if (targetId == 203700) { 
+			if (targetId == 203700) {
 				if (dialog == QuestDialog.START_DIALOG) {
 					return sendQuestDialog(env, 1011);
 				} else {
 					return sendQuestStartDialog(env);
 				}
 			}
-		} else if (qs.getStatus() == QuestStatus.START) {
+		}
+        else if (qs.getStatus() == QuestStatus.START) {
 			if (targetId == 203700) {
-				if (dialog == QuestDialog.SELECT_REWARD) {
+				if (dialog == QuestDialog.START_DIALOG) {
+					return sendQuestDialog(env, 2375);
+				}
+				else if (dialog == QuestDialog.SELECT_REWARD) {
 					return defaultCloseDialog(env, 0, 0, true, true);
 				}
 			}
-		} else if (qs == null || qs.getStatus() == QuestStatus.REWARD) {
+		}
+        else if (qs == null || qs.getStatus() == QuestStatus.REWARD) {
 			if (targetId == 203700) {
-				if (dialog == QuestDialog.USE_OBJECT) {
-					return sendQuestDialog(env, 2375);
-				}
 				return sendQuestEndDialog(env);
 			}
 		}

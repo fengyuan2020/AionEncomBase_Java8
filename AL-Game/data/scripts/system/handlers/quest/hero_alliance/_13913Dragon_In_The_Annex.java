@@ -42,9 +42,7 @@ public class _13913Dragon_In_The_Annex extends QuestHandler {
 		Player player = env.getPlayer();
 		QuestState qs = player.getQuestStateList().getQuestState(questId);
 		int targetId = env.getTargetId();
-		if (qs == null || qs.getStatus() == QuestStatus.NONE) {
-			return false;
-		} else if (qs == null || qs.getStatus() == QuestStatus.REWARD) {
+        if (qs == null || qs.getStatus() == QuestStatus.REWARD) {
 			if (targetId == 798515) { //Perna.
 				return sendQuestEndDialog(env);
 			}

@@ -2885,7 +2885,6 @@
       <spot x="1245.933105" y="2736.018799" z="304.6327" h="90" />
     </spawn>
     <spawn npc_id="798126" respawn_time="60">
-		<temporary_spawn/>
 		<spot x="409.1484" y="1838.5546" z="243.17337" h="42">
 			<temporary_spawn spawn_time="5.*.*" despawn_time="20.*.*"/>
 		</spot>

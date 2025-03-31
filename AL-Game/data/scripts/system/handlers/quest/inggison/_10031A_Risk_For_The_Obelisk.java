@@ -208,23 +208,15 @@ public class _10031A_Risk_For_The_Obelisk extends QuestHandler {
         int targetId = env.getTargetId();
 		if (qs != null && qs.getStatus() == QuestStatus.START) {
         int var = qs.getQuestVarById(0);
-        int var1 = qs.getQuestVarById(1);
-        int var2 = qs.getQuestVarById(2);
             if (var == 9) {
-				if (var1 + var2 < 11) {
-						if (var2 < 2) {
-							return defaultOnKillEvent(env, armoredSpaller, var2, var2 + 1, 2);
-						}
-					 else {
-						if (var1 < 10) {
-							return defaultOnKillEvent(env, hikironFarmBalaur, var1, var1 + 1, 1);
-						}
+				if (defaultOnKillEvent(env, hikironFarmBalaur, 0, 10, 1) || defaultOnKillEvent(env, armoredSpaller, 0, 2, 2)) {
+					int var1 = qs.getQuestVarById(1);
+					int var2 = qs.getQuestVarById(2);
+					if (var1 == 10 && var2 == 2) {
+						qs.setStatus(QuestStatus.REWARD);
+						qs.setQuestVar(10);
+						updateQuestStatus(env);
 					}
-				} else {
-					qs.setQuestVar(10);
-					qs.setStatus(QuestStatus.REWARD);
-					updateQuestStatus(env);
-					return true;
 				}
 			}
 		}

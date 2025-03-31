@@ -78,7 +78,7 @@ public class _3041SororunerkWhereabouts extends QuestHandler {
 							qs.setQuestVarById(0, qs.getQuestVarById(0) + 1);
 							qs.setStatus(QuestStatus.REWARD);
 							updateQuestStatus(env);
-						    return sendQuestStartDialog(env);
+						    return closeDialogWindow(env);
 						}
 					}
 				}

@@ -4603,8 +4603,12 @@
       <reward_item item_id="186000005" count="25" />
       <reward_item item_id="162000050" count="10" />
     </rewards>
+    <quest_drop npc_id="235504" item_id="182201769" chance="100" drop_each_member="1" />
     <quest_drop npc_id="235505" item_id="182201769" chance="100" drop_each_member="1" />
     <quest_drop npc_id="235506" item_id="182201769" chance="100" drop_each_member="1" />
+    <quest_drop npc_id="235507" item_id="182201769" chance="100" drop_each_member="1" />
+    <quest_drop npc_id="235508" item_id="182201769" chance="100" drop_each_member="1" />
+    <quest_drop npc_id="235509" item_id="182201769" chance="100" drop_each_member="1" />
   </quest>
   <quest id="1670" name="Invisible Bridges" nameId="1102861" minlevel_permitted="38" max_repeat_count="1" cannot_share="true" race_permitted="ELYOS" category="QUEST">
     <rewards gold="46650" exp="3218619">
@@ -4734,9 +4738,9 @@
     <rewards exp="3243300" ap="200">
       <reward_item item_id="186000469" count="25" />
     </rewards>
-    <quest_drop npc_id="213684" item_id="182201804" chance="100" drop_each_member="1" />
+    <quest_drop npc_id="235440" item_id="182201804" chance="100" drop_each_member="1" />
     <quest_drop npc_id="213685" item_id="182201804" chance="100" drop_each_member="1" />
-    <quest_drop npc_id="213686" item_id="182201805" chance="100" drop_each_member="1" />
+    <quest_drop npc_id="235442" item_id="182201805" chance="100" drop_each_member="1" />
     <quest_drop npc_id="213687" item_id="182201805" chance="100" drop_each_member="1" />
     <start_conditions>
       <finished quest_id="1683" />
@@ -6529,6 +6533,7 @@
       <selectable_reward_item item_id="169000003" count="200" />
       <reward_item item_id="160003501" count="4" />
     </rewards>
+	<quest_kill npc_ids="210389 210655" seq="0"/>
   </quest>
   <quest id="2118" name="Up to no Good" nameId="1103218" minlevel_permitted="5" max_repeat_count="1" cannot_share="true" race_permitted="ASMODIANS" category="QUEST">
     <collect_items>

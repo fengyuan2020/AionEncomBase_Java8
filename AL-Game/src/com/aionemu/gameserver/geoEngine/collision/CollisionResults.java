@@ -26,7 +26,7 @@ public class CollisionResults implements Iterable<CollisionResult> {
 	private boolean sorted = true;
 	private final boolean onlyFirst;
 	private final byte intentions;
-	private final int instanceId;
+	private int instanceId;  // 移除final修饰符
 
 	public CollisionResults(byte intentions, boolean searchFirst, int instanceId) {
 		this.intentions = intentions;
@@ -138,4 +138,8 @@ public class CollisionResults implements Iterable<CollisionResult> {
 	public int getInstanceId() {
 		return instanceId;
 	}
+    
+    public void setInstanceId(int instanceId) {
+        this.instanceId = instanceId;
+    }
 }

@@ -110,16 +110,40 @@ public class _24114You_Gotta_Stop_Umkata extends QuestHandler {
 	}
 	
 	@Override
-    public boolean onKillEvent(QuestEnv env) {
+	public boolean onKillEvent(QuestEnv env) {
+		if (env == null) {
+			return false;
+		}
 		final Player player = env.getPlayer();
 		final QuestState qs = player.getQuestStateList().getQuestState(questId);
+		if (qs == null) {
+			return false;
+		}
 		int var = qs.getQuestVarById(0);
-        if (qs == null || qs.getStatus() != QuestStatus.START) {
-            return false;
-        } if (var >= 0 && var < 3) {
-			return defaultOnKillEvent(env, heroSpirit, var, var + 1);
+		if (qs.getStatus() != QuestStatus.START) {
+			return false;
+		}
+
+		int killedNpcId = env.getTargetId();
+		boolean validTarget = false;
+		if (var >= 0 && var < 3) {
+			for (int mobId : heroSpirit) {
+				if (mobId == killedNpcId) {
+					validTarget = true;
+					break;
+				}
+			}
+			if (validTarget) {
+				return defaultOnKillEvent(env, heroSpirit, var, var + 1);
+			} else {
+				return false;
+			}
 		} else if (var == 4) {
-			return defaultOnKillEvent(env, 210752, 4, true);
+			if (killedNpcId == 210752) {
+				return defaultOnKillEvent(env, 210752, 4, true);
+			} else {
+			   return false;
+			}
 		}
 		return false;
 	}

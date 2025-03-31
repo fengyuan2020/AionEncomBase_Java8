@@ -70,8 +70,6 @@ public class _28511Souper_Passion extends QuestHandler {
 						} case STEP_TO_2: {
 							giveQuestItem(env, 182212023, 1);
 							return closeDialogWindow(env);
-						} case FINISH_DIALOG: {
-							return closeDialogWindow(env);
 						}
 					}
 				}

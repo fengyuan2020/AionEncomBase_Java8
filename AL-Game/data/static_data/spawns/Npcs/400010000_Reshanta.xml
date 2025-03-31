@@ -5732,6 +5732,10 @@
         <spawn npc_id="884026" respawn_time="1800">
             <spot h="0" z="2764.3176" y="2329.3806" x="737.7228"/>
         </spawn>
+		<!-- Maias -->
+		<spawn npc_id="279045" respawn_time="295">
+			<spot x="2157.0889" y="468.74582" z="1484.2308" h="52"/>
+		</spawn>
 		<spawn custom="true" respawn_time="295" npc_id="885101" difficult_id="0">
             <spot h="42" z="2962.7505" y="938.5111" x="1552.4457"/>
             <spot h="25" z="2962.3076" y="980.31824" x="1571.2278"/>

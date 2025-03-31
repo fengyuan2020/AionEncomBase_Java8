@@ -397,13 +397,13 @@ public class ChantraDredgionInstance extends GeneralInstanceHandler
 				despawnNpc(npc);
 				//The Portside Defense Shield has been generated in Ready Room 1.
 				sendMsgByRace(1400226, Race.PC_ALL, 0);
-				spawn(730345, 448.39151f, 493.64182f, 394.13174f, (byte) 0, 10);  // spawn barier
+				spawn(730345, 448.39151f, 493.64182f, 394.13174f, (byte) 0, 12);  // spawn barier
 			break;
 			case 730352: //Starboard Defense Shield Generator.
 				despawnNpc(npc);
 				//The Starboard Defense Shield has been generated in Ready Room 2.
 				sendMsgByRace(1400227, Race.PC_ALL, 0);
-				spawn(730346, 520.87555f, 493.40115f, 394.43292f, (byte) 0, 10);  // spawn barier
+				spawn(730346, 520.87555f, 493.40115f, 394.43292f, (byte) 0, 133);  // spawn barier
 			break;
 		   /**
 			* The Bulkhead:

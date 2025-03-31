@@ -58,23 +58,10 @@ public class _3096Examine_The_Extraction_Devices extends QuestHandler {
 			}
 		} if (qs == null) {
 			return false;
-		} if (qs.getStatus() == QuestStatus.START) {
+		} 
+        else if (qs.getStatus() == QuestStatus.START) {
 			switch (targetId) {
-				case 798225: {
-					switch (env.getDialog()) {
-						case START_DIALOG: {
-							return sendQuestDialog(env, 2375);
-						}	
-						case CHECK_COLLECTED_ITEMS: {
-							return checkQuestItems(env, 0, 0, true, 5, 2716);
-						} 
-						case SET_REWARD: {
-							qs.setStatus(QuestStatus.REWARD);
-							updateQuestStatus(env);
-							return sendQuestEndDialog(env);
-						}
-					}
-				} case 700423: {
+                 case 700423: {
 					switch (env.getDialog()) {
 						case USE_OBJECT: {
 							if (player.getInventory().getItemCountByItemId(182208067) < 1) {
@@ -107,9 +94,21 @@ public class _3096Examine_The_Extraction_Devices extends QuestHandler {
 						}
 					}
 				}
-
+				case 798225: {
+					switch (env.getDialog()) {
+						case START_DIALOG: {
+							return sendQuestDialog(env, 2375);
+						}	
+						case CHECK_COLLECTED_ITEMS: {
+							return checkQuestItems(env, 0, 1, true, 5, 2716);
+						}
+						case SELECT_ACTION_2716: {
+						    return closeDialogWindow(env);
+						}
+					}
+				}
 			}
-		} else if (qs == null || qs.getStatus() == QuestStatus.REWARD && targetId == 798225) {
+		} else if (qs.getStatus() == QuestStatus.REWARD && targetId == 798225) {
 			return sendQuestEndDialog(env);
 		}	
 		return false;

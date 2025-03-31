@@ -24,10 +24,9 @@ import com.aionemu.gameserver.world.zone.ZoneName;
 /** Author Ghostfur & Unknown (Aion-Unique)
 /****/
 
-public class _27500Relics_At_Idgel_Dome_Landmark extends QuestHandler
-{
+public class _27500Relics_At_Idgel_Dome_Landmark extends QuestHandler {
+
     private final static int questId = 27500;
-	
     public _27500Relics_At_Idgel_Dome_Landmark() {
         super(questId);
     }
@@ -50,13 +49,10 @@ public class _27500Relics_At_Idgel_Dome_Landmark extends QuestHandler
 				switch (env.getDialog()) {
                     case START_DIALOG: {
                         return sendQuestDialog(env, 4762);
-					} case ACCEPT_QUEST:
-					case ACCEPT_QUEST_SIMPLE: {
+					} case ACCEPT_QUEST_SIMPLE: {
 						return sendQuestStartDialog(env);
 					} case REFUSE_QUEST_SIMPLE: {
 				        return closeDialogWindow(env);
-					} case STEP_TO_1: {
-						return closeDialogWindow(env);
 					}
                 }
 			}
