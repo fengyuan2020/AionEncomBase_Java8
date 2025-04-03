@@ -21,16 +21,14 @@ import com.aionemu.gameserver.questEngine.model.QuestDialog;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
-import com.aionemu.gameserver.services.QuestService;
 
 /****/
 /** Author Ghostfur & Unknown (Aion-Unique)
 /****/
 
-public class _11036Uncommon_Recipe extends QuestHandler
-{
+public class _11036Uncommon_Recipe extends QuestHandler {
+
 	private final static int questId = 11036;
-	
 	public _11036Uncommon_Recipe() {
 		super(questId);
 	}
@@ -60,13 +58,17 @@ public class _11036Uncommon_Recipe extends QuestHandler
 		QuestDialog dialog = env.getDialog();
 		if (env.getVisibleObject() instanceof Npc) {
             targetId = ((Npc) env.getVisibleObject()).getNpcId();
-        } if (qs == null || qs.getStatus() == QuestStatus.NONE) {
-			if (targetId == 0) { 
-				if (dialog == QuestDialog.ACCEPT_QUEST) {
-					QuestService.startQuest(env);
-					return closeDialogWindow(env);
-				}
-			} else if (targetId == 700610) {
+        } 
+        if (qs == null || qs.getStatus() == QuestStatus.NONE) {
+			if (targetId == 0) {
+			if (env.getDialog() == QuestDialog.ACCEPT_QUEST) {
+				return sendQuestStartDialog(env);
+			}
+			if (env.getDialog() == QuestDialog.REFUSE_QUEST) {
+				return closeDialogWindow(env);
+			   }
+			} 
+            else if (targetId == 700610) {
 				Npc npc = (Npc) env.getVisibleObject();
 				giveQuestItem(env, 182206731, 1);
 				npc.getController().scheduleRespawn();

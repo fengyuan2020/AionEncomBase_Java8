@@ -27,7 +27,6 @@ import com.aionemu.gameserver.questEngine.model.QuestStatus;
 public class _21027FearlessKantele extends QuestHandler {
 
 	private final static int questId = 21027;
-
 	public _21027FearlessKantele() {
 		super(questId);
 	}
@@ -58,8 +57,8 @@ public class _21027FearlessKantele extends QuestHandler {
 			}
 		} if (qs == null)
 			return false;
-		int var = qs.getQuestVarById(0);
 		if (qs.getStatus() == QuestStatus.START) {
+		int var = qs.getQuestVarById(0);
 			if (env.getTargetId() == 799255) {
 				switch (env.getDialog()) {
 					case START_DIALOG:

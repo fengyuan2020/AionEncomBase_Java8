@@ -18,13 +18,11 @@ package quest.inggison;
 
 import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
-import com.aionemu.gameserver.network.aion.serverpackets.SM_DIALOG_WINDOW;
 import com.aionemu.gameserver.questEngine.handlers.QuestHandler;
 import com.aionemu.gameserver.questEngine.model.QuestDialog;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
-import com.aionemu.gameserver.utils.PacketSendUtility;
 
 /**
  * @author dta
@@ -32,7 +30,6 @@ import com.aionemu.gameserver.utils.PacketSendUtility;
 public class _11005TheLimitsofGenius extends QuestHandler {
 
 	private final static int questId = 11005;
-
 	public _11005TheLimitsofGenius() {
 		super(questId);
 	}
@@ -49,11 +46,9 @@ public class _11005TheLimitsofGenius extends QuestHandler {
 	public boolean onDialogEvent(QuestEnv env) {
 		final Player player = env.getPlayer();
 		QuestState qs = player.getQuestStateList().getQuestState(questId);
-
 		int targetId = 0;
 		if (env.getVisibleObject() instanceof Npc)
 			targetId = ((Npc) env.getVisibleObject()).getNpcId();
-
 		if (qs == null || qs.getStatus() == QuestStatus.NONE) {
 			if (targetId == 798942) {
 				if (env.getDialog() == QuestDialog.START_DIALOG)
@@ -62,10 +57,8 @@ public class _11005TheLimitsofGenius extends QuestHandler {
 					return sendQuestStartDialog(env);
 			}
 		}
-
 		if (qs == null)
 			return false;
-
 		if (qs.getStatus() == QuestStatus.START) {
 			switch (targetId) {
 				case 798950: {
@@ -76,8 +69,7 @@ public class _11005TheLimitsofGenius extends QuestHandler {
 						case STEP_TO_1: {
 							qs.setQuestVarById(0, qs.getQuestVarById(0) + 1);
 							updateQuestStatus(env);
-							PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
-							return true;
+							return closeDialogWindow(env);
 						}
 					}
 				}
@@ -89,8 +81,7 @@ public class _11005TheLimitsofGenius extends QuestHandler {
 						case STEP_TO_2: {
 							qs.setQuestVarById(0, qs.getQuestVarById(0) + 1);
 							updateQuestStatus(env);
-							PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
-							return true;
+							return closeDialogWindow(env);
 						}
 					}
 				}
@@ -100,13 +91,11 @@ public class _11005TheLimitsofGenius extends QuestHandler {
 							return sendQuestDialog(env, 2375);
 						}
 						case SELECT_REWARD: {
-							qs.setQuestVar(4);
+							qs.setQuestVar(3);
 							qs.setStatus(QuestStatus.REWARD);
 							updateQuestStatus(env);
 							return sendQuestEndDialog(env);
 						}
-						default:
-							return sendQuestEndDialog(env);
 					}
 				}
 			}

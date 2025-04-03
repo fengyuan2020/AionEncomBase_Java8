@@ -55,9 +55,7 @@ public class _1643TheStarOfHeiron extends QuestHandler {
 						return sendQuestDialog(env, 4762);
 					}
 					case ASK_ACCEPTION: {
-						if (player.getInventory().getItemCountByItemId(182201764) == 0) {
-						   return sendQuestStartDialog(env, 182201764, 1);
-						}
+						return sendQuestDialog(env, 4);
 					}
 					case ACCEPT_QUEST: {
 						if (player.getInventory().getItemCountByItemId(182201764) == 0) {

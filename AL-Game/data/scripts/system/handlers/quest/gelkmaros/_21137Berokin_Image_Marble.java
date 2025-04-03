@@ -15,24 +15,20 @@ package quest.gelkmaros;
 import com.aionemu.gameserver.model.gameobjects.Item;
 import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
-import com.aionemu.gameserver.network.aion.serverpackets.SM_DIALOG_WINDOW;
 import com.aionemu.gameserver.questEngine.handlers.HandlerResult;
 import com.aionemu.gameserver.questEngine.handlers.QuestHandler;
 import com.aionemu.gameserver.questEngine.model.QuestDialog;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
-import com.aionemu.gameserver.services.QuestService;
-import com.aionemu.gameserver.utils.PacketSendUtility;
 
 /****/
 /** Author Ghostfur & Unknown (Aion-Unique)
 /****/
 
-public class _21137Berokin_Image_Marble extends QuestHandler
-{
+public class _21137Berokin_Image_Marble extends QuestHandler {
+
 	private final static int questId = 21137;
-	
 	public _21137Berokin_Image_Marble() {
 		super(questId);
 	}
@@ -62,9 +58,10 @@ public class _21137Berokin_Image_Marble extends QuestHandler
 			targetId = ((Npc) env.getVisibleObject()).getNpcId();
 		} if (targetId == 0) {
 			if (env.getDialog() == QuestDialog.ACCEPT_QUEST) {
-				QuestService.startQuest(env);
-				PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(0, 0));
-				return true;
+				return sendQuestStartDialog(env);
+			}
+			if (env.getDialog() == QuestDialog.REFUSE_QUEST) {
+				return closeDialogWindow(env);
 			}
 		} else if (targetId == 799270) {
 			if (qs != null && qs.getStatus() == QuestStatus.START && qs.getQuestVarById(0) == 0) {
@@ -73,25 +70,23 @@ public class _21137Berokin_Image_Marble extends QuestHandler
 				} else if (env.getDialog() == QuestDialog.STEP_TO_1) {
 					qs.setQuestVarById(0, qs.getQuestVarById(0) + 1);
 					updateQuestStatus(env);
-					PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
-					return true;
-				} else {
-					return sendQuestStartDialog(env);
+                    return closeDialogWindow(env);
 				}
 			}
 		} else if (targetId == 799239) {
-			if (qs != null) {
-				if (env.getDialog() == QuestDialog.START_DIALOG && qs.getStatus() == QuestStatus.START) {
+			if (qs != null && qs.getStatus() == QuestStatus.START && qs.getQuestVarById(0) == 1) {
+				if (env.getDialog() == QuestDialog.START_DIALOG) {
 					return sendQuestDialog(env, 2375);
-				} else if (env.getDialogId() == 1009 && qs.getStatus() != QuestStatus.COMPLETE && qs.getStatus() != QuestStatus.NONE) {
+				} else if (env.getDialogId() == 1009) {
 					removeQuestItem(env, 182207920, 1);
 					qs.setQuestVar(1);
 					qs.setStatus(QuestStatus.REWARD);
 					updateQuestStatus(env);
 					return sendQuestEndDialog(env);
-				} else {
-					return sendQuestEndDialog(env);
 				}
+			}
+            else if (qs != null && qs.getStatus() == QuestStatus.REWARD) {
+		        return sendQuestEndDialog(env);
 			}
 		}
 		return false;

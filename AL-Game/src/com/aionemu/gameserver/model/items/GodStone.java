@@ -43,115 +43,213 @@ import com.aionemu.gameserver.utils.PacketSendUtility;
 import com.aionemu.gameserver.utils.ThreadPoolManager;
 
 public class GodStone extends ItemStone {
-	private static final Logger log = LoggerFactory.getLogger(GodStone.class);
+    private static final Logger log = LoggerFactory.getLogger(GodStone.class);
+    
+    // 字段声明分组
+    private final GodstoneInfo godstoneInfo;
+    private final ItemTemplate godItem;
+    private final int probability;
+    private final int probabilityLeft;
+    
+    private ActionObserver actionListener;
+    private boolean breakProc;
 
-	private final GodstoneInfo godstoneInfo;
-	private ActionObserver actionListener;
-	private final int probability;
-	private boolean breakProc;
-	private final int probabilityLeft;
-	private final ItemTemplate godItem;
+    public GodStone(int itemObjId, int itemId, PersistentState persistentState) {
+        super(itemObjId, itemId, 0, persistentState);
+        ItemTemplate itemTemplate = DataManager.ITEM_DATA.getItemTemplate(itemId);
+        this.godItem = itemTemplate;
+        this.godstoneInfo = itemTemplate.getGodstoneInfo();
 
-	public GodStone(int itemObjId, int itemId, PersistentState persistentState) {
-		super(itemObjId, itemId, 0, persistentState);
-		ItemTemplate itemTemplate = DataManager.ITEM_DATA.getItemTemplate(itemId);
-		godItem = itemTemplate;
-		godstoneInfo = itemTemplate.getGodstoneInfo();
-		if (godstoneInfo != null) {
-			probability = godstoneInfo.getProbability();
-			probabilityLeft = godstoneInfo.getProbabilityleft();
-		} else {
-			probability = 0;
-			probabilityLeft = 0;
-			log.warn("CHECKPOINT: Godstone info missing for item : " + itemId);
-		}
-	}
+        // 参数校验前置
+        validateGodstoneInfo();
+        
+        // 初始化概率值
+        if (godstoneInfo != null) {
+            this.probability = godstoneInfo.getProbability();
+            this.probabilityLeft = godstoneInfo.getProbabilityleft();
+        } else {
+            this.probability = 0;
+            this.probabilityLeft = 0;
+            log.warn("Godstone info missing for item: {}", itemId);
+        }
+    }
 
-	public void onEquip(final Player player) {
-		if (godstoneInfo == null || godItem == null) {
-			return;
-		}
-		final Item equippedItem = player.getEquipment().getEquippedItemByObjId(getItemObjId());
-		long equipmentSlot = equippedItem.getEquipmentSlot();
-		final int handProbability = equipmentSlot == ItemSlot.MAIN_HAND.getSlotIdMask() ? probability : probabilityLeft;
-		actionListener = new ActionObserver(ObserverType.ATTACK) {
-			@Override
-			public void attack(Creature creature) {
-				int chance = 100;
-				float breakChance = godstoneInfo.getProbabilityleft() / CustomConfig.ILLUSION_GODSTONE_BREAK_RATE;
-				if (handProbability > Rnd.get(0, 1000)) {
-					Skill skill = SkillEngine.getInstance().getSkill(player, godstoneInfo.getSkillid(),
-							godstoneInfo.getSkilllvl(), player.getTarget(), godItem);
-					// %effect godstone has been activated.
-					PacketSendUtility.sendPacket(player,
-							SM_SYSTEM_MESSAGE.STR_SKILL_PROC_EFFECT_OCCURRED(skill.getSkillTemplate().getNameId()));
-					skill.setFirstTargetRangeCheck(false);
-					if (skill.canUseSkill()) {
-						Effect effect = new Effect(player, creature, skill.getSkillTemplate(), 1, 0, godItem);
-						effect.initialize();
-						effect.applyEffect();
-						effect = null;
-					}
-					/**
-					 * The destruction of a Godstone is not instantaneous, there is a 10min grace
-					 * period. - When a Illusion Godstone gets damaged a message 'Illusion Godstone
-					 * has cracked' will appear and a 10min timer will be activated. - The remaining
-					 * time is going to be displayed in the item's tooltip. - Regardless of the
-					 * actions below, Illusion Godstone is going to disappear. . Mounting,
-					 * dismounting, switching weapons, armsfusing . Changing characters, logging
-					 * out, terminating connection
-					 */
-					if (chance < breakChance && !breakProc) {
-						breakProc = true;
-						// %1 equipped in %0 was fractured. %1 will be destroyed in 10 minutes even if
-						// it is unequipped.
-						PacketSendUtility.sendPacket(player, new SM_SYSTEM_MESSAGE(1402536,
-								new DescriptionId(equippedItem.getNameId()), new DescriptionId(godItem.getNameId())));
-						// The %1 equipped in %0 will be destroyed in %2 minutes
-						PacketSendUtility.playerSendPacketTime(player, new SM_SYSTEM_MESSAGE(1402537,
-								new DescriptionId(equippedItem.getNameId()), new DescriptionId(godItem.getNameId()), 5),
-								300000);
-						PacketSendUtility.playerSendPacketTime(player, new SM_SYSTEM_MESSAGE(1402537,
-								new DescriptionId(equippedItem.getNameId()), new DescriptionId(godItem.getNameId()), 2),
-								480000);
-						// The %1 equipped in %0 will be destroyed in %2 seconds
-						PacketSendUtility.playerSendPacketTime(player,
-								new SM_SYSTEM_MESSAGE(1402538, new DescriptionId(equippedItem.getNameId()),
-										new DescriptionId(godItem.getNameId()), 60),
-								540000);
-						PacketSendUtility.playerSendPacketTime(player,
-								new SM_SYSTEM_MESSAGE(1402538, new DescriptionId(equippedItem.getNameId()),
-										new DescriptionId(godItem.getNameId()), 30),
-								570000);
-						PacketSendUtility.playerSendPacketTime(player,
-								new SM_SYSTEM_MESSAGE(1402538, new DescriptionId(equippedItem.getNameId()),
-										new DescriptionId(godItem.getNameId()), 10),
-								590000);
-						PacketSendUtility.playerSendPacketTime(player, new SM_SYSTEM_MESSAGE(1402237,
-								new DescriptionId(equippedItem.getNameId()), new DescriptionId(godItem.getNameId())),
-								600000);
-						ThreadPoolManager.getInstance().schedule(new Runnable() {
-							@Override
-							public void run() {
-								onUnEquip(player);
-								equippedItem.setGodStone(null);
-								setPersistentState(PersistentState.DELETED);
-								ItemPacketService.updateItemAfterInfoChange(player, equippedItem);
-								DAOManager.getDAO(InventoryDAO.class).store(equippedItem, player);
-								PacketSendUtility.sendPacket(player,
-										new SM_INVENTORY_UPDATE_ITEM(player, equippedItem));
-							}
-						}, 600000);
-					}
-				}
-			}
-		};
-		player.getObserveController().addObserver(actionListener);
-	}
+    private void validateGodstoneInfo() {
+        if (godstoneInfo != null) {
+            if (godstoneInfo.getProbability() < 0 || godstoneInfo.getProbability() > 1000 || 
+                godstoneInfo.getProbabilityleft() < 0 || godstoneInfo.getProbabilityleft() > 1000) {
+                throw new IllegalArgumentException("概率值必须在0-1000之间");
+            }
+            if (godstoneInfo.getBreakprob() > 1000) {
+                throw new IllegalArgumentException("损坏概率值不能超过1000");
+            }
+        }
+    }
 
-	public void onUnEquip(Player player) {
-		if (actionListener != null) {
-			player.getObserveController().removeObserver(actionListener);
-		}
-	}
+    public void onEquip(final Player player) {
+        clearPreviousListener(player);
+        
+        if (!validateEquipConditions(player)) {
+            return;
+        }
+        
+        final Item equippedItem = getEquippedItem(player);
+        final int handProbability = calculateHandProbability(equippedItem);
+        final float breakChance = calculateBreakChance();
+        
+        setupAttackListener(player, equippedItem, handProbability, breakChance);
+    }
+
+    private boolean validateEquipConditions(Player player) {
+        return godstoneInfo != null && 
+               godItem != null && 
+               getEquippedItem(player) != null;
+    }
+
+    private Item getEquippedItem(Player player) {
+        return player.getEquipment().getEquippedItemByObjId(getItemObjId());
+    }
+
+    private int calculateHandProbability(Item equippedItem) {
+        boolean isMainHand = equippedItem.getEquipmentSlot() == ItemSlot.MAIN_HAND.getSlotIdMask();
+        return isMainHand ? probability : probabilityLeft;
+    }
+
+    private float calculateBreakChance() {
+        return Math.min(godstoneInfo.getBreakprob() / 1000f, 0.9f) / 
+               Math.max(CustomConfig.ILLUSION_GODSTONE_BREAK_RATE, 0.1f);
+    }
+
+    private void setupAttackListener(Player player, Item equippedItem, 
+                                   int handProbability, float breakChance) {
+        actionListener = new ActionObserver(ObserverType.ATTACK) {
+            @Override
+            public void attack(Creature creature) {
+                handleAttack(player, creature, equippedItem, handProbability, breakChance);
+            }
+        };
+        player.getObserveController().addObserver(actionListener);
+    }
+
+    private void handleAttack(Player player, Creature creature, Item equippedItem,
+                            int handProbability, float breakChance) {
+        boolean shouldTrigger = checkTriggerCondition(handProbability);
+        boolean shouldBreak = checkBreakCondition(breakChance);
+
+        if (shouldTrigger) {
+            triggerSkillEffect(player, creature);
+        }
+
+        if (shouldBreak) {
+            handleItemBreak(player, equippedItem);
+        }
+    }
+
+    private boolean checkTriggerCondition(int handProbability) {
+        return Rnd.get(0, 1000) <= handProbability;
+    }
+
+    private boolean checkBreakCondition(float breakChance) {
+        return godstoneInfo.getBreakable() && 
+               !breakProc && 
+               Rnd.get(1000) < (int)(breakChance * 1000);
+    }
+
+    private void triggerSkillEffect(Player player, Creature creature) {
+        Skill skill = createSkill(player, creature);
+        notifySkillTrigger(player, skill);
+        
+        if (skill.canUseSkill()) {
+            applySkillEffect(player, creature, skill);
+        }
+    }
+
+    private Skill createSkill(Player player, Creature creature) {
+        return SkillEngine.getInstance().getSkill(
+            player, 
+            godstoneInfo.getSkillid(),
+            godstoneInfo.getSkilllvl(), 
+            player.getTarget(), 
+            godItem
+        );
+    }
+
+    private void notifySkillTrigger(Player player, Skill skill) {
+        PacketSendUtility.sendPacket(
+            player,
+            SM_SYSTEM_MESSAGE.STR_SKILL_PROC_EFFECT_OCCURRED(
+                skill.getSkillTemplate().getNameId()
+            )
+        );
+    }
+
+    private void applySkillEffect(Player player, Creature creature, Skill skill) {
+        Effect effect = new Effect(
+            player, creature, skill.getSkillTemplate(), 1, 0, godItem
+        );
+        effect.initialize();
+        effect.applyEffect();
+    }
+
+    private void handleItemBreak(Player player, Item equippedItem) {
+        breakProc = true;
+        notifyBreakMessages(player, equippedItem);
+        scheduleItemRemoval(player, equippedItem);
+    }
+
+    private void notifyBreakMessages(Player player, Item equippedItem) {
+        // 立即发送损坏消息
+        PacketSendUtility.sendPacket(player, new SM_SYSTEM_MESSAGE(1402536,
+                new DescriptionId(equippedItem.getNameId()), 
+                new DescriptionId(godItem.getNameId())));
+        
+        // 定时消息提醒（保持原有时间间隔）
+        sendScheduledMessages(player, equippedItem);
+    }
+
+    private void sendScheduledMessages(Player player, Item equippedItem) {
+        // 10分钟后提醒
+        PacketSendUtility.playerSendPacketTime(player, 
+            new SM_SYSTEM_MESSAGE(1402237,
+                new DescriptionId(equippedItem.getNameId()), 
+                new DescriptionId(godItem.getNameId())), 
+            600000);
+        
+        // 5分钟后提醒
+        PacketSendUtility.playerSendPacketTime(player,
+            new SM_SYSTEM_MESSAGE(1402537,
+                new DescriptionId(equippedItem.getNameId()),
+                new DescriptionId(godItem.getNameId()), 5), 
+            300000);
+        
+        // 60秒前提醒
+        PacketSendUtility.playerSendPacketTime(player,
+            new SM_SYSTEM_MESSAGE(1402538,
+                new DescriptionId(equippedItem.getNameId()),
+                new DescriptionId(godItem.getNameId()), 60), 
+            540000);
+    }
+
+    private void scheduleItemRemoval(Player player, Item equippedItem) {
+        ThreadPoolManager.getInstance().schedule(() -> {
+            onUnEquip(player);
+            equippedItem.setGodStone(null);
+            setPersistentState(PersistentState.DELETED);
+            ItemPacketService.updateItemAfterInfoChange(player, equippedItem);
+            DAOManager.getDAO(InventoryDAO.class).store(equippedItem, player);
+            PacketSendUtility.sendPacket(player, 
+                new SM_INVENTORY_UPDATE_ITEM(player, equippedItem));
+        }, 600000); // 10分钟后执行
+    }
+
+    public void onUnEquip(Player player) {
+        clearPreviousListener(player);
+    }
+
+    private void clearPreviousListener(Player player) {
+        if (actionListener != null) {
+            player.getObserveController().removeObserver(actionListener);
+            actionListener = null;
+        }
+    }
 }

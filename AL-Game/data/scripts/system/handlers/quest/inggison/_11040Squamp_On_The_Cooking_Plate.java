@@ -27,7 +27,6 @@ public class _11040Squamp_On_The_Cooking_Plate extends QuestHandler {
 
 	private final static int questId = 11040;
 	private final static int[] npcs = {799036, 799035};
-	
 	public _11040Squamp_On_The_Cooking_Plate() {
 		super(questId);
 	}

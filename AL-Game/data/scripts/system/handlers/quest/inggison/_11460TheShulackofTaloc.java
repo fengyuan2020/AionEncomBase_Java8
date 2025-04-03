@@ -29,7 +29,6 @@ import com.aionemu.gameserver.questEngine.model.QuestStatus;
 public class _11460TheShulackofTaloc extends QuestHandler {
 
 	private static final int questId = 11460;
-
 	public _11460TheShulackofTaloc() {
 		super(questId);
 	}
@@ -48,7 +47,6 @@ public class _11460TheShulackofTaloc extends QuestHandler {
 		QuestState qs = player.getQuestStateList().getQuestState(questId);
 		QuestDialog dialog = env.getDialog();
 		int targetId = env.getTargetId();
-
 		if (qs == null || qs.getStatus() == QuestStatus.NONE) {
 			if (targetId == 798954) { // Tialla
 				if (dialog == QuestDialog.START_DIALOG) {
@@ -83,8 +81,8 @@ public class _11460TheShulackofTaloc extends QuestHandler {
 							}
 						}
 						case SELECT_REWARD: {
-							if (removeQuestItem(env, 182209509, 1))
-								changeQuestStep(env, 1, 1, true); // reward
+							removeQuestItem(env, 182209509, 1);
+							changeQuestStep(env, 1, 1, true);
 							return sendQuestDialog(env, 5);
 						}
 					}

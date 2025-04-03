@@ -14,22 +14,19 @@ package quest.inggison;
 
 import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
-import com.aionemu.gameserver.network.aion.serverpackets.SM_DIALOG_WINDOW;
 import com.aionemu.gameserver.questEngine.handlers.QuestHandler;
 import com.aionemu.gameserver.questEngine.model.QuestDialog;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
-import com.aionemu.gameserver.utils.PacketSendUtility;
 
 /****/
 /** Author Ghostfur & Unknown (Aion-Unique)
 /****/
 
-public class _11323ShuGo_Go_Go extends QuestHandler
-{
+public class _11323ShuGo_Go_Go extends QuestHandler {
+
 	private final static int questId = 11323;
-	
 	public _11323ShuGo_Go_Go() {
 		super(questId);
 	}
@@ -59,7 +56,6 @@ public class _11323ShuGo_Go_Go extends QuestHandler
 					case START_DIALOG: {
 						return sendQuestDialog(env, 4762);
 					}
-					case ACCEPT_QUEST:
 					case ACCEPT_QUEST_SIMPLE: {
 						return sendQuestStartDialog(env);
 					}
@@ -76,8 +72,7 @@ public class _11323ShuGo_Go_Go extends QuestHandler
 						} case STEP_TO_1: {
 							qs.setQuestVarById(0, qs.getQuestVarById(0) + 1);
 							updateQuestStatus(env);
-							PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
-							return true;
+				            return closeDialogWindow(env);
 						}
 					}
 				} case 702727: { //Izzyrunerk.
@@ -87,8 +82,7 @@ public class _11323ShuGo_Go_Go extends QuestHandler
 						} case STEP_TO_2: {
 							qs.setQuestVarById(0, qs.getQuestVarById(0) + 1);
 							updateQuestStatus(env);
-							PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
-							return true;
+				            return closeDialogWindow(env);
 						}
 					}
 				} case 702743: { //Zeirunerk.
@@ -98,8 +92,7 @@ public class _11323ShuGo_Go_Go extends QuestHandler
 						} case STEP_TO_3: {
 							qs.setQuestVarById(0, qs.getQuestVarById(0) + 1);
 							updateQuestStatus(env);
-							PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
-							return true;
+				            return closeDialogWindow(env);
 						}
 					}
 				} case 702744: { //Chubarunerk.
@@ -109,8 +102,7 @@ public class _11323ShuGo_Go_Go extends QuestHandler
 						} case STEP_TO_4: {
 							qs.setQuestVarById(0, qs.getQuestVarById(0) + 1);
 							updateQuestStatus(env);
-							PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
-							return true;
+				            return closeDialogWindow(env);
 						}
 					}
 				} case 702745: { //Danirunerk.
@@ -121,8 +113,7 @@ public class _11323ShuGo_Go_Go extends QuestHandler
 							qs.setQuestVarById(0, qs.getQuestVarById(0) + 1);
 							qs.setStatus(QuestStatus.REWARD);
 							updateQuestStatus(env);
-							PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
-							return true;
+				            return closeDialogWindow(env);
 						}
 					}
 				}

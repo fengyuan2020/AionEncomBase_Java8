@@ -25,7 +25,6 @@ import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
 import com.aionemu.gameserver.services.QuestService;
 
-
 /**
  * @author Cheatkiller
  *
@@ -33,7 +32,6 @@ import com.aionemu.gameserver.services.QuestService;
 public class _21249TheInvincibleStarket extends QuestHandler {
 
 	private final static int questId = 21249;
-
 	public _21249TheInvincibleStarket() {
 		super(questId);
 	}
@@ -50,7 +48,6 @@ public class _21249TheInvincibleStarket extends QuestHandler {
 		QuestState qs = player.getQuestStateList().getQuestState(questId);
 		QuestDialog dialog = env.getDialog();
 		int targetId = env.getTargetId();
-		
 		if (qs == null || qs.getStatus() == QuestStatus.NONE) {
 			if (targetId == 799416) { 
 				if (dialog == QuestDialog.START_DIALOG) {
@@ -80,10 +77,10 @@ public class _21249TheInvincibleStarket extends QuestHandler {
 						return sendQuestDialog(env, 1352);
 				}
 				else if (dialog == QuestDialog.SET_REWARD) {
-					changeQuestStep(env, 0, 1, false);
+					qs.setQuestVar(2);
 					Npc npc = (Npc) env.getVisibleObject();
 					npc.getController().onDelete();
-					return defaultCloseDialog(env, 1, 1, true, false);
+					return defaultCloseDialog(env, 2, 2, true, false);
 				}
 			}
 		}
@@ -98,5 +95,3 @@ public class _21249TheInvincibleStarket extends QuestHandler {
 		return false;
 	}
 }
-
-				

@@ -31,7 +31,6 @@ import com.aionemu.gameserver.questEngine.model.QuestStatus;
 public class _11110KillingTime extends QuestHandler {
 
 	private final static int questId = 11110;
-
 	public _11110KillingTime() {
 		super(questId);
 	}
@@ -58,7 +57,7 @@ public class _11110KillingTime extends QuestHandler {
 				}
 			}
 		}
-		else if (qs.getStatus() == QuestStatus.REWARD) {
+		else if (qs == null || qs.getStatus() == QuestStatus.REWARD) {
 			if (env.getTargetId() == 799075) {
 				if (env.getDialog() == QuestDialog.USE_OBJECT) {
 					return sendQuestDialog(env, 1352);

@@ -19,10 +19,9 @@ import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
 
-public class _11055Another_Piece extends QuestHandler
-{
+public class _11055Another_Piece extends QuestHandler {
+
 	private final static int questId = 11055;
-	
 	public _11055Another_Piece() {
 		super(questId);
 	}
@@ -55,17 +54,23 @@ public class _11055Another_Piece extends QuestHandler
 					}
 				}
 			}
-		} else if (qs.getStatus() == QuestStatus.START) {
+		} else if (qs == null || qs.getStatus() == QuestStatus.START) {
 			if (targetId == 798990) { //Titus
-				switch (dialog) {
-					case START_DIALOG: {
-						return sendQuestDialog(env, 2375);
-					} default: {
-						return sendQuestStartDialog(env);
-					}
+				if (dialog == QuestDialog.START_DIALOG) {
+					return sendQuestDialog(env, 2375);
+				} else if (dialog == QuestDialog.CHECK_COLLECTED_ITEMS) {
+					long itemCount = player.getInventory().getItemCountByItemId(182206840);
+					long itemCount1 = player.getInventory().getItemCountByItemId(182206841);
+					if (player.getInventory().tryDecreaseKinah(200000) && itemCount > 3 && itemCount1 > 19) {
+						player.getInventory().decreaseByItemId(182206840, 4);
+						player.getInventory().decreaseByItemId(182206841, 20);
+						changeQuestStep(env, 0, 0, true);
+						return sendQuestDialog(env, 5);
+					} else
+						return sendQuestDialog(env, 2716);
 				}
 			}
-		} else if (qs.getStatus() == QuestStatus.REWARD) {
+		} else if (qs == null || qs.getStatus() == QuestStatus.REWARD) {
 			if (targetId == 798990) { //Titus
 				return sendQuestEndDialog(env);
 			}

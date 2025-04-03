@@ -14,8 +14,6 @@ package quest.inggison;
 
 import com.aionemu.gameserver.model.gameobjects.Item;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
-import com.aionemu.gameserver.network.aion.serverpackets.SM_DIALOG_WINDOW;
-import com.aionemu.gameserver.network.aion.serverpackets.SM_ITEM_USAGE_ANIMATION;
 import com.aionemu.gameserver.questEngine.handlers.HandlerResult;
 import com.aionemu.gameserver.questEngine.handlers.QuestHandler;
 import com.aionemu.gameserver.questEngine.model.QuestDialog;
@@ -23,7 +21,6 @@ import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
 import com.aionemu.gameserver.services.QuestService;
-import com.aionemu.gameserver.utils.PacketSendUtility;
 
 /****/
 /** Author Ghostfur & Unknown (Aion-Unique)
@@ -31,7 +28,6 @@ import com.aionemu.gameserver.utils.PacketSendUtility;
 public class _11033You_Make_Me_Sick extends QuestHandler {
 
 	private final static int questId = 11033;
-	
 	public _11033You_Make_Me_Sick() {
 		super(questId);
 	}
@@ -48,7 +44,6 @@ public class _11033You_Make_Me_Sick extends QuestHandler {
 		final Player player = env.getPlayer();
 		final QuestState qs = player.getQuestStateList().getQuestState(questId);
 		int targetId = env.getTargetId();
-		QuestDialog dialog = env.getDialog();
 		if (targetId == 798959) {
 			if (qs == null || qs.getStatus() == QuestStatus.NONE) {
 				if (env.getDialog() == QuestDialog.START_DIALOG)
@@ -80,7 +75,7 @@ public class _11033You_Make_Me_Sick extends QuestHandler {
 						if (var == 1) {
 						    giveQuestItem(env, 182206728, 1);
 							changeQuestStep(env, 1, 2, false);
-							return sendQuestSelectionDialog(env);
+				            return closeDialogWindow(env);
 						}
 					}
 				}

@@ -51,15 +51,14 @@ public class _21036DeliveryofAetherSample extends QuestHandler {
                        return sendQuestDialog(env, 4);
                     }   
 				    case ACCEPT_QUEST: {
-					   giveQuestItem(env, 182207832, 1);
-					   return sendQuestStartDialog(env);
+					   return sendQuestStartDialog(env, 182207832, 1);
 				    } 
                 }
 			}
 		} if (qs == null)
 			return false;
-		int var = qs.getQuestVarById(0);
 		if (qs.getStatus() == QuestStatus.START) {
+		int var = qs.getQuestVarById(0);
 			if (env.getTargetId() == 799238) {
 				switch (env.getDialog()) {
 					case START_DIALOG:

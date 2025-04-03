@@ -36,6 +36,12 @@ public class GodstoneInfo {
 	private int breakprob;
 	@XmlAttribute
 	private int breakcount;
+	@XmlAttribute
+	private boolean breakable = true; // 默认true保持原有行为
+
+	public boolean getBreakable() {
+		return breakable;
+	}
 
 	public int getSkillid() {
 		return skillid;

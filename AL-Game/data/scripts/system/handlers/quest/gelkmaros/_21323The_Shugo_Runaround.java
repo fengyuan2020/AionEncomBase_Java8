@@ -14,22 +14,19 @@ package quest.gelkmaros;
 
 import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
-import com.aionemu.gameserver.network.aion.serverpackets.SM_DIALOG_WINDOW;
 import com.aionemu.gameserver.questEngine.handlers.QuestHandler;
 import com.aionemu.gameserver.questEngine.model.QuestDialog;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
-import com.aionemu.gameserver.utils.PacketSendUtility;
 
 /****/
 /** Author Ghostfur & Unknown (Aion-Unique)
 /****/
 
-public class _21323The_Shugo_Runaround extends QuestHandler
-{
+public class _21323The_Shugo_Runaround extends QuestHandler {
+
 	private final static int questId = 21323;
-	
 	public _21323The_Shugo_Runaround() {
 		super(questId);
 	}
@@ -48,18 +45,17 @@ public class _21323The_Shugo_Runaround extends QuestHandler
 	@Override
 	public boolean onDialogEvent(QuestEnv env) {
 		final Player player = env.getPlayer();
-		QuestDialog dialog = env.getDialog();
 		QuestState qs = player.getQuestStateList().getQuestState(questId);
 		int targetId = 0;
 		if (env.getVisibleObject() instanceof Npc) {
 			targetId = ((Npc) env.getVisibleObject()).getNpcId();
-		} if (qs == null || qs.getStatus() == QuestStatus.NONE) {
+		}
+        if (qs == null || qs.getStatus() == QuestStatus.NONE) {
 			if (targetId == 799226) { //Barretta.
-				switch (dialog) {
+				switch (env.getDialog()) {
 					case START_DIALOG: {
 						return sendQuestDialog(env, 4762);
 					}
-					case ACCEPT_QUEST:
 					case ACCEPT_QUEST_SIMPLE: {
 						return sendQuestStartDialog(env);
 					}
@@ -76,8 +72,7 @@ public class _21323The_Shugo_Runaround extends QuestHandler
 						} case STEP_TO_1: {
 							qs.setQuestVarById(0, qs.getQuestVarById(0) + 1);
 							updateQuestStatus(env);
-							PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
-							return true;
+                            return closeDialogWindow(env);
 						}
 					}
 				} case 702746: { //Zinarunerk.
@@ -87,8 +82,7 @@ public class _21323The_Shugo_Runaround extends QuestHandler
 						} case STEP_TO_2: {
 							qs.setQuestVarById(0, qs.getQuestVarById(0) + 1);
 							updateQuestStatus(env);
-							PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
-							return true;
+                            return closeDialogWindow(env);
 						}
 					}
 				} case 702748: { //Potarunerk.
@@ -98,8 +92,7 @@ public class _21323The_Shugo_Runaround extends QuestHandler
 						} case STEP_TO_3: {
 							qs.setQuestVarById(0, qs.getQuestVarById(0) + 1);
 							updateQuestStatus(env);
-							PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
-							return true;
+                            return closeDialogWindow(env);
 						}
 					}
 				} case 702747: { //Ruinrunerk.
@@ -109,8 +102,7 @@ public class _21323The_Shugo_Runaround extends QuestHandler
 						} case STEP_TO_4: {
 							qs.setQuestVarById(0, qs.getQuestVarById(0) + 1);
 							updateQuestStatus(env);
-							PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
-							return true;
+                            return closeDialogWindow(env);
 						}
 					}
 				} case 702728: { //Uzirunerk.
@@ -121,15 +113,14 @@ public class _21323The_Shugo_Runaround extends QuestHandler
 							qs.setQuestVarById(0, qs.getQuestVarById(0) + 1);
                             qs.setStatus(QuestStatus.REWARD);
 							updateQuestStatus(env);
-							PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
-							return true;
+                            return closeDialogWindow(env);
 						}
 					}
 				}
 			}
 		} else if (qs.getStatus() == QuestStatus.REWARD) {
 			if (targetId == 799226) { //Barretta.
-				if (dialog == QuestDialog.START_DIALOG) {
+				if (env.getDialog() == QuestDialog.START_DIALOG) {
 					return sendQuestDialog(env, 10002);
 				} else {
 					return sendQuestEndDialog(env);

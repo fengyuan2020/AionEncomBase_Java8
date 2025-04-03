@@ -57,13 +57,13 @@ public class _11077AWeaponOfWorth extends QuestHandler {
 						return sendQuestDialog(env, 4);
 					} 
 					case ACCEPT_QUEST: {
-						if (!giveQuestItem(env, 182214016, 1))
-							updateQuestStatus(env);
-						return sendQuestStartDialog(env);
+					    return sendQuestStartDialog(env, 182214016, 1);
 					}
 				}
 			}
 		}
+		if (qs == null)
+			return false;
 		else if (qs.getStatus() == QuestStatus.START) {
 			switch (targetId) {
 				case 799028: { // Brontes
@@ -106,10 +106,10 @@ public class _11077AWeaponOfWorth extends QuestHandler {
 				}
 			}
 		}else if (qs.getStatus() == QuestStatus.REWARD) {
-				if (targetId == 798903) { // Drenia
-					return sendQuestEndDialog(env);
-				}
+			if (targetId == 798903) { // Drenia
+				return sendQuestEndDialog(env);
 			}
+		}
 		return false;
 	}
 }

@@ -14,8 +14,6 @@ package quest.inggison;
 
 import com.aionemu.gameserver.model.gameobjects.Item;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
-import com.aionemu.gameserver.network.aion.serverpackets.SM_DIALOG_WINDOW;
-import com.aionemu.gameserver.network.aion.serverpackets.SM_ITEM_USAGE_ANIMATION;
 import com.aionemu.gameserver.questEngine.handlers.HandlerResult;
 import com.aionemu.gameserver.questEngine.handlers.QuestHandler;
 import com.aionemu.gameserver.questEngine.model.QuestDialog;
@@ -23,8 +21,6 @@ import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
 import com.aionemu.gameserver.services.QuestService;
-import com.aionemu.gameserver.utils.PacketSendUtility;
-import com.aionemu.gameserver.utils.ThreadPoolManager;
 
 /**
  * @author VladimirZ
@@ -32,7 +28,6 @@ import com.aionemu.gameserver.utils.ThreadPoolManager;
 public class _11032Everything_Better_With_Tentacles extends QuestHandler {
 
 	private final static int questId = 11032;
-
 	public _11032Everything_Better_With_Tentacles() {
 		super(questId);
 	}
@@ -49,7 +44,6 @@ public class _11032Everything_Better_With_Tentacles extends QuestHandler {
 		final Player player = env.getPlayer();
 		final QuestState qs = player.getQuestStateList().getQuestState(questId);
 		int targetId = env.getTargetId();
-		QuestDialog dialog = env.getDialog();
 		if (targetId == 798959) {
 			if (qs == null || qs.getStatus() == QuestStatus.NONE) {
 				if (env.getDialog() == QuestDialog.START_DIALOG)
@@ -60,17 +54,6 @@ public class _11032Everything_Better_With_Tentacles extends QuestHandler {
         }
 		if (qs == null)
 			return false;
-		if (qs.getStatus() == QuestStatus.REWARD) {
-			if (env.getTargetId() == 798959) {
-				if (env.getDialog() == QuestDialog.START_DIALOG)
-					return sendQuestDialog(env, 10002);
-				else if (env.getDialogId() == QuestDialog.SELECT_REWARD.id())
-					return sendQuestDialog(env, 5);
-				else
-					return sendQuestEndDialog(env);
-			}
-			return false;
-		}
 		if (qs.getStatus() == QuestStatus.START) {
             int var = qs.getQuestVarById(0);
 			switch (env.getTargetId()) {
@@ -86,22 +69,31 @@ public class _11032Everything_Better_With_Tentacles extends QuestHandler {
 								if (QuestService.collectItemCheck(env, true)) {
 									qs.setQuestVarById(0, var + 1);
 									updateQuestStatus(env);
-									PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
 								return sendQuestDialog(env, 10000);
 							} else 
 								return sendQuestDialog(env, 10001);
 							}
 						case STEP_TO_2:
 							if (var == 1) {
-								if (!giveQuestItem(env, 182206726, 1))
-									return true;
+								giveQuestItem(env, 182206726, 1);
 								qs.setQuestVarById(0, var + 1);
 								updateQuestStatus(env);
-                            return sendQuestSelectionDialog(env); 
+				                return closeDialogWindow(env);
 						}
 						return true;
 				}
 			}
+		}
+		else if (qs.getStatus() == QuestStatus.REWARD) {
+			if (env.getTargetId() == 798959) {
+				if (env.getDialog() == QuestDialog.START_DIALOG)
+					return sendQuestDialog(env, 10002);
+				else if (env.getDialogId() == QuestDialog.SELECT_REWARD.id())
+					return sendQuestDialog(env, 5);
+				else
+					return sendQuestEndDialog(env);
+			}
+			return false;
 		}
 		return false;
 	}

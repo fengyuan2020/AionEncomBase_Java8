@@ -34,7 +34,7 @@
 	<classpathentry kind="lib" path="libs/socket775-1.0.jar"/>
 	<classpathentry kind="lib" path="libs/trove-3.0.0.jar"/>
 	<classpathentry kind="lib" path="libs/trove4j-3.0.3.jar"/>
-	<classpathentry kind="lib" path="libs/xercesImpl-2.8.1.jar"/>
+	<classpathentry kind="lib" path="libs/xercesImpl-2.12.2.jar"/>
 	<classpathentry kind="lib" path="libs/xSocket-2.8.15.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="build/classes"/>

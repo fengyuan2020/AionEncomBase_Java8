@@ -23,7 +23,6 @@ import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
 
-
 /**
  * @author Cheatkiller
  *
@@ -31,7 +30,6 @@ import com.aionemu.gameserver.questEngine.model.QuestStatus;
 public class _21111TestYourMight extends QuestHandler {
 
 	private final static int questId = 21111;
-
 	public _21111TestYourMight() {
 		super(questId);
 	}
@@ -48,7 +46,6 @@ public class _21111TestYourMight extends QuestHandler {
 		QuestState qs = player.getQuestStateList().getQuestState(questId);
 		QuestDialog dialog = env.getDialog();
 		int targetId = env.getTargetId();
-		
 		if (qs == null || qs.getStatus() == QuestStatus.NONE) {
 			if (targetId == 799261) { 
 				if (dialog == QuestDialog.START_DIALOG) {
