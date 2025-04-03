@@ -24,8 +24,6 @@ import com.aionemu.gameserver.questEngine.model.QuestDialog;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
-import com.aionemu.gameserver.services.QuestService;
-
 
 /**
  * @author Cheatkiller
@@ -54,8 +52,7 @@ public class _11233SuleionTreasure extends QuestHandler {
 		if (qs == null || qs.getStatus() == QuestStatus.NONE) {
 			if (targetId == 0) { 
 				if (dialog == QuestDialog.ACCEPT_QUEST) {
-					QuestService.startQuest(env);
-					return closeDialogWindow(env);
+					return sendQuestStartDialog(env);
 				}
 			    if (dialog == QuestDialog.REFUSE_QUEST) {
 				   return closeDialogWindow(env);

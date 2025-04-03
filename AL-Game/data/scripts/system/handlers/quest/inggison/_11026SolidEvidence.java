@@ -18,13 +18,11 @@ package quest.inggison;
 
 import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
-import com.aionemu.gameserver.network.aion.serverpackets.SM_DIALOG_WINDOW;
 import com.aionemu.gameserver.questEngine.handlers.QuestHandler;
 import com.aionemu.gameserver.questEngine.model.QuestDialog;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
-import com.aionemu.gameserver.utils.PacketSendUtility;
 
 /**
  * @author dta3000
@@ -32,7 +30,6 @@ import com.aionemu.gameserver.utils.PacketSendUtility;
 public class _11026SolidEvidence extends QuestHandler {
 
 	private final static int questId = 11026;
-
 	public _11026SolidEvidence() {
 		super(questId);
 	}
@@ -56,17 +53,14 @@ public class _11026SolidEvidence extends QuestHandler {
 			if (targetId == 798950) {
 				if (env.getDialog() == QuestDialog.START_DIALOG)
 					return sendQuestDialog(env, 1011);
-				else if (env.getDialogId() == 1002) {
-					if (giveQuestItem(env, 182206719, 1))
-						return sendQuestStartDialog(env);
-					else
-						return true;
+				else if (env.getDialogId() == 1007) {
+					return sendQuestDialog(env, 4);
 				}
-				else
-					return sendQuestStartDialog(env);
+				else if (env.getDialogId() == 1002) {
+					return sendQuestStartDialog(env, 182206719, 1);
+				}
 			}
 		}
-
 		else if (targetId == 798941) {
 			if (qs != null && qs.getStatus() == QuestStatus.START && qs.getQuestVarById(0) == 0) {
 				if (env.getDialog() == QuestDialog.START_DIALOG)
@@ -74,14 +68,10 @@ public class _11026SolidEvidence extends QuestHandler {
 				else if (env.getDialog() == QuestDialog.STEP_TO_1) {
 					qs.setQuestVarById(0, qs.getQuestVarById(0) + 1);
 					updateQuestStatus(env);
-					PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
-					return true;
+				    return closeDialogWindow(env);
 				}
-				else
-					return sendQuestStartDialog(env);
 			}
 		}
-
 		else if (targetId == 203384) {
 			if (qs != null && qs.getStatus() == QuestStatus.START && qs.getQuestVarById(0) == 1) {
 				if (env.getDialog() == QuestDialog.START_DIALOG)
@@ -90,16 +80,12 @@ public class _11026SolidEvidence extends QuestHandler {
 					removeQuestItem(env, 182206719, 1);
 					qs.setStatus(QuestStatus.REWARD);
 					updateQuestStatus(env);
-					return sendQuestDialog(env, 2375);
+				    return sendQuestEndDialog(env);
 				}
-				else
-					return sendQuestStartDialog(env);
 			}
-
-			else if (qs != null && qs.getStatus() == QuestStatus.REWARD)
+		   else if (qs != null && qs.getStatus() == QuestStatus.REWARD)
 				return sendQuestEndDialog(env);
 		}
-
 		return false;
 	}
 }

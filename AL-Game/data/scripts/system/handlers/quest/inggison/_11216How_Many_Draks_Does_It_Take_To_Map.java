@@ -21,7 +21,6 @@ import com.aionemu.gameserver.questEngine.model.QuestDialog;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
-import com.aionemu.gameserver.services.QuestService;
 
 /****/
 /** Author Ghostfur & Unknown (Aion-Unique)
@@ -56,28 +55,17 @@ public class _11216How_Many_Draks_Does_It_Take_To_Map extends QuestHandler {
 			if (targetId == 0)  { 
 				if (env.getDialog() == QuestDialog.ACCEPT_QUEST) {
 					removeQuestItem(env, 182206825, 1); //Balaur's Map.
-					QuestService.startQuest(env);
-					return closeDialogWindow(env);
+					return sendQuestStartDialog(env);
 				}
 			    if (env.getDialog() == QuestDialog.REFUSE_QUEST) {
 				   return closeDialogWindow(env);
 			    }
 			}
-		} if (qs == null)
+		} 
+        if (qs == null)
 			return false;
+        else if (qs.getStatus() == QuestStatus.START) {
 		int var = qs.getQuestVarById(0);
-		if (qs != null && qs.getStatus() == QuestStatus.REWARD) {
-			if (targetId == 799017) { //Sulinia.
-				switch (env.getDialog()) {
-				    case USE_OBJECT: {
-                        return sendQuestDialog(env, 10002);
-					} case SELECT_REWARD: {
-                        return sendQuestDialog(env, 5);
-					} default:
-                        return sendQuestEndDialog(env);	
-                }
-            }
-        } else if (qs.getStatus() == QuestStatus.START) {
             switch (targetId) {
                 case 700624: { //Eastern Star.
                     switch (env.getDialog()) {
@@ -132,6 +120,18 @@ public class _11216How_Many_Draks_Does_It_Take_To_Map extends QuestHandler {
                 }
             }
 		}
+		else if (qs == null && qs.getStatus() == QuestStatus.REWARD) {
+			if (targetId == 799017) { //Sulinia.
+				switch (env.getDialog()) {
+				    case USE_OBJECT: {
+                        return sendQuestDialog(env, 10002);
+					} case SELECT_REWARD: {
+                        return sendQuestDialog(env, 5);
+					} default:
+                        return sendQuestEndDialog(env);	
+                }
+            }
+        }
 		return false;
 	}
 	

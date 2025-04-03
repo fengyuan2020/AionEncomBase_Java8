@@ -23,7 +23,6 @@ import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
 
-
 /**
  * @author Cheatkiller
  *
@@ -31,7 +30,6 @@ import com.aionemu.gameserver.questEngine.model.QuestStatus;
 public class _21106TheRealRhonnam extends QuestHandler {
 
 	private final static int questId = 21106;
-
 	public _21106TheRealRhonnam() {
 		super(questId);
 	}
@@ -50,7 +48,6 @@ public class _21106TheRealRhonnam extends QuestHandler {
 		QuestState qs = player.getQuestStateList().getQuestState(questId);
 		QuestDialog dialog = env.getDialog();
 		int targetId = env.getTargetId();
-		
 		if (qs == null || qs.getStatus() == QuestStatus.NONE) {
 			if (targetId == 799271) { 
 				if (dialog == QuestDialog.START_DIALOG) {
@@ -64,7 +61,7 @@ public class _21106TheRealRhonnam extends QuestHandler {
 		else if (qs.getStatus() == QuestStatus.START) {
 			if (targetId == 799272) {
 				if (dialog == QuestDialog.START_DIALOG) {
-						return sendQuestDialog(env, 1352);
+					return sendQuestDialog(env, 1352);
 				}
 				else if (dialog == QuestDialog.STEP_TO_1) {
 					return defaultCloseDialog(env, 0, 1);
@@ -72,7 +69,7 @@ public class _21106TheRealRhonnam extends QuestHandler {
 			}
 			else if (targetId == 799273) {
 				if (dialog == QuestDialog.START_DIALOG) {
-						return sendQuestDialog(env, 1693);
+					return sendQuestDialog(env, 1693);
 				}
 				else if (dialog == QuestDialog.STEP_TO_2) {
 					return defaultCloseDialog(env, 1, 2);
@@ -80,7 +77,7 @@ public class _21106TheRealRhonnam extends QuestHandler {
 			}
 			else if (targetId == 799274) {
 				if (dialog == QuestDialog.START_DIALOG) {
-						return sendQuestDialog(env, 2034);
+					return sendQuestDialog(env, 2034);
 				}
 				else if (dialog == QuestDialog.STEP_TO_3) {
 					qs.setQuestVar(3);

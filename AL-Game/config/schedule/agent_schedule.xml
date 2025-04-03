@@ -25,15 +25,8 @@
 		<fightTime>0 0 22 ? * MON-FRI *</fightTime>
 		<fightTime>0 0 0 ? * SAT-SUN *</fightTime>
 	</agent>
-	<agent id="4">
-		<fightTime>0 0 22 ? * MON-FRI *</fightTime>
-		<fightTime>0 0 0 ? * SAT-SUN *</fightTime>
-	</agent>
 	<!-- [BERSERKER SUNAYAKA] -->
 	<agent id="3">
-		<fightTime>0 0 20 ? * MON-FRI *</fightTime>
-	</agent>
-	<agent id="5">
 		<fightTime>0 0 20 ? * MON-FRI *</fightTime>
 	</agent>
 </agent_schedule>

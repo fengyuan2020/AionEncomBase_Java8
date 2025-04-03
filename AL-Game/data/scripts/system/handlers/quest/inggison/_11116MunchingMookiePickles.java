@@ -18,13 +18,11 @@ package quest.inggison;
 
 import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
-import com.aionemu.gameserver.network.aion.serverpackets.SM_DIALOG_WINDOW;
 import com.aionemu.gameserver.questEngine.handlers.QuestHandler;
 import com.aionemu.gameserver.questEngine.model.QuestDialog;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
-import com.aionemu.gameserver.utils.PacketSendUtility;
 
 /**
  * @author Leunam
@@ -32,8 +30,7 @@ import com.aionemu.gameserver.utils.PacketSendUtility;
 public class _11116MunchingMookiePickles extends QuestHandler {
 
 	private final static int questId = 11116;
-	private final static int[] npc_ids = { 798986, 798964, 203784, 203785 };
-
+	private final static int[] npc_ids = {798986, 798964, 203784, 203785};
 	public _11116MunchingMookiePickles() {
 		super(questId);
 	}
@@ -52,8 +49,8 @@ public class _11116MunchingMookiePickles extends QuestHandler {
 		if (env.getVisibleObject() instanceof Npc)
 			targetId = ((Npc) env.getVisibleObject()).getNpcId();
 		QuestState qs = player.getQuestStateList().getQuestState(questId);
-		if (targetId == 798986) {
-			if (qs == null || qs.getStatus() == QuestStatus.NONE) {
+		if (qs == null || qs.getStatus() == QuestStatus.NONE) {
+		    if (targetId == 798986) {
 				if (env.getDialog() == QuestDialog.START_DIALOG)
 					return sendQuestDialog(env, 4762);
 				else
@@ -62,21 +59,8 @@ public class _11116MunchingMookiePickles extends QuestHandler {
 		}
 		if (qs == null)
 			return false;
-
+		else if (qs.getStatus() == QuestStatus.START) {
 		int var = qs.getQuestVarById(0);
-		if (qs.getStatus() == QuestStatus.REWARD) {
-			if (targetId == 798986) {
-				if (env.getDialog() == QuestDialog.USE_OBJECT)
-					return sendQuestDialog(env, 10002);
-				else if (env.getDialogId() == 1009)
-					return sendQuestDialog(env, 5);
-				else
-					return sendQuestEndDialog(env);
-			}
-		}
-		else if (qs.getStatus() != QuestStatus.START) {
-			return false;
-		}
 		if (targetId == 798964) {
 			switch (env.getDialog()) {
 				case START_DIALOG:
@@ -86,10 +70,8 @@ public class _11116MunchingMookiePickles extends QuestHandler {
 					if (var == 0) {
 						qs.setQuestVarById(0, var + 1);
 						updateQuestStatus(env);
-						PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
-						return true;
+				        return closeDialogWindow(env);
 					}
-					return false;
 			}
 		}
 		else if (targetId == 203784) {
@@ -101,8 +83,8 @@ public class _11116MunchingMookiePickles extends QuestHandler {
 					if (var == 1) {
 						if (player.getInventory().getItemCountByItemId(182206790) >= 10) {
 							removeQuestItem(env, 182206790, 10);
-							if (!giveQuestItem(env, 182206791, 1))
-								qs.setQuestVarById(0, var + 1);
+							giveQuestItem(env, 182206791, 1);
+							qs.setQuestVarById(0, var + 1);
 							updateQuestStatus(env);
 							return sendQuestDialog(env, 10000);
 						}
@@ -118,14 +100,23 @@ public class _11116MunchingMookiePickles extends QuestHandler {
 						return sendQuestDialog(env, 1693);
 				case SET_REWARD:
 					if (var == 2) {
-						if (!giveQuestItem(env, 182206792, 1))
-							qs.setQuestVarById(0, var + 1);
+						giveQuestItem(env, 182206792, 1);
+						qs.setQuestVarById(0, var + 1);
 						qs.setStatus(QuestStatus.REWARD);
 						updateQuestStatus(env);
-						PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
-						return true;
+				        return closeDialogWindow(env);
 					}
-					return false;
+                }
+			}
+		}
+		else if (qs.getStatus() == QuestStatus.REWARD) {
+			if (targetId == 798986) {
+				if (env.getDialog() == QuestDialog.USE_OBJECT)
+					return sendQuestDialog(env, 10002);
+				else if (env.getDialogId() == 1009)
+					return sendQuestDialog(env, 5);
+				else
+					return sendQuestEndDialog(env);
 			}
 		}
 		return false;

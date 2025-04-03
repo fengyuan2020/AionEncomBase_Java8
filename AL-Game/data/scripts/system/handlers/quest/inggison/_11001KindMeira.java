@@ -18,13 +18,11 @@ package quest.inggison;
 
 import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
-import com.aionemu.gameserver.network.aion.serverpackets.SM_DIALOG_WINDOW;
 import com.aionemu.gameserver.questEngine.handlers.QuestHandler;
 import com.aionemu.gameserver.questEngine.model.QuestDialog;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
-import com.aionemu.gameserver.utils.PacketSendUtility;
 
 /**
  * @author dta3000
@@ -32,7 +30,6 @@ import com.aionemu.gameserver.utils.PacketSendUtility;
 public class _11001KindMeira extends QuestHandler {
 
 	private final static int questId = 11001;
-
 	public _11001KindMeira() {
 		super(questId);
 	}
@@ -53,18 +50,16 @@ public class _11001KindMeira extends QuestHandler {
 		int targetId = 0;
 		if (env.getVisibleObject() instanceof Npc)
 			targetId = ((Npc) env.getVisibleObject()).getNpcId();
-		if (targetId == 798945) {
-			if (qs == null) {
+		if (qs == null || qs.getStatus() == QuestStatus.NONE) {
+		    if (targetId == 798945) {
 				if (env.getDialog() == QuestDialog.START_DIALOG)
 					return sendQuestDialog(env, 1011);
-				else if (env.getDialogId() == 1002) {
-					if (giveQuestItem(env, 182206700, 1))
-						return sendQuestStartDialog(env);
-					else
-						return true;
+				else if (env.getDialogId() == 1007) {
+					return sendQuestDialog(env, 4);
 				}
-				else
-					return sendQuestStartDialog(env);
+				else if (env.getDialogId() == 1002) {
+					return sendQuestStartDialog(env, 182206700, 1);
+				}
 			}
 		}
 		if (qs == null)
@@ -79,8 +74,7 @@ public class _11001KindMeira extends QuestHandler {
 						case STEP_TO_1: {
 							qs.setQuestVarById(0, qs.getQuestVarById(0) + 1);
 							updateQuestStatus(env);
-							PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
-							return true;
+							return closeDialogWindow(env);
 						}
 					}
 				}
@@ -92,8 +86,7 @@ public class _11001KindMeira extends QuestHandler {
 						case STEP_TO_2: {
 							qs.setQuestVarById(0, qs.getQuestVarById(0) + 1);
 							updateQuestStatus(env);
-							PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
-							return true;
+							return closeDialogWindow(env);
 						}
 					}
 				}
@@ -105,8 +98,7 @@ public class _11001KindMeira extends QuestHandler {
 						case STEP_TO_3: {
 							qs.setQuestVarById(0, qs.getQuestVarById(0) + 1);
 							updateQuestStatus(env);
-							PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
-							return true;
+							return closeDialogWindow(env);
 						}
 					}
 				}
@@ -120,8 +112,7 @@ public class _11001KindMeira extends QuestHandler {
 							updateQuestStatus(env);
 							return sendQuestEndDialog(env);
 						}
-						default:
-							return sendQuestEndDialog(env);
+
 					}
 				}
 			}
@@ -138,10 +129,5 @@ public class _11001KindMeira extends QuestHandler {
 			}
 		}
 		return false;
-	}
-
-	@Override
-	public boolean onLvlUpEvent(QuestEnv env) {
-		return defaultOnLvlUpEvent(env, 11001);
 	}
 }

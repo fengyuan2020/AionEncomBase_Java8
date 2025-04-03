@@ -23,7 +23,6 @@ import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
 
-
 /**
  * @author Cheatkiller
  *
@@ -31,7 +30,6 @@ import com.aionemu.gameserver.questEngine.model.QuestStatus;
 public class _21217NewResearchPlan extends QuestHandler {
 
 	private final static int questId = 21217;
-
 	public _21217NewResearchPlan() {
 		super(questId);
 	}
@@ -49,7 +47,6 @@ public class _21217NewResearchPlan extends QuestHandler {
 		QuestState qs = player.getQuestStateList().getQuestState(questId);
 		QuestDialog dialog = env.getDialog();
 		int targetId = env.getTargetId();
-		
 		if (qs == null || qs.getStatus() == QuestStatus.NONE) {
 			if (targetId == 799316) { 
 				if (dialog == QuestDialog.START_DIALOG) {
@@ -63,7 +60,7 @@ public class _21217NewResearchPlan extends QuestHandler {
 		else if (qs.getStatus() == QuestStatus.START) {
 			if (targetId == 799239) {
 				if (dialog == QuestDialog.START_DIALOG) {
-					if(qs.getQuestVarById(0) == 0)
+					if (qs.getQuestVarById(0) == 0)
 						return sendQuestDialog(env, 1352);
 				}
 				else if (dialog == QuestDialog.STEP_TO_1) {
@@ -72,7 +69,7 @@ public class _21217NewResearchPlan extends QuestHandler {
 			}
 			else if (targetId == 798713) {
 				if (dialog == QuestDialog.START_DIALOG) {
-					if(qs.getQuestVarById(0) == 1)
+					if (qs.getQuestVarById(0) == 1)
 						return sendQuestDialog(env, 1693);
 				}
 				else if (dialog == QuestDialog.STEP_TO_2) {

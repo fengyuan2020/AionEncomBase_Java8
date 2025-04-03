@@ -18,13 +18,11 @@ package quest.inggison;
 
 import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
-import com.aionemu.gameserver.network.aion.serverpackets.SM_DIALOG_WINDOW;
 import com.aionemu.gameserver.questEngine.handlers.QuestHandler;
 import com.aionemu.gameserver.questEngine.model.QuestDialog;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
-import com.aionemu.gameserver.utils.PacketSendUtility;
 
 /**
  * @author dta3000
@@ -32,7 +30,6 @@ import com.aionemu.gameserver.utils.PacketSendUtility;
 public class _11012PracticalNursing extends QuestHandler {
 
 	private final static int questId = 11012;
-
 	public _11012PracticalNursing() {
 		super(questId);
 	}
@@ -53,28 +50,23 @@ public class _11012PracticalNursing extends QuestHandler {
 		if (env.getVisibleObject() instanceof Npc)
 			targetId = ((Npc) env.getVisibleObject()).getNpcId();
 		QuestState qs = player.getQuestStateList().getQuestState(questId);
-		if (targetId == 799071) {
-			if (qs == null) {
+		if (qs == null || qs.getStatus() == QuestStatus.NONE) {
+		    if (targetId == 799071) {
 				if (env.getDialog() == QuestDialog.START_DIALOG) {
 					return sendQuestDialog(env, 4762);
 				}
-				else if (env.getDialogId() == 1002) {
-					if (giveQuestItem(env, 182206715, 3))
-						return sendQuestStartDialog(env);
-					else
-						return true;
+				else if (env.getDialogId() == 1007) {
+					return sendQuestDialog(env, 4);
 				}
-				else
-					return sendQuestStartDialog(env);
+				else if (env.getDialogId() == 1002) {
+					return sendQuestStartDialog(env, 182206715, 3);
+				}
 			}
 		}
-
 		if (qs == null)
 			return false;
-
-		int var = qs.getQuestVarById(0);
-
 		if (qs.getStatus() == QuestStatus.START) {
+		int var = qs.getQuestVarById(0);
 			if (targetId == 799072 && var == 0) {
 				if (env.getDialog() == QuestDialog.START_DIALOG) {
 					return sendQuestDialog(env, 1011);
@@ -83,11 +75,8 @@ public class _11012PracticalNursing extends QuestHandler {
 					qs.setQuestVar(++var);
 					updateQuestStatus(env);
 					removeQuestItem(env, 182206715, 1);
-					PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
-					return true;
+				    return closeDialogWindow(env);
 				}
-				else
-					return sendQuestStartDialog(env);
 			}
 			else if (targetId == 799073 && var == 1) {
 				if (env.getDialog() == QuestDialog.START_DIALOG) {
@@ -97,11 +86,8 @@ public class _11012PracticalNursing extends QuestHandler {
 					qs.setQuestVar(++var);
 					updateQuestStatus(env);
 					removeQuestItem(env, 182206715, 1);
-					PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
-					return true;
+				    return closeDialogWindow(env);
 				}
-				else
-					return sendQuestStartDialog(env);
 			}
 			else if (targetId == 799074 && var == 2) {
 				if (env.getDialog() == QuestDialog.START_DIALOG) {
@@ -111,11 +97,8 @@ public class _11012PracticalNursing extends QuestHandler {
 					qs.setStatus(QuestStatus.REWARD);
 					updateQuestStatus(env);
 					removeQuestItem(env, 182206715, 1);
-					PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
-					return true;
+				    return closeDialogWindow(env);
 				}
-				else
-					return sendQuestStartDialog(env);
 			}
 		}
 		else if (qs.getStatus() == QuestStatus.REWARD) {

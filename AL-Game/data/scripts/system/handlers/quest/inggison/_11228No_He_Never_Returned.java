@@ -14,22 +14,19 @@ package quest.inggison;
 
 import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
-import com.aionemu.gameserver.network.aion.serverpackets.SM_DIALOG_WINDOW;
 import com.aionemu.gameserver.questEngine.handlers.QuestHandler;
 import com.aionemu.gameserver.questEngine.model.QuestDialog;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
-import com.aionemu.gameserver.utils.PacketSendUtility;
 
 /****/
 /** Author Ghostfur & Unknown (Aion-Unique)
 /****/
 
-public class _11228No_He_Never_Returned extends QuestHandler
-{
+public class _11228No_He_Never_Returned extends QuestHandler {
+
 	private final static int questId = 11228;
-	
 	public _11228No_He_Never_Returned() {
 		super(questId);
 	}
@@ -39,7 +36,7 @@ public class _11228No_He_Never_Returned extends QuestHandler
 		qe.registerQuestNpc(799077).addOnQuestStart(questId); //Zaniah.
 		qe.registerQuestNpc(799077).addOnTalkEvent(questId); //Zaniah.
 		qe.registerQuestNpc(798979).addOnTalkEvent(questId); //Gelon.
-		qe.registerQuestNpc(257225).addOnTalkEvent(questId); //Jennathea.
+		qe.registerQuestNpc(798999).addOnTalkEvent(questId); //Auralia.
 		qe.registerQuestNpc(799078).addOnTalkEvent(questId); //Alphecca.
 	}
 	
@@ -68,19 +65,17 @@ public class _11228No_He_Never_Returned extends QuestHandler
 						} case STEP_TO_1: {
 							qs.setQuestVarById(0, qs.getQuestVarById(0) + 1);
 							updateQuestStatus(env);
-							PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
-							return true;
+				            return closeDialogWindow(env);
 						}
 					}
-				} case 257225: { //Jennathea.
+				} case 798999: { //Auralia.
 				    switch (env.getDialog()) {
 						case START_DIALOG: {
 							return sendQuestDialog(env, 1693);
 						} case STEP_TO_2: {
 							qs.setQuestVarById(0, qs.getQuestVarById(0) + 1);
 							updateQuestStatus(env);
-							PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
-							return true;
+				            return closeDialogWindow(env);
 						}
 					}
 				} case 799078: { //Alphecca.
@@ -90,8 +85,7 @@ public class _11228No_He_Never_Returned extends QuestHandler
 						} case STEP_TO_3: {
 							qs.setQuestVarById(0, qs.getQuestVarById(0) + 1);
 							updateQuestStatus(env);
-							PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
-							return true;
+				            return closeDialogWindow(env);
 						}
 					}
 				} case 799077: { //Zaniah
@@ -103,8 +97,7 @@ public class _11228No_He_Never_Returned extends QuestHandler
 							qs.setStatus(QuestStatus.REWARD);
 							updateQuestStatus(env);
 							return sendQuestEndDialog(env);
-						} default:
-							return sendQuestEndDialog(env);
+						}
 					}
 				}
 			}

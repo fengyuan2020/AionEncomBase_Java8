@@ -30,7 +30,6 @@ import com.aionemu.gameserver.questEngine.model.QuestStatus;
 public class _21073ListentoMySongStrigiks extends QuestHandler {
 
 	private final static int questId = 21073;
-
 	public _21073ListentoMySongStrigiks() {
 		super(questId);
 	}
@@ -50,7 +49,6 @@ public class _21073ListentoMySongStrigiks extends QuestHandler {
 		QuestState qs = player.getQuestStateList().getQuestState(questId);
 		QuestDialog dialog = env.getDialog();
 		int targetId = env.getTargetId();
-
 		if (qs == null || qs.getStatus() == QuestStatus.NONE) {
 			if (targetId == 799407) { // Skilving
 				if (dialog == QuestDialog.START_DIALOG) {

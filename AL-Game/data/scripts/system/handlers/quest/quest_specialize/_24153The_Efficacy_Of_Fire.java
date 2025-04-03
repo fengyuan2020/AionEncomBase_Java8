@@ -21,13 +21,12 @@ import com.aionemu.gameserver.questEngine.model.QuestStatus;
 import com.aionemu.gameserver.services.QuestService;
 
 /****/
-/** Author Ghostfur & Unknown (Aion-Unique)
+/** Author Ghostfur & Unknown (Aion-Unique). correct DainAvenger
 /****/
 public class _24153The_Efficacy_Of_Fire extends QuestHandler {
 
     private final static int questId = 24153;
     private final static int[] mob_ids = {213730, 213788, 213789, 213790, 213791};
-	
     public _24153The_Efficacy_Of_Fire() {
         super(questId);
     }
@@ -45,21 +44,25 @@ public class _24153The_Efficacy_Of_Fire extends QuestHandler {
 	
     @Override
     public boolean onDialogEvent(final QuestEnv env) {
-        final Player player = env.getPlayer();
-        final QuestState qs = player.getQuestStateList().getQuestState(questId);
+        Player player = env.getPlayer();
+        QuestState qs = player.getQuestStateList().getQuestState(questId);
 		int targetId = env.getTargetId();
         if (qs == null || qs.getStatus() == QuestStatus.NONE) {
             if (targetId == 204787) { //Chieftain Akagitan
             	switch (env.getDialog()) {
-        			case START_DIALOG: {
+        			case START_DIALOG:
         				return sendQuestDialog(env, 1011);
-        			} case ASK_ACCEPTION: {
+        			case ASK_ACCEPTION:
         				return sendQuestDialog(env, 4);
-        			} case ACCEPT_QUEST: {
-                        return sendQuestStartDialog(env);
-        			} case REFUSE_QUEST: {
+        			case ACCEPT_QUEST:
+					if (QuestService.startQuest(env)) {
+						qs = player.getQuestStateList().getQuestState(questId);
+					    qs.setQuestVarById(5, 1);
+						updateQuestStatus(env);
+				        return closeDialogWindow(env);
+                    }
+        			case REFUSE_QUEST:
         				return sendQuestDialog(env, 1004);
-        			}
             	}
             }
         }
@@ -70,24 +73,23 @@ public class _24153The_Efficacy_Of_Fire extends QuestHandler {
         	switch (targetId) {
         		case 204784: { //Delris
         			switch (env.getDialog()) {
-        				case START_DIALOG: {
+        				case START_DIALOG:
         					return sendQuestDialog(env, 1352);
-        				} case STEP_TO_2: {
+        				case STEP_TO_2:
         					giveQuestItem(env, 182215462, 1); 
-        					qs.setQuestVar(0);
-        					updateQuestStatus(env);
+					        qs.setQuestVarById(5, 0);
+					        qs.setQuestVarById(0, 0);
+                            updateQuestStatus(env);
         					return closeDialogWindow(env);
-        				}
         			}
         		} case 204787: { //Chieftain Akagitan
         			switch (env.getDialog()) {
-    					case START_DIALOG: {
+    					case START_DIALOG:
     						return sendQuestDialog(env, 2375);
-    					} case SELECT_REWARD: {
+    					case SELECT_REWARD:
     						qs.setStatus(QuestStatus.REWARD);
                             updateQuestStatus(env);
     						return sendQuestDialog(env, 5);
-    					}
         			}
         		}
         	}

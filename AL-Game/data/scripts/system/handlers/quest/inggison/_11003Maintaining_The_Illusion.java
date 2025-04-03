@@ -24,10 +24,9 @@ import com.aionemu.gameserver.questEngine.model.QuestStatus;
 /** Author Ghostfur & Unknown (Aion-Unique)
 /****/
 
-public class _11003Maintaining_The_Illusion extends QuestHandler
-{
+public class _11003Maintaining_The_Illusion extends QuestHandler {
+
 	private final static int questId = 11003;
-	
 	public _11003Maintaining_The_Illusion() {
 		super(questId);
 	}
@@ -42,11 +41,9 @@ public class _11003Maintaining_The_Illusion extends QuestHandler
 	public boolean onDialogEvent(QuestEnv env) {
 		final Player player = env.getPlayer();
 		QuestState qs = player.getQuestStateList().getQuestState(questId);
-
 		int targetId = 0;
 		if (env.getVisibleObject() instanceof Npc)
 			targetId = ((Npc) env.getVisibleObject()).getNpcId();
-
 		if (qs == null || qs.getStatus() == QuestStatus.NONE) {
 			if (targetId == 798933) {
 				if (env.getDialog() == QuestDialog.START_DIALOG)
@@ -55,29 +52,21 @@ public class _11003Maintaining_The_Illusion extends QuestHandler
 					return sendQuestStartDialog(env);
 			}
 		}
-
-		else if (qs != null && qs.getStatus() == QuestStatus.START) {
+		else if (qs == null || qs.getStatus() == QuestStatus.START) {
 			switch (targetId) {
 				case 798942: {
 					switch (env.getDialog()) {
 						case START_DIALOG: {
-							long itemCount1 = player.getInventory().getItemCountByItemId(182206701);
-							long itemCount2 = player.getInventory().getItemCountByItemId(182206702);
-							if (itemCount1 >= 6 && itemCount2 >= 4) {
-								removeQuestItem(env, 182206701, 6);
-								removeQuestItem(env, 182206702, 4);
-								qs.setStatus(QuestStatus.REWARD);
-								updateQuestStatus(env);
-								return sendQuestDialog(env, 2375);
-							}
-							else
-								return sendQuestDialog(env, 2716);
+							return sendQuestDialog(env, 2375);
+                        }
+						case CHECK_COLLECTED_ITEMS: {
+							return checkQuestItems(env, 0, 1, true, 5, 2376); // 7
 						}
 					}
 				}
 			}
 		}
-		else if (qs.getStatus() == QuestStatus.REWARD) {
+		else if (qs == null || qs.getStatus() == QuestStatus.REWARD) {
 			if (targetId == 798942) {
 				if (env.getDialogId() == 39)
 					return sendQuestDialog(env, 5);

@@ -26,7 +26,6 @@ import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
 import com.aionemu.gameserver.services.QuestService;
 
-
 /**
  * @author Cheatkiller
  *
@@ -34,7 +33,6 @@ import com.aionemu.gameserver.services.QuestService;
 public class _21105CoweringRefugee extends QuestHandler {
 
 	private final static int questId = 21105;
-
 	public _21105CoweringRefugee() {
 		super(questId);
 	}
@@ -52,7 +50,6 @@ public class _21105CoweringRefugee extends QuestHandler {
 		QuestState qs = player.getQuestStateList().getQuestState(questId);
 		QuestDialog dialog = env.getDialog();
 		int targetId = env.getTargetId();
-		
 		if (qs == null || qs.getStatus() == QuestStatus.NONE || qs.canRepeat()) {
 			if (targetId == 799276) { 
 				if (dialog == QuestDialog.START_DIALOG) {
@@ -66,7 +63,7 @@ public class _21105CoweringRefugee extends QuestHandler {
 		else if (qs.getStatus() == QuestStatus.START) {
 			if (targetId == 799366) {
 				if (dialog == QuestDialog.START_DIALOG) {
-						return sendQuestDialog(env, 1011);
+					return sendQuestDialog(env, 1011);
 				}
 				else if (dialog == QuestDialog.SET_REWARD) {
 					Npc npc = (Npc) env.getVisibleObject();

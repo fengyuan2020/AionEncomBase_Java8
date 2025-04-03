@@ -23,9 +23,10 @@ import com.aionemu.gameserver.questEngine.model.QuestDialog;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
+import com.aionemu.gameserver.services.QuestService;
 
 /**
- * @Author Majka Ajural 
+ * @Author Majka Ajural. correct DainAvenger
  */
 
 public class _24112NoLaissezfaireforLepharists extends QuestHandler {
@@ -56,7 +57,12 @@ public class _24112NoLaissezfaireforLepharists extends QuestHandler {
 					case START_DIALOG:
 						return sendQuestDialog(env, 1011);
 					case ACCEPT_QUEST_SIMPLE:
-						return sendQuestStartDialog(env, 5, 1);
+					if (QuestService.startQuest(env)) {
+						qs = player.getQuestStateList().getQuestState(questId);
+					    qs.setQuestVarById(5, 1);
+						updateQuestStatus(env);
+				        return closeDialogWindow(env);
+                    }
 					case REFUSE_QUEST_SIMPLE:
 				        return closeDialogWindow(env);
 				}
@@ -73,8 +79,10 @@ public class _24112NoLaissezfaireforLepharists extends QuestHandler {
 							return sendQuestDialog(env, 2375);
 						}
 					case STEP_TO_1:
-						qs.setQuestVarById(0, 1);
-						return sendQuestSelectionDialog(env);
+						qs.setQuestVarById(5, 0);
+						qs.setQuestVarById(0, 0);
+						updateQuestStatus(env);
+				        return closeDialogWindow(env);
 					case SELECT_REWARD:
 						qs.setStatus(QuestStatus.REWARD);
 						updateQuestStatus(env);

@@ -18,9 +18,10 @@ import com.aionemu.gameserver.questEngine.model.QuestDialog;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
+import com.aionemu.gameserver.services.QuestService;
 
 /****/
-/** Author Ghostfur & Unknown (Aion-Unique)
+/** Author Ghostfur & Unknown (Aion-Unique). correct DainAvenger
 /****/
 public class _24155Leather_Wing_And_Shiny_Things extends QuestHandler {
 
@@ -40,21 +41,25 @@ public class _24155Leather_Wing_And_Shiny_Things extends QuestHandler {
 	
     @Override
     public boolean onDialogEvent(final QuestEnv env) {
-        final Player player = env.getPlayer();
-        final QuestState qs = player.getQuestStateList().getQuestState(questId);
+        Player player = env.getPlayer();
+        QuestState qs = player.getQuestStateList().getQuestState(questId);
         int targetId = env.getTargetId();
         if (qs == null || qs.getStatus() == QuestStatus.NONE) {
             if (targetId == 204701) { //Hod
             	switch (env.getDialog()) {
-        			case START_DIALOG: {
+        			case START_DIALOG:
         				return sendQuestDialog(env, 1011);
-        			} case ASK_ACCEPTION: {
+        			case ASK_ACCEPTION:
         				return sendQuestDialog(env, 4);
-        			} case ACCEPT_QUEST: {
-        				return sendQuestStartDialog(env);
-        			} case REFUSE_QUEST: {
+        			case ACCEPT_QUEST:
+					if (QuestService.startQuest(env)) {
+						qs = player.getQuestStateList().getQuestState(questId);
+					    qs.setQuestVarById(5, 1);
+						updateQuestStatus(env);
+				        return closeDialogWindow(env);
+                    }
+        			case REFUSE_QUEST:
         				return sendQuestDialog(env, 1004);
-        			}
             	}
             }
         }
@@ -65,28 +70,28 @@ public class _24155Leather_Wing_And_Shiny_Things extends QuestHandler {
         	switch (targetId) {
                 case 204785: { //Gwendolin
                     switch (env.getDialog()) {
-                        case START_DIALOG: {
+                        case START_DIALOG:
                             return sendQuestDialog(env, 1352);
-                        } case STEP_TO_2: {
-                        	qs.setQuestVar(0);
-        					updateQuestStatus(env);
+                        case STEP_TO_2:
+						    qs.setQuestVarById(5, 0);
+						    qs.setQuestVarById(0, 0);
+						    updateQuestStatus(env);
                             return closeDialogWindow(env);
-                        }
                     }
-                } case 204701: { //Hod
+                } 
+                case 204701: { //Hod
                     switch (env.getDialog()) {
-                        case START_DIALOG: {
+                        case START_DIALOG:
                         	return sendQuestDialog(env, 2375);
-                        } case SELECT_REWARD: {
+                        case SELECT_REWARD:
                         	qs.setStatus(QuestStatus.REWARD);
                             updateQuestStatus(env);
-    						return sendQuestDialog(env, 5);
+            		        return sendQuestEndDialog(env);
                         }
-                    }
-                    break;
-                }
-            }
-        } else if (qs.getStatus() == QuestStatus.REWARD) {
+                   }
+              }
+         } 
+         else if (qs.getStatus() == QuestStatus.REWARD) {
             if (targetId == 204701) { //Hod
             	if (env.getDialog() == QuestDialog.SELECT_REWARD) {
             		return sendQuestDialog(env, 5);

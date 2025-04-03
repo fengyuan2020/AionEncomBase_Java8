@@ -23,7 +23,6 @@ import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
 
-
 /**
  * @author Cheatkiller
  *
@@ -31,7 +30,6 @@ import com.aionemu.gameserver.questEngine.model.QuestStatus;
 public class _21244SearchForTheBiolab extends QuestHandler {
 
 	private final static int questId = 21244;
-
 	public _21244SearchForTheBiolab() {
 		super(questId);
 	}
@@ -49,7 +47,6 @@ public class _21244SearchForTheBiolab extends QuestHandler {
 		QuestState qs = player.getQuestStateList().getQuestState(questId);
 		QuestDialog dialog = env.getDialog();
 		int targetId = env.getTargetId();
-		
 		if (qs == null || qs.getStatus() == QuestStatus.NONE) {
 			if (targetId == 799317) { 
 				if (dialog == QuestDialog.START_DIALOG) {
@@ -72,12 +69,12 @@ public class _21244SearchForTheBiolab extends QuestHandler {
 			}
 			else if (targetId == 799320) {
 				if (dialog == QuestDialog.START_DIALOG) {
-					if(qs.getQuestVarById(0) == 1)
+					if (qs.getQuestVarById(0) == 1)
 						return sendQuestDialog(env, 1693);
 				}
 				else if (dialog == QuestDialog.STEP_TO_2) {
-					qs.setQuestVar(2);
 					giveQuestItem(env, 182207924, 1);
+					qs.setQuestVar(2);
 					return defaultCloseDialog(env, 2, 2, true, false);
 				}
 			}

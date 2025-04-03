@@ -19,10 +19,9 @@ import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
 
-public class _11053These_Shoes_Are_Made_For_Stalking extends QuestHandler
-{
+public class _11053These_Shoes_Are_Made_For_Stalking extends QuestHandler {
+
 	private final static int questId = 11053;
-	
 	public _11053These_Shoes_Are_Made_For_Stalking() {
 		super(questId);
 	}
@@ -40,7 +39,7 @@ public class _11053These_Shoes_Are_Made_For_Stalking extends QuestHandler
 		QuestState qs = player.getQuestStateList().getQuestState(questId);
 		QuestDialog dialog = env.getDialog();
 		int targetId = env.getTargetId();
-		if (qs == null || qs.canRepeat()) {
+		if (qs == null || qs.getStatus() == QuestStatus.NONE || qs.canRepeat()) {
 			if (targetId == 799015) { //Siaqua
 				if (dialog == QuestDialog.START_DIALOG) {
 					return sendQuestDialog(env, 1011);
@@ -48,13 +47,11 @@ public class _11053These_Shoes_Are_Made_For_Stalking extends QuestHandler
 					return sendQuestStartDialog(env);
 				}
 			}
-		} else if (qs.getStatus() == QuestStatus.START) {
+		} else if (qs == null || qs.getStatus() == QuestStatus.START) {
 			if (targetId == 799017) { //Sulinia
 				if (dialog == QuestDialog.START_DIALOG) {
 					return sendQuestDialog(env, 2375);
 				} else if (dialog == QuestDialog.CHECK_COLLECTED_ITEMS) {
-					//Collect Dry Ettin Leaf (30)
-                    //Collect Kinah (50000)
 					long itemCount = player.getInventory().getItemCountByItemId(182206838);
 					if (player.getInventory().tryDecreaseKinah(50000) && itemCount > 29) {
 						player.getInventory().decreaseByItemId(182206838, 30);
@@ -62,11 +59,9 @@ public class _11053These_Shoes_Are_Made_For_Stalking extends QuestHandler
 						return sendQuestDialog(env, 5);
 					} else
 						return sendQuestDialog(env, 2716);
-				} else if (dialog == QuestDialog.FINISH_DIALOG) {
-					return defaultCloseDialog(env, 0, 0);
 				}
 			}
-		} else if (qs.getStatus() == QuestStatus.REWARD) {
+		} else if (qs == null || qs.getStatus() == QuestStatus.REWARD) {
 			if (targetId == 799017) //Sulinia
 				return sendQuestEndDialog(env);
 		}

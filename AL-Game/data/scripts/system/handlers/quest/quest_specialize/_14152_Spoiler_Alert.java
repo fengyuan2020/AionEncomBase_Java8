@@ -22,7 +22,7 @@ import com.aionemu.gameserver.questEngine.model.QuestStatus;
 import com.aionemu.gameserver.services.QuestService;
 
 /****/
-/** Author Ghostfur & Unknown (Aion-Unique)
+/** Author Ghostfur & Unknown (Aion-Unique). correct DainAvenger
 /****/
 public class _14152_Spoiler_Alert extends QuestHandler {
 
@@ -52,18 +52,19 @@ public class _14152_Spoiler_Alert extends QuestHandler {
         if (qs == null || qs.getStatus() == QuestStatus.NONE) {
             if (targetId == 204504) { //Sofne.
                 switch (dialog) {
-                    case START_DIALOG: {
+                    case START_DIALOG:
                         return sendQuestDialog(env, 1011);
-                    }
-                    case ASK_ACCEPTION: {
+                    case ASK_ACCEPTION:
                         return sendQuestDialog(env, 4);
+                    case ACCEPT_QUEST:
+					if (QuestService.startQuest(env)) {
+						qs = player.getQuestStateList().getQuestState(questId);
+					    qs.setQuestVarById(5, 1);
+						updateQuestStatus(env);
+				        return closeDialogWindow(env);
                     }
-                    case ACCEPT_QUEST: {
-                        return sendQuestStartDialog(env);
-                    }
-                    case REFUSE_QUEST: {
+                    case REFUSE_QUEST:
                         return closeDialogWindow(env);
-                    }
                 }
             }
         }
@@ -73,49 +74,43 @@ public class _14152_Spoiler_Alert extends QuestHandler {
         else if (qs == null || qs.getStatus() == QuestStatus.START) {
             if (targetId == 204574) { //Finn.
                 switch (dialog) {
-                    case START_DIALOG: {
+                    case START_DIALOG:
                         return sendQuestDialog(env, 1352);
-                    }
-                    case STEP_TO_1: {
+                    case STEP_TO_1:
                         qs.setQuestVarById(5, 2);
                         updateQuestStatus(env);
                         giveQuestItem(env, 182215481, 1);
                         return closeDialogWindow(env);
-                    }
                 }
             }
             else if (targetId == 203705) { //Jumentis.
                 switch (dialog) {
-                    case START_DIALOG: {
+                    case START_DIALOG:
                         return sendQuestDialog(env, 1693);
-                    }
-                    case STEP_TO_2: {
+                    case STEP_TO_2:
                         removeQuestItem(env, 182215481, 1);
 						qs.setQuestVarById(5, 0);
 						qs.setQuestVarById(0, 0);
 						updateQuestStatus(env);
                         return closeDialogWindow(env);
-                    }
                 }
             }
             else if (targetId == 204504) { //Sofne.
                 switch (dialog) {
-                case START_DIALOG: {
+                case START_DIALOG:
                     return sendQuestDialog(env, 2375);
-                }
-                case SELECT_REWARD: {
+                case SELECT_REWARD:
                     qs.setStatus(QuestStatus.REWARD);
                     updateQuestStatus(env);
                     return sendQuestEndDialog(env);
-                    }
                 }
             }
         }   
         else if (qs.getStatus() == QuestStatus.REWARD) {
             if (targetId == 204504) { //Sofne.
-                    return sendQuestEndDialog(env);
-                }
+                return sendQuestEndDialog(env);
             }
+        }
         return false;
     }
 

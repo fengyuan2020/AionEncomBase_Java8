@@ -29,7 +29,6 @@ import com.aionemu.gameserver.questEngine.model.QuestStatus;
 public class _21460AShulacksStory extends QuestHandler {
 
 	private static final int questId = 21460;
-
 	public _21460AShulacksStory() {
 		super(questId);
 	}
@@ -48,7 +47,6 @@ public class _21460AShulacksStory extends QuestHandler {
 		QuestState qs = player.getQuestStateList().getQuestState(questId);
 		QuestDialog dialog = env.getDialog();
 		int targetId = env.getTargetId();
-
 		if (qs == null || qs.getStatus() == QuestStatus.NONE) {
 			if (targetId == 799258) { // Denskel
 				if (dialog == QuestDialog.START_DIALOG) {
@@ -83,9 +81,9 @@ public class _21460AShulacksStory extends QuestHandler {
 							}
 						}
 						case SELECT_REWARD: {
-							if (removeQuestItem(env, 182209520, 1))
-								changeQuestStep(env, 1, 1, true); // reward
-							return sendQuestDialog(env, 5);
+							removeQuestItem(env, 182209520, 1);
+							changeQuestStep(env, 1, 1, true); // reward
+				            return sendQuestEndDialog(env);
 						}
 					}
 				}

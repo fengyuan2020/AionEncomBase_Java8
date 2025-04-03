@@ -19,9 +19,10 @@ import com.aionemu.gameserver.questEngine.model.QuestDialog;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
+import com.aionemu.gameserver.services.QuestService;
 
 /****/
-/** Author Ghostfur & Unknown (Aion-Unique)
+/** Author Ghostfur & Unknown (Aion-Unique). correct DainAvenger
 /****/
 public class _14112Pollution_Resolution extends QuestHandler {
 
@@ -52,9 +53,13 @@ public class _14112Pollution_Resolution extends QuestHandler {
 				switch (dialog) {
 					case START_DIALOG:
 						return sendQuestDialog(env, 1011);
-					case ACCEPT_QUEST:
 					case ACCEPT_QUEST_SIMPLE:
-						return sendQuestStartDialog(env);
+					if (QuestService.startQuest(env)) {
+						qs = player.getQuestStateList().getQuestState(questId);
+					    qs.setQuestVarById(5, 1);
+						updateQuestStatus(env);
+				        return closeDialogWindow(env);
+					}
 					case REFUSE_QUEST_SIMPLE:
 				        return closeDialogWindow(env);
 				}
@@ -67,24 +72,22 @@ public class _14112Pollution_Resolution extends QuestHandler {
 			switch (targetId) {
 				case 203148: {
 					switch (dialog) {
-						case START_DIALOG: {
+						case START_DIALOG:
 							return sendQuestDialog(env, 1352);
-						} case STEP_TO_1: {
-							return sendQuestEndDialog(env);
-						} default:
-							return sendQuestEndDialog(env);
+						case STEP_TO_1:
+					        qs.setQuestVarById(5, 0);
+						    qs.setQuestVarById(0, 0);
+            				updateQuestStatus(env);
+            				return closeDialogWindow(env);
 					}
 				}
-			}
-		} else if (qs.getStatus() == QuestStatus.START) {
-			switch (targetId) {
 				case 203195: {
 					switch (dialog) {
-						case START_DIALOG: {
+						case START_DIALOG:
 							return sendQuestDialog(env, 2375);
-						} case SELECT_REWARD: {
-							return sendQuestEndDialog(env);
-						} default:
+						case SELECT_REWARD:
+        					qs.setStatus(QuestStatus.REWARD);
+        					updateQuestStatus(env);
 							return sendQuestEndDialog(env);
 					}
 				}
@@ -107,18 +110,17 @@ public class _14112Pollution_Resolution extends QuestHandler {
 		Player player = env.getPlayer();
 		int targetId = env.getTargetId();
 		QuestState qs = player.getQuestStateList().getQuestState(questId);
-		if (qs == null || qs.getStatus() != QuestStatus.START) {
-			return false;
-		} switch (targetId) {
+		if (qs == null || qs.getStatus() == QuestStatus.START) {
+		switch (targetId) {
 			case 210318:
-				if (qs.getQuestVarById(1) < 1) {
-					qs.setQuestVarById(1, qs.getQuestVarById(1) + 1);
+				if (qs.getQuestVarById(0) < 1) {
+					qs.setQuestVarById(0, qs.getQuestVarById(0) + 1);
 					updateQuestStatus(env);
 				} if (qs.getQuestVarById(1) >= 1) {
-					qs.setStatus(QuestStatus.REWARD);
+                    qs.setQuestVarById(0, 1);
 					updateQuestStatus(env);
 				}
-			break;
+            } 
 		}
 		return false;
 	}

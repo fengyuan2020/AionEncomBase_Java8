@@ -19,10 +19,9 @@ import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
 
-public class _21051TroubleinStone extends QuestHandler
-{
+public class _21051TroubleinStone extends QuestHandler {
+
 	private final static int questId = 21051;
-	
 	public _21051TroubleinStone() {
 		super(questId);
 	}
@@ -50,21 +49,21 @@ public class _21051TroubleinStone extends QuestHandler
 					}
 				}
 			}
-		} else if (qs.getStatus() == QuestStatus.START) {
+		} else if (qs == null || qs.getStatus() == QuestStatus.START) {
 			if (targetId == 799291) { //Aquila.
-				switch (dialog) {
-					case START_DIALOG: {
-						return sendQuestDialog(env, 2375);
-					}
-					case CHECK_COLLECTED_ITEMS: {
-						return checkQuestItems(env, 0, 0, true, 5, 2716);
-					}
-					case FINISH_DIALOG: {
-						return sendQuestSelectionDialog(env);
-					}
+				if (dialog == QuestDialog.START_DIALOG) {
+					return sendQuestDialog(env, 2375);
+				} else if (dialog == QuestDialog.CHECK_COLLECTED_ITEMS) {
+					long itemCount = player.getInventory().getItemCountByItemId(182207839);
+					if (player.getInventory().tryDecreaseKinah(50000) && itemCount > 29) {
+						player.getInventory().decreaseByItemId(182207839, 30);
+						changeQuestStep(env, 0, 0, true);
+						return sendQuestDialog(env, 5);
+					} else
+						return sendQuestDialog(env, 2716);
 				}
 			}
-		} else if (qs.getStatus() == QuestStatus.REWARD) {
+		} else if (qs == null || qs.getStatus() == QuestStatus.REWARD) {
 			if (targetId == 799291) { //Aquila.
 				return sendQuestEndDialog(env);
 			}

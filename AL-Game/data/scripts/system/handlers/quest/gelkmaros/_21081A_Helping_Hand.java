@@ -57,9 +57,7 @@ public class _21081A_Helping_Hand extends QuestHandler {
 						return sendQuestDialog(env, 4);
 					} 
 					case ACCEPT_QUEST: {
-						if (!giveQuestItem(env, 182214017, 1))
-							updateQuestStatus(env);
-						return sendQuestStartDialog(env);
+						return sendQuestStartDialog(env, 182214017, 1);
 					}
 				}
 			}

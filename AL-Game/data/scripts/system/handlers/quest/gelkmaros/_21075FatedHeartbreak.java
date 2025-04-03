@@ -23,7 +23,6 @@ import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
 
-
 /**
  * @author Cheatkiller
  *
@@ -32,7 +31,6 @@ public class _21075FatedHeartbreak extends QuestHandler {
 
 	private final static int questId = 21075;
 	private int rewardIndex;
-	
 	public _21075FatedHeartbreak() {
 		super(questId);
 	}
@@ -51,7 +49,6 @@ public class _21075FatedHeartbreak extends QuestHandler {
 		QuestState qs = player.getQuestStateList().getQuestState(questId);
 		QuestDialog dialog = env.getDialog();
 		int targetId = env.getTargetId();
-		
 		if (qs == null || qs.getStatus() == QuestStatus.NONE) {
 			if (targetId == 799409) { 
 				if (dialog == QuestDialog.START_DIALOG) {
@@ -78,17 +75,18 @@ public class _21075FatedHeartbreak extends QuestHandler {
 			}
 			else if (targetId == 799410) {
 				if (dialog == QuestDialog.START_DIALOG) {
-					if(qs.getQuestVarById(0) == 1)
+					if (qs.getQuestVarById(0) == 1)
 					return sendQuestDialog(env, 1352);
 				}
 				else if (dialog == QuestDialog.SET_REWARD) {
+					rewardIndex = 0;
 					removeQuestItem(env, 182207917, 1);
 					return defaultCloseDialog(env, 1, 1, true, false);
 				}
 			}
 			else if (targetId == 204138) {
 				if (dialog == QuestDialog.START_DIALOG) {
-					if(qs.getQuestVarById(0) == 2)
+					if (qs.getQuestVarById(0) == 2)
 					return sendQuestDialog(env, 1693);
 				}
 				else if (dialog == QuestDialog.SET_REWARD) {
