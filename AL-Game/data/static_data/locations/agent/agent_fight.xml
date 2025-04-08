@@ -15,8 +15,6 @@
 	http://aion.power.plaync.com/wiki/%ED%8B%B0%EC%95%84%EB%A7%88%EB%9E%80%ED%83%80%EC%9D%98+%EB%88%88 -->
 	<!-- [GOVERNOR SUNAYAKA] -->
 	<agent_location id="2"/>
-	<agent_location id="4"/>
 	<!-- [BERSERKER SUNAYAKA] -->
 	<agent_location id="3"/>
-	<agent_location id="5"/>
 </agent_fight>

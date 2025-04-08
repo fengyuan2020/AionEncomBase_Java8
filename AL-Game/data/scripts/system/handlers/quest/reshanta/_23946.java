@@ -34,9 +34,7 @@ public class _23946 extends QuestHandler {
     public void register() {
         qe.registerQuestNpc(835724).addOnQuestStart(questId);
         qe.registerQuestNpc(835724).addOnTalkEvent(questId);
-		for (int mob: Ab11011Boss) {
-			qe.registerQuestNpc(mob).addOnKillEvent(questId);
-		}
+		qe.registerQuestNpc(885020).addOnKillEvent(questId);
     }
 	
     @Override

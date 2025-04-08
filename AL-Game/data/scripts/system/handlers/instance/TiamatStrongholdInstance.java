@@ -47,8 +47,8 @@ import java.util.Set;
 /****/
 
 @InstanceID(300510000)
-public class TiamatStrongholdInstance extends GeneralInstanceHandler
-{
+public class TiamatStrongholdInstance extends GeneralInstanceHandler {
+
 	private int kills;
 	private int protectorate;
 	private boolean startSuramaEvent;
@@ -189,6 +189,7 @@ public class TiamatStrongholdInstance extends GeneralInstanceHandler
 		    case 219352: //Invincible Shabokan.
 				//A Balaur Medal Chest appeared in the Noble's Garden.
 			    sendMsgByRace(1401614, Race.PC_ALL, 2000);
+				spawn(701501, 1075.4409f, 1078.5071f, 787.685f, (byte) 16);
 				spawn(283177, 1178.7662f, 1068.971f, 500.6963f, (byte) 0); //Tiamat Eye.
 				Npc tiamatEye1 = getNpc(283177);
 				//Insolent Daevas! Destroying my lieutenants!
@@ -213,6 +214,7 @@ public class TiamatStrongholdInstance extends GeneralInstanceHandler
 		    case 219355: //Traitor Kumbanda.
 				//A Balaur Medal Chest appeared in the Noble's Garden.
 				sendMsgByRace(1401614, Race.PC_ALL, 2000);
+				spawn(701501, 1063.5973f, 1092.7402f, 787.685f, (byte) 107);
 		    break;
 			case 219356: //Brigade General Laksyaka.
 			    spawn(283178, 628.3988f, 1319.0686f, 494.79846f, (byte) 119); //Tiamat Eye.
@@ -239,18 +241,20 @@ public class TiamatStrongholdInstance extends GeneralInstanceHandler
 			    doors.get(610).setOpen(true);
 				//A Balaur Medal Chest appeared in the Noble's Garden.
 				sendMsgByRace(1401614, Race.PC_ALL, 2000);
+				spawn(701501, 1077.1716f, 1058.1995f, 787.685f, (byte) 61);
 		    break;
 		    case 219358: //Brigade General Tahabata.
-			    switch (Rnd.get(1, 2)) {
+/* 			    switch (Rnd.get(1, 2)) {
 		            case 1:
 				        spawn(702658, 678.0355f, 1071.9641f, 497.75186f, (byte) 85); //Abbey Box.
 					break;
 					case 2:
 					    spawn(702659, 678.0355f, 1071.9641f, 497.75186f, (byte) 85); //Noble Abbey Box.
 					break;
-				}
+				} */
 				//A Balaur Medal Chest appeared in the Noble's Garden.
 				sendMsgByRace(1401614, Race.PC_ALL, 2000);
+				spawn(701541, 677.35785f, 1069.5361f, 499.86716f, (byte) 0);
 				spawn(283178, 644.7906f, 1068.6279f, 506.9512f, (byte) 119); //Tiamat Eye.
 				Npc tiamatEye3 = getNpc(283178);
 				//Insolent Daevas! Destroying my lieutenants!
@@ -273,12 +277,13 @@ public class TiamatStrongholdInstance extends GeneralInstanceHandler
 			    doors.get(711).setOpen(true);
 				//A Balaur Medal Chest appeared in the Noble's Garden.
 				sendMsgByRace(1401614, Race.PC_ALL, 2000);
+				spawn(701541, 677.35785f, 1069.5361f, 499.86716f, (byte) 0);
 		    break;
 		    case 219354: //Brigade General Terath.
-			    spawnBalaurMedalBox();
 				spawnStrongholdTreasureChest();
 				//A Balaur Medal Chest appeared in the Noble's Garden.
 				sendMsgByRace(1401614, Race.PC_ALL, 2000);
+				spawn(701541, 677.35785f, 1069.5361f, 499.86716f, (byte) 0);
 				sendMsg("Congratulation]: you finish <Tiamat Stronghold>");
 				spawn(283180, 1029.9412f, 266.9634f, 416.4337f, (byte) 28); //Tiamat Eye.
 				spawn(800464, 1119.9684f, 1069.8219f, 496.86157f, (byte) 0); //Reian Sorcerer.
@@ -308,15 +313,6 @@ public class TiamatStrongholdInstance extends GeneralInstanceHandler
 	
 	private void spawnStrongholdTreasureChest() {
 		spawn(701527, 1074.0504f, 1068.9313f, 785.9529f, (byte) 118);
-	}
-	
-	private void spawnBalaurMedalBox() {
-		spawn(701501, 1063.5973f, 1092.7402f, 787.685f, (byte) 107);
-		spawn(701501, 1071.5909f, 1040.6797f, 787.685f, (byte) 23);
-		spawn(701501, 1075.4409f, 1078.5071f, 787.685f, (byte) 16);
-		spawn(701501, 1077.1716f, 1058.1995f, 787.685f, (byte) 61);
-		spawn(701501, 1086.274f, 1098.3997f, 787.685f, (byte) 90);
-		spawn(701501, 1099.8691f, 1047.1895f, 787.685f, (byte) 64);
 	}
 	
 	private void raidProtectorate(final Npc npc, float x, float y, float z, boolean despawn) {

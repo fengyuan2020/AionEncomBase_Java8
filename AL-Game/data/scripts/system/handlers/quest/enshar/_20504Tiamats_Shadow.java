@@ -25,11 +25,10 @@ import com.aionemu.gameserver.services.QuestService;
 /** Author Ghostfur & Unknown (Aion-Unique)
 /****/
 
-public class _20504Tiamats_Shadow extends QuestHandler
-{
+public class _20504Tiamats_Shadow extends QuestHandler {
+
     public static final int questId = 20504;
 	private final static int[] mobs = {219943, 219944, 219945, 219946, 219947, 219948};
-	
     public _20504Tiamats_Shadow() {
         super(questId);
     }
@@ -43,6 +42,7 @@ public class _20504Tiamats_Shadow extends QuestHandler
             qe.registerQuestNpc(mob).addOnKillEvent(questId);
         }
 		qe.registerOnLevelUp(questId);
+		qe.registerOnLogOut(questId);
 		qe.registerOnEnterZoneMissionEnd(questId);
 		qe.registerQuestNpc(219949).addOnKillEvent(questId);
     }
@@ -141,6 +141,19 @@ public class _20504Tiamats_Shadow extends QuestHandler
 		}
         return false;
     }
+
+	@Override
+	public boolean onLogOutEvent(QuestEnv env) {
+		Player player = env.getPlayer();
+		QuestState qs = player.getQuestStateList().getQuestState(questId);
+		if (qs != null && qs.getStatus() == QuestStatus.START) {
+			int var = qs.getQuestVarById(0);
+			if (var == 5) {
+				changeQuestStep(env, 5, 4, false);
+			}
+		}
+		return false;
+	}
 	
 	@Override
     public boolean onKillEvent(QuestEnv env) {
@@ -186,9 +199,9 @@ public class _20504Tiamats_Shadow extends QuestHandler
             } else if (var == 4) {
 				switch (targetId) {
                     case 219949: { //Cursed Gilgamesh.
-						QuestService.addNewSpawn(220080000, 1, 804742, npc.getX(), npc.getY(), npc.getZ(), (byte) 0);
 						qs.setQuestVar(5);
 						updateQuestStatus(env);
+						QuestService.addNewSpawn(220080000, 1, 804742, npc.getX(), npc.getY(), npc.getZ(), (byte) 0);
 						return true;
 					}
                 }

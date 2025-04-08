@@ -18,9 +18,10 @@ import com.aionemu.gameserver.questEngine.model.QuestDialog;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
+import com.aionemu.gameserver.services.QuestService;
 
 /****/
-/** Author Ghostfur & Unknown (Aion-Unique)
+/** Author Ghostfur & Unknown (Aion-Unique). correct DainAvenger.
 /****/
 
 public class _26906Bloodscent_Of_Violent_Death extends QuestHandler {
@@ -45,21 +46,53 @@ public class _26906Bloodscent_Of_Violent_Death extends QuestHandler {
         QuestState qs = player.getQuestStateList().getQuestState(questId);
         if (qs == null || qs.getStatus() == QuestStatus.NONE) {
             if (targetId == 204301) {
-                if (env.getDialog() == QuestDialog.START_DIALOG) {
-                    return sendQuestDialog(env, 1011);
-                } else {
-                    return sendQuestStartDialog(env);
-                }
-            }
-        }
-        else if (qs == null || qs.getStatus() == QuestStatus.REWARD) {
-			if (targetId == 204369) {
-				if (env.getDialogId() == 10000) {
-					return sendQuestDialog(env, 5);
-				} else {
-					return sendQuestEndDialog(env);
+				switch (env.getDialog()) {
+					case START_DIALOG:
+						return sendQuestDialog(env, 1011);
+					case ACCEPT_QUEST_SIMPLE:
+					if (QuestService.startQuest(env)) {
+						qs = player.getQuestStateList().getQuestState(questId);
+					    qs.setQuestVarById(5, 1);
+						updateQuestStatus(env);
+				        return closeDialogWindow(env);
+					}
+					case REFUSE_QUEST_SIMPLE:
+				        return closeDialogWindow(env);
 				}
 			}
+		}
+        else if (qs.getStatus() == QuestStatus.START) {
+        	int var = qs.getQuestVarById(0);
+			switch (targetId) {
+				case 204369: {
+					switch (env.getDialog()) {
+						case START_DIALOG:
+                    	if (var == 1) {
+                    		return sendQuestDialog(env, 2375);
+                    	}
+                    	return sendQuestDialog(env, 1352);
+						case STEP_TO_1:
+					        qs.setQuestVarById(5, 0);
+						    qs.setQuestVarById(0, 0);
+            				updateQuestStatus(env);
+            				return closeDialogWindow(env);
+					    case SELECT_REWARD:
+        				    qs.setStatus(QuestStatus.REWARD);
+        				    updateQuestStatus(env);
+						    return sendQuestEndDialog(env);
+					}
+				}
+			}
+		}
+        else if (qs == null || qs.getStatus() == QuestStatus.REWARD) {
+			if (targetId == 204369) {
+				switch (env.getDialog()) {
+				case SELECT_REWARD:
+					return sendQuestDialog(env, 5);
+				default:
+					return sendQuestEndDialog(env);
+                }
+		    }
 		}
         return false;
     }
@@ -73,7 +106,7 @@ public class _26906Bloodscent_Of_Violent_Death extends QuestHandler {
 				case 231559:
                 if (qs.getQuestVarById(0) < 1) {
                     qs.setQuestVarById(0, qs.getQuestVarById(0) + 1);
-					qs.setStatus(QuestStatus.REWARD);
+                    qs.setQuestVarById(0, 1);
                     updateQuestStatus(env);
                     return true;
                 }

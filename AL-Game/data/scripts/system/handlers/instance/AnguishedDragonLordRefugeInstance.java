@@ -391,7 +391,7 @@ public class AnguishedDragonLordRefugeInstance extends GeneralInstanceHandler
 				        break;
 					}
 			    }
-				spawnAbbeyNobleBox();
+/* 				spawnAbbeyNobleBox(); */
 				spawnTiamatHugeTreasureCrate();
 			    killNpc(getNpcs(701502)); //Siel's Relic.
 				despawnNpc(getNpc(219489)); //God Kaisinel Tired.

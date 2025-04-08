@@ -30,7 +30,6 @@ import com.aionemu.gameserver.questEngine.model.QuestStatus;
 public class _2724MissingInAction extends QuestHandler {
 
 	private final static int questId = 2724;
-
 	public _2724MissingInAction() {
 		super(questId);
 	}
@@ -51,8 +50,8 @@ public class _2724MissingInAction extends QuestHandler {
 		if (env.getVisibleObject() instanceof Npc)
 			targetId = ((Npc) env.getVisibleObject()).getNpcId();
 		QuestState qs = player.getQuestStateList().getQuestState(questId);
-		if (targetId == 278002) {
-			if (qs == null || qs.getStatus() == QuestStatus.NONE) {
+		if (qs == null || qs.getStatus() == QuestStatus.NONE) {
+		    if (targetId == 278002) {
 				if (env.getDialog() == QuestDialog.START_DIALOG)
 					return sendQuestDialog(env, 1011);
 				else
@@ -92,6 +91,9 @@ public class _2724MissingInAction extends QuestHandler {
 					return sendQuestEndDialog(env);
 				}
 			}
+		    else if (qs != null && qs.getStatus() == QuestStatus.REWARD) {
+			     return sendQuestEndDialog(env);
+		    }
 		}
 		return false;
 	}

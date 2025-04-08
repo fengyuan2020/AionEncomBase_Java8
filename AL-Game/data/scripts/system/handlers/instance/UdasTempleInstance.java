@@ -121,14 +121,14 @@ public class UdasTempleInstance extends GeneralInstanceHandler
 			case 215783: //Nexus.
 				//sendMsg("[SUCCES]: You have finished <Udas Temple>");
 				spawn(730255, 508.3610f, 362.7170f, 137.0000f, (byte) 31); //Udas Temple Exit.
-				switch (Rnd.get(1, 2)) {
+/* 				switch (Rnd.get(1, 2)) {
 		            case 1:
 				        spawn(702658, 508.4381f, 374.57526f, 135.88919f, (byte) 30); //Abbey Box.
 					break;
 					case 2:
 					    spawn(702659, 508.4381f, 374.57526f, 135.88919f, (byte) 30); //Noble Abbey Box.
 					break;
-				}
+				} */
             break;
 			case 215787: //Cota The Gatekeeper.
 				//The Seal of Uniformity has been weakened.

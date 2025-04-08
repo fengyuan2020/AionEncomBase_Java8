@@ -48,7 +48,6 @@ public class _1876Taranis_Emergency_Orders extends QuestHandler {
 					case START_DIALOG: {
 						return sendQuestDialog(env, 4762);
 					}
-					case ACCEPT_QUEST:
 					case ACCEPT_QUEST_SIMPLE: {
 						return sendQuestStartDialog(env);
 					}

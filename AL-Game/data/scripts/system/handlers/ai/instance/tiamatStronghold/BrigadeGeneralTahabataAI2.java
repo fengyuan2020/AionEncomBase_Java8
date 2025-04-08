@@ -124,7 +124,7 @@ public class BrigadeGeneralTahabataAI2 extends AggressiveNpcAI2
 			deleteNpcs(p.getWorldMapInstance().getNpcs(283120));
 		}
 		sendMsg(1500717);
-		spawn(701541, 676.50964f, 1066.1975f, 497.75186f, (byte) 25); //Brigade General Tahabata Chest.
+/* 		spawn(701541, 676.50964f, 1066.1975f, 497.75186f, (byte) 25); //Brigade General Tahabata Chest. */
 		super.handleDied();
 		AI2Actions.deleteOwner(this);
 	}

@@ -171,9 +171,9 @@
 	        <spot x="686.653" y="1325.66" z="489.317" h="0"/>
         </spawn>
 	    <!-- Narkun The Loyal (NPC Normal lvl:60) -->
-        <spawn npc_id="800462">
+<!--         <spawn npc_id="800462">
 	        <spot x="1089.0542" y="1072.1359" z="786.2352" h="59"/>
-        </spawn>
+        </spawn> -->
 	    <!-- Elite Reian Fighter (NPC Normal lvl:60) -->
         <spawn npc_id="800463">
 	        <spot x="1038.82" y="1061.3" z="497.315" h="0"/>
@@ -339,10 +339,10 @@
 		<spawn npc_id="219379">
 			<spot x="1084.6" y="641.61" z="440.98566" walker_id="1AFA5BCD1B8914D3E9542F4CF3A1679DA5CB1879"/>
 			<spot x="1074.21" y="842.28" z="495.0493" walker_id="C744E810CE6BC052439FAEE215B723507E4EF9B1"/>
-			<spot x="1095.6788" y="771.12439" z="497.39438" h="31"/>
-			<spot x="1074.3159" y="668.15717" z="443"/>
+			<spot x="1095.6788" y="771.12439" z="495.04965" h="31"/>
+			<spot x="1074.3159" y="668.15717" z="441.03708"/>
 			<spot x="1091.46" y="662.28" z="440.99817" walker_id="020DE240E0C127E516939DE8521376EF394813FC"/>
-			<spot x="1076.7484" y="771.12439" z="497.39438" h="31"/>
+			<spot x="1076.7484" y="771.12439" z="495.04965" h="31"/>
 			<spot x="1094.94" y="783.13" z="495.04932" walker_id="95AAF1E677D89C94858FE1EFD8A7C60C37EFA88E" walker_index="1"/>
 		</spawn>
 		<!-- Terath Elite Commander -->
@@ -468,6 +468,19 @@
 		<!-- Laksyaka Elite Guard Captain -->
 		<spawn npc_id="219392">
 			<spot x="966.234" y="1319.16" z="496.012" h="0"/>
+		</spawn>
+		<!-- Captured Drakan Scientist -->
+		<spawn npc_id="800427">
+			<spot x="885.2" y="1248.2" z="397.42804" h="10"/>
+			<spot x="892.3" y="1264.1" z="397.42825" h="41"/>
+			<spot x="893.7" y="1382.82" z="397.4198"/>
+		</spawn>
+		<!-- Captured Drakan Scientist -->
+		<spawn npc_id="800425">
+			<spot x="882.38" y="1262.39" z="397.4198" h="6"/>
+			<spot x="883.52" y="1380.92" z="397.42822"/>
+			<spot x="898.92" y="1380.92" z="397.42816"/>
+			<spot x="899.18" y="1255.34" z="397.428" h="16"/>
 		</spawn>
 	</spawn_map>
 </spawns>

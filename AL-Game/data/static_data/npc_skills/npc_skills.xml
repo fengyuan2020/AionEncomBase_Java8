@@ -35463,7 +35463,6 @@
 		<npcskill probability="70" skilllevel="1" skillid="20730"/>
 		<npcskill probability="70" skilllevel="1" skillid="20731"/>
 		<npcskill probability="70" skilllevel="1" skillid="20865"/>
-		<npcskill probability="70" skilllevel="1" skillid="20952"/>
     </npcskills>
 	<!-- Adjudant Anuhart -->
 	<npcskills npcid="219357">

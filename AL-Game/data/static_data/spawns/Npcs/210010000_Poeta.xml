@@ -991,7 +991,7 @@
     <spawn npc_id="211822" pool="1" respawn_time="1200">
       <spot x="264.000000" y="1043.000000" z="127.22676" h="25" random_walk="0" />
       <spot x="256.000000" y="1025.000000" z="120.875854" h="25" random_walk="0" />
-      <spot x="235.880005" y="992.880005" z="130.5844" h="25" random_walk="0" />
+      <spot x="235.880005" y="992.880005" z="124.79556" h="25" random_walk="0" />
     </spawn>
     <spawn npc_id="203077" respawn_time="60">
       <spot x="562.394897" y="1390.207275" z="116.82195" h="30" walker_id="LF1_3_NpcPath_Nier" walker_index="0" />

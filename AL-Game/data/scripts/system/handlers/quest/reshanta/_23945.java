@@ -13,7 +13,6 @@
 package quest.reshanta;
 
 import com.aionemu.gameserver.model.gameobjects.player.Player;
-import com.aionemu.gameserver.network.aion.serverpackets.SM_DIALOG_WINDOW;
 import com.aionemu.gameserver.questEngine.handlers.QuestHandler;
 import com.aionemu.gameserver.questEngine.model.QuestDialog;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
@@ -50,8 +49,7 @@ public class _23945 extends QuestHandler {
 				switch (env.getDialog()) {
 					case START_DIALOG: {
 						return sendQuestDialog(env, 4762);
-					} case ACCEPT_QUEST:
-					case ACCEPT_QUEST_SIMPLE: {
+					} case ACCEPT_QUEST_SIMPLE: {
 						return sendQuestStartDialog(env);
 					} case REFUSE_QUEST_SIMPLE: {
 				        return closeDialogWindow(env);

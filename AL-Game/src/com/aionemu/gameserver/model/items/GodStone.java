@@ -53,6 +53,8 @@ public class GodStone extends ItemStone {
     
     private ActionObserver actionListener;
     private boolean breakProc;
+    private int triggerCounter = 0;    
+    private volatile boolean isProcessingAttack = false;
 
     public GodStone(int itemObjId, int itemId, PersistentState persistentState) {
         super(itemObjId, itemId, 0, persistentState);
@@ -76,10 +78,20 @@ public class GodStone extends ItemStone {
 
     private void validateGodstoneInfo() {
         if (godstoneInfo != null) {
-            if (godstoneInfo.getProbability() < 0 || godstoneInfo.getProbability() > 1000 || 
-                godstoneInfo.getProbabilityleft() < 0 || godstoneInfo.getProbabilityleft() > 1000) {
-                throw new IllegalArgumentException("概率值必须在0-1000之间");
+            // 双手武器只需要检查主手概率
+            if (godItem.isTwoHandWeapon()) {
+                if (godstoneInfo.getProbability() < 0 || godstoneInfo.getProbability() > 1000) {
+                    throw new IllegalArgumentException("双手武器概率值必须在0-1000之间");
+                }
+            } 
+            // 非双手武器检查主副手概率
+            else {
+                if (godstoneInfo.getProbability() < 0 || godstoneInfo.getProbability() > 1000 || 
+                    godstoneInfo.getProbabilityleft() < 0 || godstoneInfo.getProbabilityleft() > 1000) {
+                    throw new IllegalArgumentException("概率值必须在0-1000之间");
+                }
             }
+            
             if (godstoneInfo.getBreakprob() > 1000) {
                 throw new IllegalArgumentException("损坏概率值不能超过1000");
             }
@@ -111,6 +123,10 @@ public class GodStone extends ItemStone {
     }
 
     private int calculateHandProbability(Item equippedItem) {
+        // 双手武器总是使用主手概率
+        if (equippedItem.getItemTemplate().isTwoHandWeapon()) {
+            return probability;
+        }
         boolean isMainHand = equippedItem.getEquipmentSlot() == ItemSlot.MAIN_HAND.getSlotIdMask();
         return isMainHand ? probability : probabilityLeft;
     }
@@ -130,38 +146,75 @@ public class GodStone extends ItemStone {
         };
         player.getObserveController().addObserver(actionListener);
     }
-
+    
     private void handleAttack(Player player, Creature creature, Item equippedItem,
                             int handProbability, float breakChance) {
-        boolean shouldTrigger = checkTriggerCondition(handProbability);
-        boolean shouldBreak = checkBreakCondition(breakChance);
-
-        if (shouldTrigger) {
-            triggerSkillEffect(player, creature);
+        // 所有武器类型都使用同步锁防止重复触发
+        synchronized (this) {
+            if (isProcessingAttack) {
+                return;
+            }
+            isProcessingAttack = true;
         }
-
-        if (shouldBreak) {
-            handleItemBreak(player, equippedItem);
+        
+        try {
+            boolean shouldTrigger = checkTriggerCondition(handProbability);
+            boolean shouldBreak = checkBreakCondition(breakChance);
+    
+            if (shouldTrigger) {
+                // 创建技能并检查是否可以使用（包括距离检查）
+                Skill skill = createSkill(player, creature);
+                
+                // 只有当技能可以使用时才发送提示和应用效果
+                if (skill.canUseSkill()) {
+                    // 发送技能触发提示
+                    notifySkillTrigger(player, skill);
+                    
+                    // 应用技能效果
+                    Effect effect = new Effect(
+                        player, creature, skill.getSkillTemplate(), 1, 0, godItem
+                    );
+                    effect.initialize();
+                    effect.applyEffect();
+                }
+            }
+    
+            if (shouldBreak) {
+                handleItemBreak(player, equippedItem);
+            }
+        } finally {
+            synchronized (this) {
+                isProcessingAttack = false;
+            }
         }
     }
 
+    private void triggerSkillEffect(Player player, Creature creature) {
+        // 此方法不再使用
+    }
+
     private boolean checkTriggerCondition(int handProbability) {
-        return Rnd.get(0, 1000) <= handProbability;
+        // 将概率值转换为0-1之间的浮点数
+        float baseProbability = handProbability / 1000f;
+        
+        // PRD算法核心：实际概率 = 基础概率 * (计数器+1)
+        float actualProbability = baseProbability * (triggerCounter + 1);
+        
+        // 随机判断是否触发
+        boolean triggered = Rnd.get(0, 1000) <= (int)(actualProbability * 1000);
+        
+        if (triggered) {
+            triggerCounter = 0; // 触发后重置计数器
+        } else {
+            triggerCounter++;   // 未触发时增加计数器
+        }
+        return triggered;
     }
 
     private boolean checkBreakCondition(float breakChance) {
         return godstoneInfo.getBreakable() && 
                !breakProc && 
                Rnd.get(1000) < (int)(breakChance * 1000);
-    }
-
-    private void triggerSkillEffect(Player player, Creature creature) {
-        Skill skill = createSkill(player, creature);
-        notifySkillTrigger(player, skill);
-        
-        if (skill.canUseSkill()) {
-            applySkillEffect(player, creature, skill);
-        }
     }
 
     private Skill createSkill(Player player, Creature creature) {

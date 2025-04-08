@@ -23,7 +23,6 @@ import com.aionemu.gameserver.questEngine.model.QuestDialog;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
-import com.aionemu.gameserver.services.QuestService;
 
 /**
  * @author Hilgert
@@ -55,16 +54,12 @@ public class _1725CenturionsForgetfulness extends QuestHandler {
 				if (env.getDialog() == QuestDialog.START_DIALOG) {
 					return sendQuestDialog(env, 1011);
 				}
-				else if (env.getDialogId() == 1002) {
-					if (QuestService.startQuest(env)) {
-						if (giveQuestItem(env, 182202153, 1))
-							return sendQuestDialog(env, 1003);
-						else
-							return true;
-					}
+				else if (env.getDialogId() == 1007) {
+					return sendQuestDialog(env, 4);
 				}
-				else
-					return sendQuestStartDialog(env);
+				else if (env.getDialogId() == 1002) {
+					return sendQuestStartDialog(env, 182202153, 1);
+				}
 			}
 		}
 		else if (qs.getStatus() == QuestStatus.START) {

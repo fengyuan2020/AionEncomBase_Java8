@@ -30,13 +30,8 @@ public class _2888Trade_Goods_Needed extends QuestHandler {
 		super(questId);
 	}
 	
-	@Override
-	public boolean onLvlUpEvent(QuestEnv env) {
-		return defaultOnLvlUpEvent(env);
-	}
-	
 	public void register() {
-		qe.registerOnLevelUp(questId);
+		qe.registerQuestNpc(278151).addOnQuestStart(questId); //Ickulnerk.
 		qe.registerQuestNpc(278086).addOnTalkEvent(questId); //Sinjah.
 		qe.registerQuestNpc(278085).addOnTalkEvent(questId); //Durin.
 		qe.registerQuestNpc(278151).addOnTalkEvent(questId); //Ickulnerk.
@@ -47,14 +42,25 @@ public class _2888Trade_Goods_Needed extends QuestHandler {
 		final Player player = env.getPlayer();
 		int targetId = env.getTargetId();
 		final QuestState qs = player.getQuestStateList().getQuestState(questId);
-		int var = qs.getQuestVarById(0);
+		if (qs == null || qs.getStatus() == QuestStatus.NONE) {
+			if (targetId == 278151) { //Ickulnerk.
+				switch (env.getDialog()) {
+					case START_DIALOG: {
+						return sendQuestDialog(env, 4762);
+					} default:
+					    return sendQuestStartDialog(env);
+				}
+			}
+        }
 		if (qs == null || qs.getStatus() == QuestStatus.START) {
+		int var = qs.getQuestVarById(0);
 			if (targetId == 278086) { //Sinjah.
 				switch (env.getDialog()) {
 					case START_DIALOG: {
 						return sendQuestDialog(env, 1011);
 					} case STEP_TO_1: {
-                        return defaultCloseDialog(env, 0, 1);
+						changeQuestStep(env, 0, 1, false);
+						return closeDialogWindow(env);
                     }
 				}
 			} if (targetId == 278151) { //Ickulnerk.

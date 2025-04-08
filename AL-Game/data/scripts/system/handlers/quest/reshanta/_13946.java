@@ -26,7 +26,6 @@ import com.aionemu.gameserver.questEngine.model.QuestStatus;
 public class _13946 extends QuestHandler {
 
     private final static int questId = 13946;
-	private final static int[] Ab11011Boss = {885020};
     public _13946() {
         super(questId);
     }
@@ -34,9 +33,7 @@ public class _13946 extends QuestHandler {
     public void register() {
         qe.registerQuestNpc(835722).addOnQuestStart(questId);
         qe.registerQuestNpc(835722).addOnTalkEvent(questId);
-		for (int mob: Ab11011Boss) {
-			qe.registerQuestNpc(mob).addOnKillEvent(questId);
-		}
+		qe.registerQuestNpc(885020).addOnKillEvent(questId);
     }
 	
     @Override
