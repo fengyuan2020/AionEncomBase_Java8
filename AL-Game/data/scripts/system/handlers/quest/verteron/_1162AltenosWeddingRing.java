@@ -27,7 +27,7 @@ import com.aionemu.gameserver.questEngine.model.QuestStatus;
 import com.aionemu.gameserver.services.QuestService;
 
 /**
- * @author Balthazar. redone DainAvenger. know problem both npc has reward windows
+ * @author Balthazar. redone DainAvenger
  */
 public class _1162AltenosWeddingRing extends QuestHandler {
 
@@ -66,15 +66,13 @@ public class _1162AltenosWeddingRing extends QuestHandler {
 			switch (targetId) {
 				case 700005: {
 					switch (env.getDialog()) {
-						case USE_OBJECT: {
-						return sendQuestDialog(env, 3739);
-							}
-							case STEP_TO_1: {
-							if (player.getInventory().getItemCountByItemId(182200563) == 0) {
-								giveQuestItem(env, 182200563, 1);
-							    changeQuestStep(env, 0, 1, false);
-						        return closeDialogWindow(env);
-							}
+						case USE_OBJECT:
+						    return sendQuestDialog(env, 3739);
+						case STEP_TO_1:
+						if (player.getInventory().getItemCountByItemId(182200563) == 0) {
+							giveQuestItem(env, 182200563, 1);
+							changeQuestStep(env, 0, 1, false);
+						    return closeDialogWindow(env);
 						}
 					}
 				}
@@ -92,7 +90,7 @@ public class _1162AltenosWeddingRing extends QuestHandler {
                        return sendQuestDialog(env, 1693);
                     }
 					case STEP_TO_2:
-					    return sendQuestDialog(env, 1693);
+						return closeDialogWindow(env);
 				}
 			    case 203093:
                 switch (env.getDialog()) {
@@ -109,18 +107,18 @@ public class _1162AltenosWeddingRing extends QuestHandler {
                        return sendQuestDialog(env, 2375);
                     }
 					case STEP_TO_2:
-					    return sendQuestDialog(env, 2375);
+						return closeDialogWindow(env);
 			    }
 	        }
         }
         else if (qs == null || qs.getStatus() == QuestStatus.REWARD) {
-            if (targetId == 203095) {
+            if (targetId == 203095 && qs.getQuestVarById(0) == 1) {
 				if (env.getDialogId() == 1009) {
 					return sendQuestDialog(env, 5);
 			    } else
 					return sendQuestEndDialog(env, rewardId);
 			}
-			if (targetId == 203093) {
+			if (targetId == 203093 && qs.getQuestVarById(0) == 11) {
 				if (env.getDialogId() == 1009) {
 					return sendQuestDialog(env, 6);
 				} else

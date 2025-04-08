@@ -30,13 +30,8 @@ public class _1888In_Need_Of_Goods extends QuestHandler {
 		super(questId);
 	}
 	
-	@Override
-	public boolean onLvlUpEvent(QuestEnv env) {
-		return defaultOnLvlUpEvent(env);
-	}
-	
 	public void register() {
-		qe.registerOnLevelUp(questId);
+		qe.registerQuestNpc(278651).addOnQuestStart(questId); //Aurunerk.
 		qe.registerQuestNpc(278591).addOnTalkEvent(questId); //Deidamia.
 		qe.registerQuestNpc(278578).addOnTalkEvent(questId); //Ineias.
 		qe.registerQuestNpc(278651).addOnTalkEvent(questId); //Aurunerk.
@@ -47,14 +42,25 @@ public class _1888In_Need_Of_Goods extends QuestHandler {
 		final Player player = env.getPlayer();
 		int targetId = env.getTargetId();
 		final QuestState qs = player.getQuestStateList().getQuestState(questId);
-		int var = qs.getQuestVarById(0);
+		if (qs == null || qs.getStatus() == QuestStatus.NONE) {
+			if (targetId == 278651) { //Aurunerk.
+				switch (env.getDialog()) {
+					case START_DIALOG: {
+						return sendQuestDialog(env, 4762);
+					} default:
+					    return sendQuestStartDialog(env);
+				}
+			}
+        }
 		if (qs == null || qs.getStatus() == QuestStatus.START) {
+		int var = qs.getQuestVarById(0);
 			if (targetId == 278591) { //Deidamia.
 				switch (env.getDialog()) {
 					case START_DIALOG: {
 						return sendQuestDialog(env, 1011);
 					} case STEP_TO_1: {
-                        return defaultCloseDialog(env, 0, 1);
+						changeQuestStep(env, 0, 1, false);
+						return closeDialogWindow(env);
                     }
 				}
 			} if (targetId == 278651) { //Aurunerk.

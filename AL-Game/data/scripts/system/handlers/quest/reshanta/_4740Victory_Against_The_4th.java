@@ -46,15 +46,13 @@ public class _4740Victory_Against_The_4th extends QuestHandler {
 	@Override
 	public boolean onDialogEvent(QuestEnv env) {
 		final Player player = env.getPlayer();
-		int targetId = env.getTargetId();
 		final QuestState qs = player.getQuestStateList().getQuestState(questId);
-		if (env.getTargetId() == 278035) { //Konto.
-			if (qs == null || qs.getStatus() == QuestStatus.NONE) {
+		if (qs == null || qs.getStatus() == QuestStatus.NONE) {
+		    if (env.getTargetId() == 278035) { //Konto.
 			    switch (env.getDialog()) {
 					case START_DIALOG: {
 						return sendQuestDialog(env, 4762);
 					}
-					case ACCEPT_QUEST:
 					case ACCEPT_QUEST_SIMPLE: {
 						return sendQuestStartDialog(env);
 					}
@@ -64,7 +62,7 @@ public class _4740Victory_Against_The_4th extends QuestHandler {
 				}
 			} 
             if (qs == null || qs.getStatus() == QuestStatus.REWARD) {
-				if (targetId == 278035) { //Konto.
+				if (env.getTargetId() == 278035) { //Konto.
 				    if (env.getDialog() == QuestDialog.START_DIALOG) {
 						return sendQuestDialog(env, 10002);
 					} else if (env.getDialog() == QuestDialog.SELECT_REWARD) {

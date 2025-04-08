@@ -32,11 +32,8 @@ public class _19900 extends QuestHandler {
 	
 	@Override
 	public void register() {
-		int[] npcs = {836073};
-        for (int npc: npcs) {
-            qe.registerQuestNpc(npc).addOnTalkEvent(questId);
-        }
 		qe.registerOnLevelUp(questId);
+        qe.registerQuestNpc(836073).addOnTalkEvent(questId);
 		qe.registerQuestNpc(836073).addOnAtDistanceEvent(questId);
 	}
 	

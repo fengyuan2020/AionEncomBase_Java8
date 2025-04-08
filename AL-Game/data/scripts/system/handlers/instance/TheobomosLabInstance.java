@@ -255,14 +255,14 @@ public class TheobomosLabInstance extends GeneralInstanceHandler
 			break;
 			case 237251: //Corrupted Ifrit.
 			    //sendMsg("Congratulation]: you finish <Theobomos Lab>");
-				switch (Rnd.get(1, 2)) {
+/* 				switch (Rnd.get(1, 2)) {
 		            case 1:
 				        spawn(702658, 602.04486f, 488.82837f, 196.01512f, (byte) 60); //Abbey Box.
 					break;
 					case 2:
 					    spawn(702659, 602.04486f, 488.82837f, 196.01512f, (byte) 60); //Noble Abbey Box.
 					break;
-				}
+				} */
 				spawn(730178, 637.3241f, 475.9548f, 195.96295f, (byte) 0, 244); //Unstable Exit Fragment.
 			break;
 		}

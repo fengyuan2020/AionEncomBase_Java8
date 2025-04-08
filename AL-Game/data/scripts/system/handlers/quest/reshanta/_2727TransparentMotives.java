@@ -48,8 +48,8 @@ public class _2727TransparentMotives extends QuestHandler {
 		if (env.getVisibleObject() instanceof Npc)
 			targetId = ((Npc) env.getVisibleObject()).getNpcId();
 		QuestState qs = player.getQuestStateList().getQuestState(questId);
-		if (targetId == 278003) {
-			if (qs == null || qs.getStatus() == QuestStatus.NONE) {
+		if (qs == null || qs.getStatus() == QuestStatus.NONE) {
+		    if (targetId == 278003) {
 				if (env.getDialog() == QuestDialog.START_DIALOG)
 					return sendQuestDialog(env, 1011);
 				else
@@ -70,8 +70,8 @@ public class _2727TransparentMotives extends QuestHandler {
 		else if (targetId == 278013) {
 			if (qs != null && qs.getStatus() == QuestStatus.START && qs.getQuestVarById(0) == 1) {
 				if (env.getDialog() == QuestDialog.START_DIALOG)
-					return sendQuestDialog(env, 1352);
-				else if (env.getDialog() == QuestDialog.STEP_TO_1) {
+					return sendQuestDialog(env, 1693);
+				else if (env.getDialog() == QuestDialog.STEP_TO_2) {
 					qs.setQuestVarById(0, qs.getQuestVarById(0) + 1);
 					updateQuestStatus(env);
 					return closeDialogWindow(env);
@@ -79,8 +79,8 @@ public class _2727TransparentMotives extends QuestHandler {
 			}
 		}
 		else if (targetId == 278102) {
-			if (qs != null) {
-				if (env.getDialog() == QuestDialog.START_DIALOG && qs.getStatus() == QuestStatus.START)
+			if (qs != null && qs.getStatus() == QuestStatus.START && qs.getQuestVarById(0) == 2) {
+				if (env.getDialog() == QuestDialog.START_DIALOG)
 					return sendQuestDialog(env, 2375);
 				else if (env.getDialogId() == 1009) {
 					qs.setQuestVar(2);
@@ -88,6 +88,9 @@ public class _2727TransparentMotives extends QuestHandler {
 					updateQuestStatus(env);
 					return sendQuestEndDialog(env);
 				}
+			}
+			else if (qs != null && qs.getStatus() == QuestStatus.REWARD) {
+				 return sendQuestEndDialog(env);
 			}
 		}
 		return false;

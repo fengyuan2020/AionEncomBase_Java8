@@ -92,7 +92,7 @@ public class _2721MeetingWithTheBrigadeGeneral extends QuestHandler {
 				}
 			}
 			else if (qs != null && qs.getStatus() == QuestStatus.REWARD) {
-				return sendQuestEndDialog(env);
+				 return sendQuestEndDialog(env);
 			}
 		}
 		return false;

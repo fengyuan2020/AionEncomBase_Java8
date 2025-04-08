@@ -49,7 +49,6 @@ public class _30515Reian_Whereabouts extends QuestHandler {
 					case START_DIALOG: {
 						return sendQuestDialog(env, 4762);
 					}
-					case ACCEPT_QUEST:
 					case ACCEPT_QUEST_SIMPLE:
 						return sendQuestStartDialog(env);
 					case REFUSE_QUEST_SIMPLE:

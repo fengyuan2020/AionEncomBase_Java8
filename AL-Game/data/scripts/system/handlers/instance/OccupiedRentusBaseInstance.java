@@ -167,14 +167,14 @@ public class OccupiedRentusBaseInstance extends GeneralInstanceHandler
 			return;
 		} switch (npc.getObjectTemplate().getTemplateId()) {
 			case 236300: //Brigade General Vasharti.
-				switch (Rnd.get(1, 2)) {
+/* 				switch (Rnd.get(1, 2)) {
 		            case 1:
 				        spawn(702658, 184.69116f, 414.00864f, 260.75488f, (byte) 59); //Abbey Box.
 					break;
 					case 2:
 					    spawn(702659, 184.69116f, 414.00864f, 260.75488f, (byte) 59); //Noble Abbey Box.
 					break;
-				}
+				} */
 				boostMorale();
 				sendMovie(player, 481);
 				reianOccupiedSecureBridge();

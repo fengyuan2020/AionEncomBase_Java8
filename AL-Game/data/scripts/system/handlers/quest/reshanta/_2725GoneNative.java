@@ -46,8 +46,8 @@ public class _2725GoneNative extends QuestHandler {
 		if (env.getVisibleObject() instanceof Npc)
 			targetId = ((Npc) env.getVisibleObject()).getNpcId();
 		QuestState qs = player.getQuestStateList().getQuestState(questId);
-		if (targetId == 278003) {
-			if (qs == null || qs.getStatus() == QuestStatus.NONE) {
+		if (qs == null || qs.getStatus() == QuestStatus.NONE) {
+		    if (targetId == 278003) {
 				if (env.getDialog() == QuestDialog.START_DIALOG)
 					return sendQuestDialog(env, 1011);
 				else

@@ -18,13 +18,11 @@ package quest.reshanta;
 
 import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
-import com.aionemu.gameserver.network.aion.serverpackets.SM_DIALOG_WINDOW;
 import com.aionemu.gameserver.questEngine.handlers.QuestHandler;
 import com.aionemu.gameserver.questEngine.model.QuestDialog;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
-import com.aionemu.gameserver.utils.PacketSendUtility;
 
 /**
  * @author Rhys2002
@@ -33,7 +31,6 @@ public class _1722RastinsHomesickness extends QuestHandler {
 
 	private final static int questId = 1722;
 	private final static int[] npc_ids = { 278547, 278560, 278517, 278544, 278532, 278539, 278524, 278555, 278567 };
-
 	public _1722RastinsHomesickness() {
 		super(questId);
 	}
@@ -52,8 +49,8 @@ public class _1722RastinsHomesickness extends QuestHandler {
 		if (env.getVisibleObject() instanceof Npc)
 			targetId = ((Npc) env.getVisibleObject()).getNpcId();
 		QuestState qs = player.getQuestStateList().getQuestState(questId);
-		if (targetId == 278547) {
-			if (qs == null || qs.getStatus() == QuestStatus.NONE) {
+		if (qs == null || qs.getStatus() == QuestStatus.NONE) {
+		    if (targetId == 278547) {
 				if (env.getDialog() == QuestDialog.START_DIALOG)
 					return sendQuestDialog(env, 4762);
 				else
@@ -62,16 +59,13 @@ public class _1722RastinsHomesickness extends QuestHandler {
 		}
 		if (qs == null)
 			return false;
-
-		int var = qs.getQuestVarById(0);
 		if (qs.getStatus() == QuestStatus.REWARD) {
 			if (targetId == 278547)
 				removeQuestItem(env, 182202101, 1);
 			return sendQuestEndDialog(env);
 		}
-		else if (qs.getStatus() != QuestStatus.START) {
-			return false;
-		}
+		else if (qs.getStatus() == QuestStatus.START) {
+		int var = qs.getQuestVarById(0);
 		if (targetId == 278560) {
 			switch (env.getDialog()) {
 				case START_DIALOG:
@@ -81,10 +75,8 @@ public class _1722RastinsHomesickness extends QuestHandler {
 					if (var == 0) {
 						qs.setQuestVarById(0, var + 1);
 						updateQuestStatus(env);
-						PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
-						return true;
+            		    return closeDialogWindow(env);
 					}
-					return false;
 			}
 		}
 		else if (targetId == 278517) {
@@ -96,10 +88,8 @@ public class _1722RastinsHomesickness extends QuestHandler {
 					if (var == 1) {
 						qs.setQuestVarById(0, var + 1);
 						updateQuestStatus(env);
-						PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
-						return true;
+            		    return closeDialogWindow(env);
 					}
-					return false;
 			}
 		}
 		else if (targetId == 278544) {
@@ -111,10 +101,8 @@ public class _1722RastinsHomesickness extends QuestHandler {
 					if (var == 2) {
 						qs.setQuestVarById(0, var + 1);
 						updateQuestStatus(env);
-						PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
-						return true;
+            		    return closeDialogWindow(env);
 					}
-					return false;
 			}
 		}
 		else if (targetId == 278532) {
@@ -126,10 +114,8 @@ public class _1722RastinsHomesickness extends QuestHandler {
 					if (var == 3) {
 						qs.setQuestVarById(0, var + 1);
 						updateQuestStatus(env);
-						PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
-						return true;
+            		    return closeDialogWindow(env);
 					}
-					return false;
 			}
 		}
 		else if (targetId == 278539) {
@@ -141,10 +127,8 @@ public class _1722RastinsHomesickness extends QuestHandler {
 					if (var == 4) {
 						qs.setQuestVarById(0, var + 1);
 						updateQuestStatus(env);
-						PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
-						return true;
+            		    return closeDialogWindow(env);
 					}
-					return false;
 			}
 		}
 		else if (targetId == 278524) {
@@ -156,10 +140,8 @@ public class _1722RastinsHomesickness extends QuestHandler {
 					if (var == 5) {
 						qs.setQuestVarById(0, var + 1);
 						updateQuestStatus(env);
-						PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
-						return true;
+            		    return closeDialogWindow(env);
 					}
-					return false;
 			}
 		}
 		else if (targetId == 278555) {
@@ -171,10 +153,8 @@ public class _1722RastinsHomesickness extends QuestHandler {
 					if (var == 6) {
 						qs.setQuestVarById(0, var + 1);
 						updateQuestStatus(env);
-						PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
-						return true;
+            		    return closeDialogWindow(env);
 					}
-					return false;
 			}
 		}
 		else if (targetId == 278567) {
@@ -184,15 +164,13 @@ public class _1722RastinsHomesickness extends QuestHandler {
 						return sendQuestDialog(env, 3398);
 				case SET_REWARD:
 					if (var == 7) {
-						if (!giveQuestItem(env, 182202101, 1))
-							return true;
+						giveQuestItem(env, 182202101, 1);
 						qs.setStatus(QuestStatus.REWARD);
 						updateQuestStatus(env);
-						PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
-						return true;
+            		    return closeDialogWindow(env);
 					}
-					return false;
-			}
+			   }
+		    }
 		}
 		return false;
 	}

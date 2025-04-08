@@ -35,8 +35,6 @@ public class _30564Reian_Final_Hope extends QuestHandler {
         qe.registerQuestNpc(799670).addOnTalkEvent(questId);
 		qe.registerQuestNpc(217310).addOnKillEvent(questId);
 		qe.registerQuestNpc(217317).addOnKillEvent(questId);
-		qe.registerQuestNpc(236297).addOnKillEvent(questId);
-		qe.registerQuestNpc(236302).addOnKillEvent(questId);
     }
 	
     @Override
@@ -52,20 +50,10 @@ public class _30564Reian_Final_Hope extends QuestHandler {
                     return sendQuestStartDialog(env);
                 }
             }
-        } else if (qs.getStatus() == QuestStatus.START) {
-            if (targetId == 799670) {
-                if (env.getDialog() == QuestDialog.START_DIALOG) {
-                    if (qs.getQuestVarById(0) == 1) {
-                        return sendQuestDialog(env, 2375);
-                    }
-                } if (env.getDialog() == QuestDialog.SELECT_REWARD) {
-                    changeQuestStep(env, 1, 2, true);
-                    return sendQuestEndDialog(env);
-                }
-			}
-        } else if (qs == null || qs.getStatus() == QuestStatus.REWARD) {
+        }
+        else if (qs == null || qs.getStatus() == QuestStatus.REWARD) {
 			if (targetId == 799670) {
-				if (env.getDialogId() == 1352) {
+				if (env.getDialogId() == 10002) {
 					return sendQuestDialog(env, 5);
 				} else {
 					return sendQuestEndDialog(env);
@@ -79,18 +67,15 @@ public class _30564Reian_Final_Hope extends QuestHandler {
         Player player = env.getPlayer();
         QuestState qs = player.getQuestStateList().getQuestState(questId);
         if (qs != null && qs.getStatus() == QuestStatus.START) {
-            switch (env.getTargetId()) {
-                case 217310:
-				case 217317:
-				case 236297:
-				case 236302:
-                if (qs.getQuestVarById(0) < 1) {
-                    qs.setQuestVarById(0, qs.getQuestVarById(0) + 1);
-                    qs.setStatus(QuestStatus.REWARD);
+			if (defaultOnKillEvent(env, 217310, 0, 1, 1) || defaultOnKillEvent(env, 217317, 0, 1, 2)) {
+				int var1 = qs.getQuestVarById(1);
+				int var2 = qs.getQuestVarById(2);
+				if (var1 == 1 && var2 == 1) {
+					qs.setQuestVarById(0, 1);
+					qs.setStatus(QuestStatus.REWARD);
 					updateQuestStatus(env);
-                    return true;
-                }
-            }
+				}
+			}
         }
         return false;
     }

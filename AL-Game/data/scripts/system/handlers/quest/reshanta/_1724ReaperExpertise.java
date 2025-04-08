@@ -49,18 +49,16 @@ public class _1724ReaperExpertise extends QuestHandler {
 		QuestState qs = player.getQuestStateList().getQuestState(questId);
 		if (env.getVisibleObject() instanceof Npc)
 			targetId = ((Npc) env.getVisibleObject()).getNpcId();
-		if (targetId == 278519) {
-			if (qs == null || qs.getStatus() == QuestStatus.NONE) {
+		if (qs == null || qs.getStatus() == QuestStatus.NONE) {
+		    if (targetId == 278519) {
 				if (env.getDialog() == QuestDialog.START_DIALOG)
 					return sendQuestDialog(env, 1011);
-				else if (env.getDialogId() == 1003) {
-					if (giveQuestItem(env, 182203131, 1))
-						return sendQuestStartDialog(env);
-					else
-						return true;
+				else if (env.getDialogId() == 1007) {
+					return sendQuestDialog(env, 4);
 				}
-				else
-					return sendQuestStartDialog(env);
+				else if (env.getDialogId() == 1002) {
+					return sendQuestStartDialog(env, 182203131, 1);
+				}
 			}
 		}
 		else if (qs != null && qs.getStatus() == QuestStatus.START) {

@@ -21,7 +21,7 @@ import com.aionemu.gameserver.questEngine.model.QuestStatus;
 import com.aionemu.gameserver.services.QuestService;
 
 /****/
-/** Author Ghostfur & Unknown (Aion-Unique). correct DainAvenger
+/** Author Ghostfur & Unknown (Aion-Unique). correct DainAvenger.
 /****/
 
 public class _26908Blast_It_Neritra_Im_A_Researcher extends QuestHandler {

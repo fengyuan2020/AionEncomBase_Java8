@@ -32,7 +32,7 @@ public class _30566Recapture_Rentus_Base extends QuestHandler {
 	
     public void register() {
         qe.registerQuestNpc(804879).addOnQuestStart(questId);
-        qe.registerQuestNpc(799670).addOnTalkEvent(questId);
+        qe.registerQuestNpc(805235).addOnTalkEvent(questId);
 		qe.registerQuestNpc(217313).addOnKillEvent(questId);
 		qe.registerQuestNpc(236300).addOnKillEvent(questId);
     }
@@ -52,7 +52,7 @@ public class _30566Recapture_Rentus_Base extends QuestHandler {
             }
         }
         else if (qs == null || qs.getStatus() == QuestStatus.REWARD) {
-			if (targetId == 799670) {
+			if (targetId == 805235) {
 				if (env.getDialogId() == 1352) {
 					return sendQuestDialog(env, 5);
 				} else {

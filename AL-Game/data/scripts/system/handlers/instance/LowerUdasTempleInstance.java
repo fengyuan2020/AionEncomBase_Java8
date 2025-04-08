@@ -96,14 +96,14 @@ public class LowerUdasTempleInstance extends GeneralInstanceHandler
 			case 215795: //Debilkarim The Maker.
 			    chestUdasTempleTask.cancel(true);
 				//sendMsg("[SUCCES]: You have finished <Lower Udas Temple>");
-				switch (Rnd.get(1, 2)) {
+/* 				switch (Rnd.get(1, 2)) {
 		            case 1:
 				        spawn(702658, 575.1232f, 1295.7212f, 187.85898f, (byte) 113); //Abbey Box.
 					break;
 					case 2:
 					    spawn(702659, 575.1232f, 1295.7212f, 187.85898f, (byte) 113); //Noble Abbey Box.
 					break;
-				}
+				} */
 				instance.doOnAllPlayers(new Visitor<Player>() {
 			        @Override
 			        public void visit(Player player) {

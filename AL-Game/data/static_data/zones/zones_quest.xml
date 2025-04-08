@@ -195,7 +195,7 @@
         <sphere x="1478" y="68" z="206.625" r="10.0"/>
     </zone>
     <zone mapid="220080000" name="DF5_ITEMUSEAREA_Q25023" area_type="SPHERE" zone_type="ITEM_USE">
-        <sphere x="2223.106" y="2145.1606" z="325.05246" r="15.0"/>
+        <sphere x="2196.2678" y="2170.6733" z="324.18994" r="15.0"/>
     </zone>
 	<!-- Archives Of Eternity 5.0 -->
 	<zone mapid="301540000" name="IDETERNITY_01_Q16800_301540000" area_type="SPHERE" zone_type="SUB">

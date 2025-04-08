@@ -215,14 +215,14 @@ public class AdmaStrongholdInstance extends GeneralInstanceHandler
             break;
 			case 237239: //Death Reaper.
 				//sendMsg("[SUCCES]: You have finished <Adma Stronghold>");
-				switch (Rnd.get(1, 2)) {
+/* 				switch (Rnd.get(1, 2)) {
 		            case 1:
 				        spawn(702658, 614.9905f, 745.60156f, 198.75998f, (byte) 60); //Abbey Box.
 					break;
 					case 2:
 					    spawn(702659, 614.9905f, 745.60156f, 198.75998f, (byte) 60); //Noble Abbey Box.
 					break;
-				}
+				} */
 				SpawnTemplate wreckOfUnstableExit = SpawnEngine.addNewSingleTimeSpawn(320130000, 730176, 627.72888f, 745.44885f, 199.8019f, (byte) 0);
 			    wreckOfUnstableExit.setEntityId(66);
 			    objects.put(730176, SpawnEngine.spawnObject(wreckOfUnstableExit, instanceId));
