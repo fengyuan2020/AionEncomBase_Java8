@@ -22,7 +22,6 @@ import com.aionemu.gameserver.questEngine.model.QuestDialog;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
-import com.aionemu.gameserver.services.QuestService;
 
 public class _19000ExpertEssencetappersTest extends QuestHandler {
 
@@ -33,27 +32,11 @@ public class _19000ExpertEssencetappersTest extends QuestHandler {
 	
 	@Override
 	public void register() {
-		qe.registerOnEnterWorld(questId);
 		qe.registerQuestNpc(203780).addOnQuestStart(questId);
 		qe.registerQuestNpc(203780).addOnTalkEvent(questId);
 		qe.registerQuestNpc(203781).addOnTalkEvent(questId);
 		qe.registerGetingItem(122001250, questId);
 	}
-	
-	@Override
-    public boolean onEnterWorldEvent(QuestEnv env) {
-        Player player = env.getPlayer();
-        if (player.getWorldId() == 110010000) { //Sanctum.
-            QuestState qs = player.getQuestStateList().getQuestState(questId);
-            if (qs == null) {
-                env.setQuestId(questId);
-                if (QuestService.startQuest(env)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
 	
 	@Override
 	public boolean onDialogEvent(QuestEnv env) {
@@ -80,7 +63,7 @@ public class _19000ExpertEssencetappersTest extends QuestHandler {
 							}
 						} case STEP_TO_1: {
 							giveQuestItem(env, 122001250, 1);
-							return sendQuestSelectionDialog(env);
+						    return closeDialogWindow(env);
 						}
 					}
 					break;

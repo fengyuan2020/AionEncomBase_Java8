@@ -23,7 +23,6 @@ import com.aionemu.gameserver.questEngine.model.QuestDialog;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
-import com.aionemu.gameserver.services.QuestService;
 
 public class _19002ExpertAethertappersTest extends QuestHandler {
 
@@ -34,26 +33,10 @@ public class _19002ExpertAethertappersTest extends QuestHandler {
 	
 	@Override
 	public void register() {
-		qe.registerOnEnterWorld(questId);
 		qe.registerQuestNpc(203782).addOnQuestStart(questId);
 		qe.registerQuestNpc(203782).addOnTalkEvent(questId);
 		qe.registerQuestNpc(203783).addOnTalkEvent(questId);
 	}
-	
-	@Override
-    public boolean onEnterWorldEvent(QuestEnv env) {
-        Player player = env.getPlayer();
-        if (player.getWorldId() == 110010000) { //Sanctum.
-            QuestState qs = player.getQuestStateList().getQuestState(questId);
-            if (qs == null) {
-                env.setQuestId(questId);
-                if (QuestService.startQuest(env)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
 	
 	@Override
 	public boolean onDialogEvent(QuestEnv env) {

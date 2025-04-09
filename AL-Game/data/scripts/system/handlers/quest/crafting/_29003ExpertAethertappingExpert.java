@@ -33,15 +33,9 @@ public class _29003ExpertAethertappingExpert extends QuestHandler {
 	
 	@Override
 	public void register() {
-		qe.registerOnLevelUp(questId);
 		qe.registerQuestNpc(204257).addOnQuestStart(questId);
 		qe.registerQuestNpc(204257).addOnTalkEvent(questId);
 		qe.registerQuestNpc(204052).addOnTalkEvent(questId);
-	}
-	
-	@Override
-	public boolean onLvlUpEvent(QuestEnv env) {
-		return defaultOnLvlUpEvent(env, 29002);
 	}
 	
 	@Override
@@ -54,13 +48,9 @@ public class _29003ExpertAethertappingExpert extends QuestHandler {
 		} if (qs == null || qs.getStatus() == QuestStatus.NONE) {
 			if (targetId == 204257) {
 				if (env.getDialog() == QuestDialog.START_DIALOG) {
-					if (giveQuestItem(env, 182207142, 1)) {
-						return sendQuestDialog(env, 1011);
-					} else {
-						return true;
-					}
+					return sendQuestDialog(env, 1011);
 				} else {
-					return sendQuestStartDialog(env);
+					return sendQuestStartDialog(env, 182207142, 1);
 				}
 			}
 		} if (qs == null) {

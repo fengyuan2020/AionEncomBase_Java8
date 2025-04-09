@@ -24,27 +24,21 @@ import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
 
-public class _19003ExpertAethertappingExpert extends QuestHandler
-{
+public class _19003ExpertAethertappingExpert extends QuestHandler {
+
 	private final static int questId = 19003;
-	
 	public _19003ExpertAethertappingExpert() {
 		super(questId);
 	}
 	
 	@Override
 	public void register() {
-		qe.registerOnLevelUp(questId);
 		qe.registerQuestNpc(203782).addOnQuestStart(questId);
 		qe.registerQuestNpc(203782).addOnTalkEvent(questId);
 		qe.registerQuestNpc(203700).addOnTalkEvent(questId);
 	}
 	
-	@Override
-	public boolean onLvlUpEvent(QuestEnv env) {
-		return defaultOnLvlUpEvent(env, 19002);
-	}
-	
+
 	@Override
 	public boolean onDialogEvent(QuestEnv env) {
 		final Player player = env.getPlayer();
@@ -55,14 +49,10 @@ public class _19003ExpertAethertappingExpert extends QuestHandler
 		} if (qs == null || qs.getStatus() == QuestStatus.NONE) {
 			if (targetId == 203782) {
 				if (env.getDialog() == QuestDialog.START_DIALOG) {
-					if (giveQuestItem(env, 182206128, 1)) {
-						return sendQuestDialog(env, 1011);
-					} else {
-						return true;
-					}
+					return sendQuestDialog(env, 1011);
 				} else {
-					return sendQuestStartDialog(env);
-				}
+					return sendQuestStartDialog(env, 182206128, 1);
+				} 
 			}
 		} if (qs == null) {
 			return false;

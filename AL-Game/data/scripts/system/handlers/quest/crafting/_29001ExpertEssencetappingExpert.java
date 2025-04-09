@@ -33,15 +33,9 @@ public class _29001ExpertEssencetappingExpert extends QuestHandler {
 	
 	@Override
 	public void register() {
-		qe.registerOnLevelUp(questId);
 		qe.registerQuestNpc(204096).addOnQuestStart(questId);
 		qe.registerQuestNpc(204096).addOnTalkEvent(questId);
 		qe.registerQuestNpc(204052).addOnTalkEvent(questId);
-	}
-	
-	@Override
-	public boolean onLvlUpEvent(QuestEnv env) {
-		return defaultOnLvlUpEvent(env, 29000);
 	}
 	
 	@Override
@@ -54,13 +48,9 @@ public class _29001ExpertEssencetappingExpert extends QuestHandler {
 		} if (qs == null || qs.getStatus() == QuestStatus.NONE) {
 			if (targetId == 204096) {
 				if (env.getDialog() == QuestDialog.START_DIALOG) {
-					if (giveQuestItem(env, 182207141, 1)) {
-						return sendQuestDialog(env, 1011);
-					} else {
-						return true;
-					}
+					return sendQuestDialog(env, 1011);
 				} else {
-					return sendQuestStartDialog(env);
+					return sendQuestStartDialog(env, 182207141, 1);
 				}
 			}
 		} if (qs == null) {
