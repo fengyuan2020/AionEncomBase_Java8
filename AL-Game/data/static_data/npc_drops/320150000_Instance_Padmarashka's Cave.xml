@@ -5797,22 +5797,6 @@
 			<drop item_id="100000318" chance="0.97" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Elder Sword"/>
 		</drop_group>
 	</npc_drop>
-	<!-- Dramata Hideout Manager -->
-	<npc_drop npc_id="218679">
-		<drop_group name="NONE_COMMON" use_category="true" race="PC_ALL">
-			<drop item_id="188051517" chance="9.51" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Random Option Class Drop Test Item"/>
-			<drop item_id="188051518" chance="1.37" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Random Option Disassemble Test Item"/>
-		</drop_group>
-		<drop_group name="WEAPON_SWORD_EPIC" use_category="true" race="PC_ALL">
-			<drop item_id="100001276" chance="0.36" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Tune, Retune_Test_Option"/>
-			<drop item_id="100001289" chance="1.09" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Tune, Retune_Test_Option+Manastone"/>
-			<drop item_id="100001290" chance="0.35" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Tune, Retune_Test_Option+Manastone+Enchanting Stage"/>
-			<drop item_id="100001291" chance="0.81" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Tune, Retune_Test_Enchanting Stage"/>
-		</drop_group>
-		<drop_group name="WEAPON_SWORD_UNIQUE" use_category="true" race="PC_ALL">
-			<drop item_id="100001288" chance="1.84" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Tune, Retune_Test_Option+Enchanting Stage"/>
-		</drop_group>
-	</npc_drop>
 	<!-- Padmarashka's Elite Sentinel -->
 	<npc_drop npc_id="218680">
 		<drop_group name="ARMOR_BELT_COMMON" use_category="true" race="PC_ALL">

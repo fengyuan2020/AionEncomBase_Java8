@@ -57,112 +57,77 @@ public class CraftSkillUpdateService {
 
 	private CraftSkillUpdateService() {
 		// CRAFT ASMODIANS.
-		npcBySkill.put(204096, new CraftLearnTemplate(30002, false, "Essencetapping")); // Essencetapping (You can
-																						// obtain materials through
-																						// extracting the vitality of
-																						// objects)
-		npcBySkill.put(830158, new CraftLearnTemplate(30002, false, "Essencetapping")); // Essencetapping (You can
-																						// obtain materials through
-																						// extracting the vitality of
-																						// objects)
-		npcBySkill.put(204257, new CraftLearnTemplate(30003, false, "Aethertapping")); // Aethertapping (You can obtain
-																						// the Aether Crystals floating
-																						// in the sky)
-		npcBySkill.put(830148, new CraftLearnTemplate(30003, false, "Aethertapping")); // Aethertapping (You can obtain
-																						// the Aether Crystals floating
-																						// in the sky)
-		npcBySkill.put(204100, new CraftLearnTemplate(40001, true, "Cooking")); // Cooking (Allows you to make food and
-																				// beverages that have effects when
-																				// consumed. You may also purify
-																				// contaminated materials)
-		npcBySkill.put(830142, new CraftLearnTemplate(40001, true, "Cooking")); // Cooking (Allows you to make food and
-																				// beverages that have effects when
-																				// consumed. You may also purify
-																				// contaminated materials)
-		npcBySkill.put(204104, new CraftLearnTemplate(40002, true, "Weaponsmithing")); // Weaponsmithing (Allows you to
-																						// craft metal weapons)
-		npcBySkill.put(830146, new CraftLearnTemplate(40002, true, "Weaponsmithing")); // Weaponsmithing (Allows you to
-																						// craft metal weapons)
-		npcBySkill.put(204106, new CraftLearnTemplate(40003, true, "Armorsmithing")); // Armorsmithing (Allows you to
-																						// craft metal armor, helmets
-																						// and shields)
-		npcBySkill.put(830144, new CraftLearnTemplate(40003, true, "Armorsmithing")); // Armorsmithing (Allows you to
-																						// craft metal armor, helmets
-																						// and shields)
-		npcBySkill.put(204110, new CraftLearnTemplate(40004, true, "Tailoring")); // Tailoring (Allows you to make cloth
-																					// armor, leather armor and clothing
-																					// with cloth and leather)
-		npcBySkill.put(830136, new CraftLearnTemplate(40004, true, "Tailoring")); // Tailoring (Allows you to make cloth
-																					// armor, leather armor and clothing
-																					// with cloth and leather)
-		npcBySkill.put(204102, new CraftLearnTemplate(40007, true, "Alchemy")); // Alchemy (Allows you to make items
-																				// that enhance various magical weapons,
-																				// items and equipment)
-		npcBySkill.put(830138, new CraftLearnTemplate(40007, true, "Alchemy")); // Alchemy (Allows you to make items
-																				// that enhance various magical weapons,
-																				// items and equipment)
-		npcBySkill.put(204108, new CraftLearnTemplate(40008, true, "Handicrafting")); // Handicrafting (Allows you to
-																						// craft precious metal, wooden
-																						// weapons and small parts)
-		npcBySkill.put(830140, new CraftLearnTemplate(40008, true, "Handicrafting")); // Handicrafting (Allows you to
-																						// craft precious metal, wooden
-																						// weapons and small parts)
-		npcBySkill.put(798452, new CraftLearnTemplate(40010, true, "Construction")); // Construction Asmodians
-																						// Pandaemonium.
+		npcBySkill.put(204096, new CraftLearnTemplate(30002, false, "Essencetapping")); // Essencetapping (You can obtain materials through extracting the vitality of objects)
+
+		npcBySkill.put(830158, new CraftLearnTemplate(30002, false, "Essencetapping")); // Essencetapping (You can obtain materials through extracting the vitality of objects)
+
+		npcBySkill.put(204257, new CraftLearnTemplate(30003, false, "Aethertapping")); // Aethertapping (You can obtain the Aether Crystals floating in the sky)
+
+		npcBySkill.put(830148, new CraftLearnTemplate(30003, false, "Aethertapping")); // Aethertapping (You can obtain the Aether Crystals floating in the sky)
+
+		npcBySkill.put(204100, new CraftLearnTemplate(40001, true, "Cooking")); // Cooking (Allows you to make food and beverages that have effects when consumed. You may also purify contaminated materials)
+
+		npcBySkill.put(830142, new CraftLearnTemplate(40001, true, "Cooking")); // Cooking (Allows you to make food and  beverages that have effects when consumed. You may also purify contaminated materials)
+
+		npcBySkill.put(204104, new CraftLearnTemplate(40002, true, "Weaponsmithing")); // Weaponsmithing (Allows you to craft metal weapons)
+
+		npcBySkill.put(830146, new CraftLearnTemplate(40002, true, "Weaponsmithing")); // Weaponsmithing (Allows you to craft metal weapons)
+
+		npcBySkill.put(204106, new CraftLearnTemplate(40003, true, "Armorsmithing")); // Armorsmithing (Allows you to craft metal armor, helmets and shields)
+
+		npcBySkill.put(830144, new CraftLearnTemplate(40003, true, "Armorsmithing")); // Armorsmithing (Allows you to craft metal armor, helmets and shields)
+
+		npcBySkill.put(204110, new CraftLearnTemplate(40004, true, "Tailoring")); // Tailoring (Allows you to make cloth armor, leather armor and clothing with cloth and leather)
+
+		npcBySkill.put(830136, new CraftLearnTemplate(40004, true, "Tailoring")); // Tailoring (Allows you to make cloth armor, leather armor and clothing with cloth and leather)
+
+		npcBySkill.put(204102, new CraftLearnTemplate(40007, true, "Alchemy")); // Alchemy (Allows you to make items that enhance various magical weapons, items and equipment)
+
+		npcBySkill.put(830138, new CraftLearnTemplate(40007, true, "Alchemy")); // Alchemy (Allows you to make items that enhance various magical weapons, items and equipment)
+
+		npcBySkill.put(204108, new CraftLearnTemplate(40008, true, "Handicrafting")); // Handicrafting (Allows you to craft precious metal, wooden  weapons and small parts)
+
+		npcBySkill.put(830140, new CraftLearnTemplate(40008, true, "Handicrafting")); // Handicrafting (Allows you to craft precious metal, wooden weapons and small parts)
+
+		npcBySkill.put(798452, new CraftLearnTemplate(40010, true, "Construction")); // Construction Asmodians Pandaemonium.
+
 		npcBySkill.put(798456, new CraftLearnTemplate(40010, true, "Construction")); // Construction Asmodians Pernon.
 
 		// CRAFT ELYOS.
-		npcBySkill.put(203780, new CraftLearnTemplate(30002, false, "Essencetapping")); // Essencetapping (You can
-																						// obtain materials through
-																						// extracting the vitality of
-																						// objects)
-		npcBySkill.put(830066, new CraftLearnTemplate(30002, false, "Essencetapping")); // Essencetapping (You can
-																						// obtain materials through
-																						// extracting the vitality of
-																						// objects)
-		npcBySkill.put(203782, new CraftLearnTemplate(30003, false, "Aethertapping")); // Aethertapping (You can obtain
-																						// the Aether Crystals floating
-																						// in the sky)
-		npcBySkill.put(830064, new CraftLearnTemplate(30003, false, "Aethertapping")); // Aethertapping (You can obtain
-																						// the Aether Crystals floating
-																						// in the sky)
-		npcBySkill.put(203784, new CraftLearnTemplate(40001, true, "Cooking")); // Cooking (Allows you to make food and
-																				// beverages that have effects when
-																				// consumed. You may also purify
-																				// contaminated materials)
-		npcBySkill.put(830058, new CraftLearnTemplate(40001, true, "Cooking")); // Cooking (Allows you to make food and
-																				// beverages that have effects when
-																				// consumed. You may also purify
-																				// contaminated materials)
-		npcBySkill.put(203788, new CraftLearnTemplate(40002, true, "Weaponsmithing")); // Weaponsmithing (Allows you to
-																						// craft metal weapons)
-		npcBySkill.put(830062, new CraftLearnTemplate(40002, true, "Weaponsmithing")); // Weaponsmithing (Allows you to
-																						// craft metal weapons)
-		npcBySkill.put(203790, new CraftLearnTemplate(40003, true, "Armorsmithing")); // Armorsmithing (Allows you to
-																						// craft metal armor, helmets
-																						// and shields)
-		npcBySkill.put(830060, new CraftLearnTemplate(40003, true, "Armorsmithing")); // Armorsmithing (Allows you to
-																						// craft metal armor, helmets
-																						// and shields)
-		npcBySkill.put(203793, new CraftLearnTemplate(40004, true, "Tailoring")); // Tailoring (Allows you to make cloth
-																					// armor, leather armor and clothing
-																					// with cloth and leather)
-		npcBySkill.put(830052, new CraftLearnTemplate(40004, true, "Tailoring")); // Tailoring (Allows you to make cloth
-																					// armor, leather armor and clothing
-																					// with cloth and leather)
-		npcBySkill.put(203786, new CraftLearnTemplate(40007, true, "Alchemy")); // Alchemy (Allows you to make items
-																				// that enhance various magical weapons,
-																				// items and equipment)
-		npcBySkill.put(830054, new CraftLearnTemplate(40007, true, "Alchemy")); // Alchemy (Allows you to make items
-																				// that enhance various magical weapons,
-																				// items and equipment)
-		npcBySkill.put(203792, new CraftLearnTemplate(40008, true, "Handicrafting")); // Handicrafting (Allows you to
-																						// craft precious metal, wooden
-																						// weapons and small parts)
-		npcBySkill.put(830056, new CraftLearnTemplate(40008, true, "Handicrafting")); // Handicrafting (Allows you to
-																						// craft precious metal, wooden
-																						// weapons and small parts)
+		npcBySkill.put(203780, new CraftLearnTemplate(30002, false, "Essencetapping")); // Essencetapping (You can obtain materials through extracting the vitality of objects)
+
+		npcBySkill.put(830066, new CraftLearnTemplate(30002, false, "Essencetapping")); // Essencetapping (You can obtain materials through extracting the vitality of objects)
+
+		npcBySkill.put(203782, new CraftLearnTemplate(30003, false, "Aethertapping")); // Aethertapping (You can obtain the Aether Crystals floating in the sky)
+
+		npcBySkill.put(830064, new CraftLearnTemplate(30003, false, "Aethertapping")); // Aethertapping (You can obtain the Aether Crystals floating in the sky)
+
+		npcBySkill.put(203784, new CraftLearnTemplate(40001, true, "Cooking")); // Cooking (Allows you to make food and beverages that have effects when consumed. You may also purify contaminated materials)
+
+		npcBySkill.put(830058, new CraftLearnTemplate(40001, true, "Cooking")); // Cooking (Allows you to make food and beverages that have effects when consumed. You may also purify contaminated materials)
+
+		npcBySkill.put(203788, new CraftLearnTemplate(40002, true, "Weaponsmithing")); // Weaponsmithing (Allows you to craft metal weapons)
+
+		npcBySkill.put(830062, new CraftLearnTemplate(40002, true, "Weaponsmithing")); // Weaponsmithing (Allows you to craft metal weapons)
+
+		npcBySkill.put(203790, new CraftLearnTemplate(40003, true, "Armorsmithing")); // Armorsmithing (Allows you to craft metal armor, helmets and shields)
+
+		npcBySkill.put(830060, new CraftLearnTemplate(40003, true, "Armorsmithing")); // Armorsmithing (Allows you to craft metal armor, helmets and shields)
+
+		npcBySkill.put(203793, new CraftLearnTemplate(40004, true, "Tailoring")); // Tailoring (Allows you to make cloth armor, leather armor and clothing with cloth and leather)
+
+		npcBySkill.put(830052, new CraftLearnTemplate(40004, true, "Tailoring")); // Tailoring (Allows you to make cloth armor, leather armor and clothing with cloth and leather)
+
+		npcBySkill.put(203786, new CraftLearnTemplate(40007, true, "Alchemy")); // Alchemy (Allows you to make items that enhance various magical weapons, items and equipment)
+
+		npcBySkill.put(830054, new CraftLearnTemplate(40007, true, "Alchemy")); // Alchemy (Allows you to make items that enhance various magical weapons, items and equipment)
+
+		npcBySkill.put(203792, new CraftLearnTemplate(40008, true, "Handicrafting")); // Handicrafting (Allows you to craft precious metal, wooden weapons and small parts)
+
+		npcBySkill.put(830056, new CraftLearnTemplate(40008, true, "Handicrafting")); // Handicrafting (Allows you to craft precious metal, wooden weapons and small parts)
+
 		npcBySkill.put(798450, new CraftLearnTemplate(40010, true, "Construction")); // Construction Elyos Sanctum.
+
 		npcBySkill.put(798454, new CraftLearnTemplate(40010, true, "Construction")); // Construction Elyos Oriel.
 
 		// PRICE CRAFT KINAH.
@@ -171,6 +136,7 @@ public class CraftSkillUpdateService {
 		cost.put(199, 115000);
 		cost.put(299, 460000);
 		cost.put(399, 0);
+        cost.put(449, 6004900);
 		cost.put(499, 10000000);
 
 		craftingSkillIds.add(40001);
@@ -242,18 +208,21 @@ public class CraftSkillUpdateService {
 			return;
 		}
 		if (isCraftingSkill(skillId) && (!canLearnMoreExpertCraftingSkill(player) && skillLvl == 399)) {
-			PacketSendUtility.sendMessage(player,
-					"You can only have " + CraftConfig.MAX_EXPERT_CRAFTING_SKILLS + " Expert crafting skills.");
+			PacketSendUtility.sendMessage(player, "You can only have " + CraftConfig.MAX_EXPERT_CRAFTING_SKILLS + " Expert crafting skills.");
 			return;
 		}
 		if (isCraftingSkill(skillId) && (!canLearnMoreMasterCraftingSkill(player) && skillLvl == 499)) {
-			PacketSendUtility.sendMessage(player,
-					"You can only have " + CraftConfig.MAX_MASTER_CRAFTING_SKILLS + " Master crafting skill.");
+			PacketSendUtility.sendMessage(player, "You can only have " + CraftConfig.MAX_MASTER_CRAFTING_SKILLS + " Master crafting skill.");
 			return;
 		}
+
+		if (skillLvl == 399) {
+			PacketSendUtility.sendPacket(player, new SM_SYSTEM_MESSAGE(1300834));
+			return;
+		}
+
 		// ESSENCETAPPING
-		if (skillLvl == 399 && ((skillId == 30002 && // Essencetapping [Journeyman]
-				(!player.isCompleteQuest(19001) || !player.isCompleteQuest(29001))))) {
+		if (skillLvl == 399 && ((skillId == 30002 && (!player.isCompleteQuest(19001) || !player.isCompleteQuest(29001))))) { // Essencetapping [Journeyman]
 			// You must pass the Expert test in order to be promoted.
 			PacketSendUtility.sendPacket(player, new SM_SYSTEM_MESSAGE(1400284));
 			return;
@@ -264,10 +233,13 @@ public class CraftSkillUpdateService {
 			return;
 		}
 		// AETHERTAPPING
-		if (skillLvl == 399 && ((skillId == 30003 && // [Journeyman]
-				(!player.isCompleteQuest(19003) || !player.isCompleteQuest(29003))))) {
+		if (skillLvl == 399 && ((skillId == 30003 && (!player.isCompleteQuest(19003) || !player.isCompleteQuest(29003))))) { // [Journeyman] 
 			// You must pass the Expert test in order to be promoted.
 			PacketSendUtility.sendPacket(player, new SM_SYSTEM_MESSAGE(1400284));
+			return;
+		}
+		if (skillLvl == 449 && (skillId == 30002 || skillId == 30003)) {
+			PacketSendUtility.sendPacket(player, new SM_SYSTEM_MESSAGE(1390233));
 			return;
 		}
 		if (skillLvl == 499 && (skillId == 30003)) { // Aethertapping [Artisan]
@@ -277,14 +249,7 @@ public class CraftSkillUpdateService {
 		}
 		//CRAFTING
 		// You must do quest before being able to buy master update (499 to 500)
-		if (skillLvl == 499 //[Artisan]
-			&& ((skillId == 40001 && (!player.isCompleteQuest(29039) || !player.isCompleteQuest(19039)))
-			|| (skillId == 40002 && (!player.isCompleteQuest(29009) || !player.isCompleteQuest(19009)))
-			|| (skillId == 40003 && (!player.isCompleteQuest(29015) || !player.isCompleteQuest(19015)))
-			|| (skillId == 40004 && (!player.isCompleteQuest(29021) || !player.isCompleteQuest(19021)))
-			|| (skillId == 40007 && (!player.isCompleteQuest(29033) || !player.isCompleteQuest(19033)))
-			|| (skillId == 40008 && (!player.isCompleteQuest(29027) || !player.isCompleteQuest(19027)))
-			|| (skillId == 40010 && (!player.isCompleteQuest(29058) || !player.isCompleteQuest(19058))))) {
+		if (skillLvl == 499 && ((skillId == 40001 && (!player.isCompleteQuest(29039) || !player.isCompleteQuest(19039))) || (skillId == 40002 && (!player.isCompleteQuest(29009) || !player.isCompleteQuest(19009))) || (skillId == 40003 && (!player.isCompleteQuest(29015) || !player.isCompleteQuest(19015))) || (skillId == 40004 && (!player.isCompleteQuest(29021) || !player.isCompleteQuest(19021))) || (skillId == 40007 && (!player.isCompleteQuest(29033) || !player.isCompleteQuest(19033))) || (skillId == 40008 && (!player.isCompleteQuest(29027) || !player.isCompleteQuest(19027))) || (skillId == 40010 && (!player.isCompleteQuest(29058) || !player.isCompleteQuest(19058))))) { //[Artisan]
 			PacketSendUtility.sendPacket(player, new SM_SYSTEM_MESSAGE(1400286));
 			return;
 		}
@@ -304,8 +269,7 @@ public class CraftSkillUpdateService {
 					skillList.addSkill(responder, skillId, skillLevel + 1);
 					responder.getRecipeList().autoLearnRecipe(responder, skillId, skillLevel + 1);
 					// You have learned the %0 skill.
-					PacketSendUtility.sendPacket(responder,
-							new SM_SKILL_LIST(skillList.getSkillEntry(skillId), 1330004, false));
+					PacketSendUtility.sendPacket(responder, new SM_SKILL_LIST(skillList.getSkillEntry(skillId), 1330004, false));
 				} else {
 					// You do not have enough Kinah.
 					PacketSendUtility.sendPacket(responder, new SM_SYSTEM_MESSAGE(1300388));
@@ -316,13 +280,9 @@ public class CraftSkillUpdateService {
 			public void denyRequest(Creature requester, Player responder) {
 			}
 		};
-		boolean result = player.getResponseRequester().putRequest(SM_QUESTION_WINDOW.STR_CRAFT_ADDSKILL_CONFIRM,
-				responseHandler);
+		boolean result = player.getResponseRequester().putRequest(SM_QUESTION_WINDOW.STR_CRAFT_ADDSKILL_CONFIRM, responseHandler);
 		if (result) {
-			PacketSendUtility.sendPacket(player,
-					new SM_QUESTION_WINDOW(SM_QUESTION_WINDOW.STR_CRAFT_ADDSKILL_CONFIRM, 0, 0,
-							new DescriptionId(DataManager.SKILL_DATA.getSkillTemplate(skillId).getNameId()),
-							String.valueOf(price)));
+			PacketSendUtility.sendPacket(player, new SM_QUESTION_WINDOW(SM_QUESTION_WINDOW.STR_CRAFT_ADDSKILL_CONFIRM, 0, 0, new DescriptionId(DataManager.SKILL_DATA.getSkillTemplate(skillId).getNameId()), String.valueOf(price)));
 		}
 	}
 
@@ -369,8 +329,7 @@ public class CraftSkillUpdateService {
 	}
 
 	public static boolean canLearnMoreExpertCraftingSkill(Player player) {
-		if (getTotalExpertCraftingSkills(player)
-				+ getTotalMasterCraftingSkills(player) < CraftConfig.MAX_EXPERT_CRAFTING_SKILLS) {
+		if (getTotalExpertCraftingSkills(player) + getTotalMasterCraftingSkills(player) < CraftConfig.MAX_EXPERT_CRAFTING_SKILLS) {
 			return true;
 		} else {
 			return false;

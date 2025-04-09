@@ -61,12 +61,10 @@ public class CraftService {
 		if (recipetemplate.getMaxProductionCount() != null) {
 			player.getRecipeList().deleteRecipe(player, recipetemplate.getId());
 			if (critCount == 0) {
-				QuestEngine.getInstance().onFailCraft(new QuestEnv(null, player, 0, 0),
-						recipetemplate.getComboProduct(1) == null ? 0 : recipetemplate.getComboProduct(1));
+				QuestEngine.getInstance().onFailCraft(new QuestEnv(null, player, 0, 0), recipetemplate.getComboProduct(1) == null ? 0 : recipetemplate.getComboProduct(1));
 			}
 		}
-		int xpReward = (int) ((0.008 * (recipetemplate.getSkillpoint() + 100) * (recipetemplate.getSkillpoint() + 100)
-				+ 60));
+		int xpReward = (int) ((0.008 * (recipetemplate.getSkillpoint() + 100) * (recipetemplate.getSkillpoint() + 100) + 60));
 		xpReward = xpReward + (xpReward * bonus / 100);
 		int productItemId = critCount > 0 ? recipetemplate.getComboProduct(critCount) : recipetemplate.getProductid();
 		ItemService.addItem(player, productItemId, recipetemplate.getQuantity(), new ItemUpdatePredicate() {
@@ -94,32 +92,24 @@ public class CraftService {
 		ItemTemplate itemTemplate = DataManager.ITEM_DATA.getItemTemplate(productItemId);
 		int gainedCraftExp = (int) RewardType.CRAFTING.calcReward(player, xpReward);
 		int skillId = recipetemplate.getSkillid();
-		if ((skillId == 40001) || (skillId == 40002) || (skillId == 40003) || (skillId == 40004) || (skillId == 40007)
-				|| (skillId == 40008) || (skillId == 40010)) {
-			if ((player.getSkillList().getSkillLevel(skillId) >= 500) && (recipetemplate.getSkillpoint() < 500)) {
+		if ((skillId == 40001) || (skillId == 40002) || (skillId == 40003) || (skillId == 40004) || (skillId == 40007) || (skillId == 40008) || (skillId == 40010)) {
+			if ((player.getSkillList().getSkillLevel(skillId) >= 500) && (recipetemplate.getSkillpoint() < 465)) {
 				// Such basic crafting doesn't affect your skill level, Master.
 				PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_DONT_GET_COMBINE_EXP_GRAND_MASTER);
-			} else if ((player.getSkillList().getSkillLevel(skillId) >= 400)
-					&& (recipetemplate.getSkillpoint() < 400)) {
-				// Your skill level does not increase with low level crafting as you are an
-				// Expert.
+			} else if ((player.getSkillList().getSkillLevel(skillId) >= 400) && (recipetemplate.getSkillpoint() < 365)) {
+				// Your skill level does not increase with low level crafting as you are an Expert.
 				PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_DONT_GET_COMBINE_EXP);
 			} else {
-				if (player.getSkillList().addSkillXp(player, recipetemplate.getSkillid(), gainedCraftExp,
-						recipetemplate.getSkillpoint())) {
+				if (player.getSkillList().addSkillXp(player, recipetemplate.getSkillid(), gainedCraftExp, recipetemplate.getSkillpoint())) {
 					player.getCommonData().addExp(xpReward, RewardType.CRAFTING);
 				} else {
-					// The skill level for the %0 skill does not increase as the difficulty is too
-					// low.
-					PacketSendUtility.sendPacket(player,
-							SM_SYSTEM_MESSAGE.STR_MSG_DONT_GET_PRODUCTION_EXP(new DescriptionId(
-									DataManager.SKILL_DATA.getSkillTemplate(recipetemplate.getSkillid()).getNameId())));
+					// The skill level for the %0 skill does not increase as the difficulty is too low.
+					PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_DONT_GET_PRODUCTION_EXP(new DescriptionId(DataManager.SKILL_DATA.getSkillTemplate(recipetemplate.getSkillid()).getNameId())));
 				}
 			}
 		}
 		if (recipetemplate.getCraftDelayId() != null) {
-			player.getCraftCooldownList().addCraftCooldown(recipetemplate.getCraftDelayId(),
-					recipetemplate.getCraftDelayTime());
+			player.getCraftCooldownList().addCraftCooldown(recipetemplate.getCraftDelayId(), recipetemplate.getCraftDelayTime());
 		}
 	}
 
@@ -135,8 +125,7 @@ public class CraftService {
 			player.setCraftingTask(new MorphingTask(player, (StaticObject) target, recipeTemplate));
 		} else {
 			int skillLvlDiff = player.getSkillList().getSkillLevel(skillId) - recipeTemplate.getSkillpoint();
-			player.setCraftingTask(new CraftingTask(player, (StaticObject) target, recipeTemplate, skillLvlDiff,
-					craftType == 1 ? 15 : 0));
+			player.setCraftingTask(new CraftingTask(player, (StaticObject) target, recipeTemplate, skillLvlDiff, craftType == 1 ? 15 : 0));
 		}
 		player.getCraftingTask().start();
 	}
@@ -148,8 +137,7 @@ public class CraftService {
 			public void abort() {
 				player.getController().cancelTask(TaskId.ITEM_USE);
 				player.getObserveController().removeObserver(this);
-				PacketSendUtility.broadcastPacket(player,
-						new SM_AETHERFORGING_ANIMATION(player, recipeTemplate.getId(), 0, 1), true);
+				PacketSendUtility.broadcastPacket(player, new SM_AETHERFORGING_ANIMATION(player, recipeTemplate.getId(), 0, 1), true);
 			}
 		};
 	}
@@ -159,26 +147,22 @@ public class CraftService {
 		int skillLvl = 0;
 		int skillId = recipeTemplate.getSkillid();
 		final ItemTemplate itemTemplate = DataManager.ITEM_DATA.getItemTemplate(recipeTemplate.getProductid());
-		PacketSendUtility.broadcastPacket(player,
-				new SM_AETHERFORGING_ANIMATION(player, recipeTemplate.getId(), 3000, 0), true);
+		PacketSendUtility.broadcastPacket(player, new SM_AETHERFORGING_ANIMATION(player, recipeTemplate.getId(), 3000, 0), true);
 		final ItemUseObserver observer = new ItemUseObserver() {
 			@Override
 			public void abort() {
 				player.getController().cancelTask(TaskId.ITEM_USE);
 				player.getObserveController().removeObserver(this);
-				PacketSendUtility.broadcastPacket(player,
-						new SM_AETHERFORGING_ANIMATION(player, recipeTemplate.getId(), 0, 1), true);
+				PacketSendUtility.broadcastPacket(player, new SM_AETHERFORGING_ANIMATION(player, recipeTemplate.getId(), 0, 1), true);
 			}
 		};
 		player.getObserveController().attach(observer);
 		player.getController().addTask(TaskId.ITEM_USE, ThreadPoolManager.getInstance().schedule(new Runnable() {
 			@Override
 			public void run() {
-				int xpReward = (int) ((2 * (recipeTemplate.getSkillpoint() + 100)
-						* (recipeTemplate.getSkillpoint() + 100) + 60));
+				int xpReward = (int) ((2 * (recipeTemplate.getSkillpoint() + 100) * (recipeTemplate.getSkillpoint() + 100) + 60));
 				int gainedCraftExp = (int) RewardType.CRAFTING.calcReward(player, xpReward);
-				ItemService.addItem(player, recipeTemplate.getProductid(), recipeTemplate.getQuantity(),
-						new ItemUpdatePredicate(ItemAddType.AETHERFORGING, ItemUpdateType.INC_ITEM_COLLECT));
+				ItemService.addItem(player, recipeTemplate.getProductid(), recipeTemplate.getQuantity(), new ItemUpdatePredicate(ItemAddType.AETHERFORGING, ItemUpdateType.INC_ITEM_COLLECT));
 				if (Rnd.get(1, 10) == 10 && player.getSkillList().getSkillLevel(40011) != 300) {
 					player.getObserveController().removeObserver(observer);
 					player.getCommonData().addExp(xpReward, RewardType.CRAFTING);
@@ -186,8 +170,7 @@ public class CraftService {
 				}
 				player.getObserveController().removeObserver(observer);
 				PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_CRAFT_SUCCESS_GETEXP);
-				PacketSendUtility.sendPacket(player,
-						new SM_AETHERFORGING_ANIMATION(player, recipeTemplate.getId(), 0, 2));
+				PacketSendUtility.sendPacket(player, new SM_AETHERFORGING_ANIMATION(player, recipeTemplate.getId(), 0, 2));
 			}
 		}, 3000));
 	}
