@@ -34653,7 +34653,7 @@
       <finished quest_id="18996" />
     </start_conditions>
   </quest>
-  <quest id="19000" name="[Expert] Essencetapper's Test" nameId="1124500" minlevel_permitted="50" max_repeat_count="1" cannot_share="true" race_permitted="ELYOS" combineskill="30002" combine_skillpoint="399" category="SIGNIFICANT">
+  <quest id="19000" name="[Expert] Essencetapper's Test" nameId="1124500" minlevel_permitted="40" max_repeat_count="1" cannot_share="true" race_permitted="ELYOS" combineskill="30002" combine_skillpoint="399" category="SIGNIFICANT">
     <collect_items>
       <collect_item item_id="152003004" count="1" />
       <collect_item item_id="152003005" count="1" />
@@ -34664,7 +34664,7 @@
       <quest_work_item item_id="122001250" />
     </quest_work_items>
   </quest>
-  <quest id="19001" name="[Expert] Essencetapping Expert" nameId="1124501" minlevel_permitted="50" max_repeat_count="1" cannot_share="true" race_permitted="ELYOS" category="SIGNIFICANT">
+  <quest id="19001" name="[Expert] Essencetapping Expert" nameId="1124501" minlevel_permitted="40" max_repeat_count="1" cannot_share="true" race_permitted="ELYOS" category="SIGNIFICANT">
     <rewards exp="1347585">
       <reward_item item_id="125010013" count="1" />
       <reward_item item_id="169405021" count="30" />
@@ -34676,7 +34676,7 @@
       <quest_work_item item_id="182206127" />
     </quest_work_items>
   </quest>
-  <quest id="19002" name="[Expert] Aethertapper's Test" nameId="1124502" minlevel_permitted="50" max_repeat_count="1" cannot_share="true" race_permitted="ELYOS" combineskill="30003" combine_skillpoint="399" category="SIGNIFICANT">
+  <quest id="19002" name="[Expert] Aethertapper's Test" nameId="1124502" minlevel_permitted="40" max_repeat_count="1" cannot_share="true" race_permitted="ELYOS" combineskill="30003" combine_skillpoint="399" category="SIGNIFICANT">
     <collect_items>
       <collect_item item_id="152003007" count="1" />
       <collect_item item_id="152003008" count="1" />
@@ -34686,7 +34686,7 @@
       <quest_work_item item_id="122001251" />
     </quest_work_items>
   </quest>
-  <quest id="19003" name="[Expert] Aethertapping Expert" nameId="1124503" minlevel_permitted="50" max_repeat_count="1" cannot_share="true" race_permitted="ELYOS" category="SIGNIFICANT">
+  <quest id="19003" name="[Expert] Aethertapping Expert" nameId="1124503" minlevel_permitted="40" max_repeat_count="1" cannot_share="true" race_permitted="ELYOS" category="SIGNIFICANT">
     <rewards exp="1347585">
       <reward_item item_id="125020013" count="1" />
       <reward_item item_id="169405022" count="30" />
@@ -44981,7 +44981,7 @@
       <finished quest_id="28996" />
     </start_conditions>
   </quest>
-  <quest id="29000" name="[Expert] Essencetapper's Test" nameId="1124800" minlevel_permitted="50" max_repeat_count="1" cannot_share="true" race_permitted="ASMODIANS" combineskill="30002" combine_skillpoint="399" category="SIGNIFICANT">
+  <quest id="29000" name="[Expert] Essencetapper's Test" nameId="1124800" minlevel_permitted="40" max_repeat_count="1" cannot_share="true" race_permitted="ASMODIANS" combineskill="30002" combine_skillpoint="399" category="SIGNIFICANT">
     <collect_items>
       <collect_item item_id="152003004" count="1" />
       <collect_item item_id="152003005" count="1" />
@@ -44992,7 +44992,7 @@
       <quest_work_item item_id="122001250" />
     </quest_work_items>
   </quest>
-  <quest id="29001" name="[Expert] Essencetapping Expert" nameId="1124801" minlevel_permitted="50" max_repeat_count="1" cannot_share="true" race_permitted="ASMODIANS" category="SIGNIFICANT">
+  <quest id="29001" name="[Expert] Essencetapping Expert" nameId="1124801" minlevel_permitted="40" max_repeat_count="1" cannot_share="true" race_permitted="ASMODIANS" category="SIGNIFICANT">
     <rewards exp="1347585">
       <reward_item item_id="125010014" count="1" />
       <reward_item item_id="169405021" count="30" />
@@ -45004,7 +45004,7 @@
       <quest_work_item item_id="182207141" />
     </quest_work_items>
   </quest>
-  <quest id="29002" name="[Expert] Aethertapper's Test" nameId="1124802" minlevel_permitted="50" max_repeat_count="1" cannot_share="true" race_permitted="ASMODIANS" combineskill="30003" combine_skillpoint="399" category="SIGNIFICANT">
+  <quest id="29002" name="[Expert] Aethertapper's Test" nameId="1124802" minlevel_permitted="40" max_repeat_count="1" cannot_share="true" race_permitted="ASMODIANS" combineskill="30003" combine_skillpoint="399" category="SIGNIFICANT">
     <collect_items>
       <collect_item item_id="152003007" count="1" />
       <collect_item item_id="152003008" count="1" />
@@ -45014,7 +45014,7 @@
       <quest_work_item item_id="122001251" />
     </quest_work_items>
   </quest>
-  <quest id="29003" name="[Expert] Aethertapping Expert" nameId="1124803" minlevel_permitted="50" max_repeat_count="1" cannot_share="true" race_permitted="ASMODIANS" category="SIGNIFICANT">
+  <quest id="29003" name="[Expert] Aethertapping Expert" nameId="1124803" minlevel_permitted="40" max_repeat_count="1" cannot_share="true" race_permitted="ASMODIANS" category="SIGNIFICANT">
     <rewards exp="1347585">
       <reward_item item_id="125020014" />
       <reward_item item_id="169405022" count="30" />
@@ -48963,7 +48963,7 @@
 		<collect_item item_id="182213260" count="3"/>
 	</collect_items>
 	<rewards gold="331020" exp="7086913">
-		<reward_item item_id="169000010" count="761"/>
+		<reward_item item_id="169000009" count="761"/>
 	</rewards>
 	<quest_drop npc_id="219374" item_id="182213260" drop_each_member="1"/>
 	<quest_drop npc_id="219375" item_id="182213260" drop_each_member="1"/>

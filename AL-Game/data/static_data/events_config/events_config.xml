@@ -61,7 +61,7 @@
                 </spawn_map>	
             </spawns>
 		</event>
-		<event name="Doppelgangers" start="2020-01-01T00:00:00+00:00" end="2050-12-31T00:00:00+00:00">
+		<event name="Doppelgangers" start="2020-01-01T00:00:00+00:00" end="2020-12-31T00:00:00+00:00">
 			<spawns>
 				<!-- Poeta -->
 				<spawn_map map_id="210010000">
@@ -1662,7 +1662,7 @@
 				</spawn_map>
 			</spawns>
 		</event>
-		<event name="Code Red: Atreia" start="2020-01-01T00:00:00+00:00" end="2050-12-31T00:00:00+00:00">
+		<event name="Code Red: Atreia" start="2020-01-01T00:00:00+00:00" end="2020-12-31T00:00:00+00:00">
 			<quests>
 				<maintainable>80324;80325;80326;80327</maintainable>
 			</quests>
@@ -2345,7 +2345,7 @@
 				</spawn_map>
 			</spawns>
 		</event>
-		<event name="Shop Event" start="2020-01-01T00:00:00+00:00" end="2050-12-31T00:00:00+00:00">
+		<event name="Shop Event" start="2020-01-01T00:00:00+00:00" end="2020-12-31T00:00:00+00:00">
             <quests>
                 <maintainable>80617;80618;80619;80620;80643;80644</maintainable>
             </quests>
@@ -3192,10 +3192,10 @@
 				</spawn_map>
 			</spawns>
 		</event>
-		<event name="Prestige Pack Inventory" start="2020-01-01T00:00:00+00:00" end="2020-12-31T00:00:00+00:00">
+		<event name="Prestige Pack Inventory" start="2020-01-01T00:00:00+00:00" end="2050-12-31T00:00:00+00:00">
 			<inventory_drop startlevel="10" interval="20" maxCountOfDay="20" cleanTime="9">186000344</inventory_drop>
 		</event>
-		<event name="Prestige Pack Event" start="2020-01-01T00:00:00+00:00" end="2020-12-31T00:00:00+00:00">
+		<event name="Prestige Pack Event" start="2020-01-01T00:00:00+00:00" end="2050-12-31T00:00:00+00:00">
 			<quests>
 				<maintainable>80834;80835;80836;80837</maintainable>
 			</quests>
