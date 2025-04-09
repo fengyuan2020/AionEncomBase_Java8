@@ -33,15 +33,9 @@ public class _19001ExpertEssencetappingExpert extends QuestHandler {
 	
 	@Override
 	public void register() {
-		qe.registerOnLevelUp(questId);
 		qe.registerQuestNpc(203780).addOnQuestStart(questId);
 		qe.registerQuestNpc(203780).addOnTalkEvent(questId);
 		qe.registerQuestNpc(203700).addOnTalkEvent(questId); //Fasimedes
-	}
-	
-	@Override
-	public boolean onLvlUpEvent(QuestEnv env) {
-		return defaultOnLvlUpEvent(env, 19000);
 	}
 	
 	@Override
@@ -54,13 +48,9 @@ public class _19001ExpertEssencetappingExpert extends QuestHandler {
 		} if (qs == null || qs.getStatus() == QuestStatus.NONE) {
 			if (targetId == 203780) {
 				if (env.getDialog() == QuestDialog.START_DIALOG) {
-					if (giveQuestItem(env, 182206127, 1)) {
-						return sendQuestDialog(env, 1011);
-					} else {
-						return true;
-					}
+					return sendQuestDialog(env, 1011);
 				} else {
-					return sendQuestStartDialog(env);
+					return sendQuestStartDialog(env, 182206127, 1);
 				}
 			}
 		} if (qs == null) {
