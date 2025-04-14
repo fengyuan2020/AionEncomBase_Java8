@@ -696,7 +696,7 @@
             <spot x="980.06268" y="1286.7218" z="1184.4224" h="83"/>
 		</spawn>
 		<!-- Protectorate Sikar Sniper -->
-		<spawn npc_id="219209" respawn_time="295">
+<!-- 		<spawn npc_id="219209" respawn_time="295">
             <spot h="92" z="1206.7035" y="1012.4872" x="1051.9312"/>
             <spot h="43" z="1206.7035" y="923.2342" x="1072.0133"/>
             <spot h="84" z="1206.7035" y="586.03656" x="1069.2274"/>
@@ -715,7 +715,7 @@
             <spot h="64" z="1183.8473" y="911.2395" x="1311.7421"/>
             <spot h="57" z="1183.8424" y="621.55426" x="1309.5996"/>
             <spot h="100" z="1201.6992" y="361.33463" x="990.97516"/>
-        </spawn>
+        </spawn> -->
 		<!-- Keymaster Chookuri -->
 		<spawn npc_id="219218" pool="1" respawn_time="1800">
             <spot x="398.3" y="1126.44" z="1195.1401" h="107"/>
@@ -773,13 +773,13 @@
             <spot x="1301.5658" y="669.76678" z="1184.3158" h="30"/>
 		</spawn>
 		<!-- Satra Treasure Hoard [Not Used] -->
-		<spawn npc_id="730586" respawn_time="60">
+<!-- 		<spawn npc_id="730586" respawn_time="60">
             <spot x="1356.514" y="612.97125" z="1184.3698" h="57"/>
-		</spawn>
+		</spawn> -->
 		<!-- Satra Treasure Hoard [Not Used] -->
-		<spawn npc_id="730587" respawn_time="60">
+<!-- 		<spawn npc_id="730587" respawn_time="60">
             <spot x="1356.514" y="918.6734" z="1184.3698" h="63"/>
-		</spawn>
+		</spawn> -->
 		<!-- Spy Vergel
 		A stealthy Asmodian spy stationed in Tiamaranta's Eye,
 		who will be difficult to locate -->
@@ -1316,13 +1316,13 @@
             <spot x="98.5252" y="758.5784" z="1211.4800" h="20"/>
         </spawn>
 		<!-- Tiamat_Down_L_Abyss_Seller -->
-		<spawn npc_id="836525" respawn_time="60">
+<!-- 		<spawn npc_id="836525" respawn_time="60">
             <spot h="0" z="1201.5183" y="188.95813" x="745.52325"/>
-		</spawn>
+		</spawn> -->
 		<!-- Tiamat_Down_D_Abyss_Seller -->
-		<spawn npc_id="836526" respawn_time="60">
+<!-- 		<spawn npc_id="836526" respawn_time="60">
             <spot h="60" z="1201.5183" y="1348.5256" x="762.9541"/>
-		</spawn>
+		</spawn> -->
 		<spawn npc_id="281446" respawn_time="60">
             <spot h="0" z="1183.8933" y="1300.9078" x="754.2468"/>
         </spawn>
