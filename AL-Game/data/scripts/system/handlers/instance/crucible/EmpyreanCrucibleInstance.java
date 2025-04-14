@@ -1103,8 +1103,8 @@ public class EmpyreanCrucibleInstance extends CrucibleInstance
 					break;
 					case 2:
 						sp(217555, 1260.0372f, 796.80334f, 358.60562f, (byte) 30, 2000); //Chief Gunner Koakoa.
-						sp(701199, 1273.2186f, 797.2602f, 358.60562f, (byte) 60, 2000); //Rideable Antiaircraft Gun.
-						sp(701199, 1247.782f, 797.38104f, 358.60562f, (byte) 0, 2000); //Rideable Antiaircraft Gun.
+/* 						sp(701199, 1273.2186f, 797.2602f, 358.60562f, (byte) 60, 2000); //Rideable Antiaircraft Gun.
+						sp(701199, 1247.782f, 797.38104f, 358.60562f, (byte) 0, 2000); //Rideable Antiaircraft Gun. */
 					break;
 				}
 			break;
@@ -1454,8 +1454,8 @@ public class EmpyreanCrucibleInstance extends CrucibleInstance
 				    sendMsgByRace(1400929, Race.PC_ALL, 0);
 				    sp(217603, 1744.6332f, 1280.0349f, 394.3f, (byte) 9, 2000);
 				    sp(217604, 1756.2661f, 1305.561f, 394.3f, (byte) 97, 6000);
-					sp(217605, 1763.1177f, 1268.2404f, 394.3f, (byte) 22, 10000);
-				    sp(217606, 1765.2681f, 1306.5621f, 394.3f, (byte) 89, 14000);
+					sp(217605, 1763.1177f, 1268.2404f, 394.3f, (byte) 22, 8000);
+				    sp(217606, 1765.2681f, 1306.5621f, 394.3f, (byte) 89, 10000);
 				}
 			break;
 			case 217603:
