@@ -1159,6 +1159,10 @@
 		<spawn npc_id="730201">
 			<spot x="461.898" y="488.349" z="877.682" entity_id="82"/>
 		</spawn>
+        <!-- The Brig Entrance -->
+        <spawn npc_id="730200">
+            <spot x="461.898" y="487.228" z="877.713" entity_id="30"/>
+        </spawn>
 		<!-- Large Gun Deck Exit -->
 		<spawn npc_id="730204">
 			<spot x="724.042" y="508.901" z="1012.83" entity_id="89"/>

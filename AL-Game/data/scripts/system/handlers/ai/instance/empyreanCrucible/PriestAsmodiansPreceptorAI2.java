@@ -37,8 +37,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /****/
 
 @AIName("priest_asmodians_preceptor")
-public class PriestAsmodiansPreceptorAI2 extends AggressiveNpcAI2
-{
+public class PriestAsmodiansPreceptorAI2 extends AggressiveNpcAI2 {
+
 	private AtomicBoolean is75EventStarted = new AtomicBoolean(false);
 	private AtomicBoolean is25EventStarted = new AtomicBoolean(false);
 	
@@ -117,36 +117,35 @@ public class PriestAsmodiansPreceptorAI2 extends AggressiveNpcAI2
 			}
 		}, 1000);
 	}
-	
+
 	@Override
-	protected void handleDied() {
-		final WorldPosition p = getPosition();
-		if (p != null) {
-			deleteNpcs(p.getWorldMapInstance().getNpcs(282369)); //Traufnir.
-			deleteNpcs(p.getWorldMapInstance().getNpcs(282370)); //Sigyn.
-			deleteNpcs(p.getWorldMapInstance().getNpcs(282371)); //Sif.
-		}
+	public void handleDespawned() {
+		despawnNpcs();
+		super.handleDespawned();
+	}
+
+	@Override
+	public void handleDied() {
+		despawnNpcs();
 		super.handleDied();
 	}
 	
-	@Override
+	private void despawnNpcs() {
+		despawnNpc(getPosition().getWorldMapInstance().getNpc(282369)); //Traufnir.
+		despawnNpc(getPosition().getWorldMapInstance().getNpc(282370)); //Sigyn.
+		despawnNpc(getPosition().getWorldMapInstance().getNpc(282371)); //Sif.
+	}
+		
+    @Override
 	protected void handleBackHome() {
-		final WorldPosition p = getPosition();
-		if (p != null) {
-			deleteNpcs(p.getWorldMapInstance().getNpcs(282369)); //Traufnir.
-			deleteNpcs(p.getWorldMapInstance().getNpcs(282370)); //Sigyn.
-			deleteNpcs(p.getWorldMapInstance().getNpcs(282371)); //Sif.
-		}
 		is75EventStarted.set(false);
 		is25EventStarted.set(false);
 		super.handleDied();
 	}
 	
-	private void deleteNpcs(List<Npc> npcs) {
-		for (Npc npc: npcs) {
-			if (npc != null) {
-				npc.getController().onDelete();
-			}
+	private void despawnNpc(Npc npc) {
+		if (npc != null) {
+			npc.getController().onDelete();
 		}
 	}
 }

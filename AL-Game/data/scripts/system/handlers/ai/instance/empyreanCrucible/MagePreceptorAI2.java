@@ -37,8 +37,8 @@ import java.util.List;
 /****/
 
 @AIName("mage_preceptor")
-public class MagePreceptorAI2 extends AggressiveNpcAI2
-{
+public class MagePreceptorAI2 extends AggressiveNpcAI2 {
+
 	private List<Integer> percents = new ArrayList<Integer>();
 	
 	@Override
@@ -129,31 +129,33 @@ public class MagePreceptorAI2 extends AggressiveNpcAI2
 	}
 	
 	@Override
-	protected void handleDied() {
-		final WorldPosition p = getPosition();
-		if (p != null) {
-			deleteNpcs(p.getWorldMapInstance().getNpcs(282363)); //Summoned Tran Of Fire.
-			deleteNpcs(p.getWorldMapInstance().getNpcs(282364)); //Summoned Tran Of Wind.
-		}
-		super.handleDied();
+	public void handleDespawned() {
+		percents.clear();
+		despawnNpcs();
+		super.handleDespawned();
 	}
-	
+
 	@Override
-	protected void handleBackHome() {
-		final WorldPosition p = getPosition();
-		if (p != null) {
-			deleteNpcs(p.getWorldMapInstance().getNpcs(282363)); //Summoned Tran Of Fire.
-			deleteNpcs(p.getWorldMapInstance().getNpcs(282364)); //Summoned Tran Of Wind.
-		}
-		addPercents();
+	public void handleDied() {
+		despawnNpcs();
 		super.handleDied();
 	}
+
+	@Override
+	public void handleBackHome() {
+		addPercents();
+		despawnNpcs();
+		super.handleBackHome();
+	}
 	
-	private void deleteNpcs(List<Npc> npcs) {
-		for (Npc npc: npcs) {
-			if (npc != null) {
-				npc.getController().onDelete();
-			}
+	private void despawnNpcs() {
+		despawnNpc(getPosition().getWorldMapInstance().getNpc(282364));
+		despawnNpc(getPosition().getWorldMapInstance().getNpc(282363));
+	}
+
+	private void despawnNpc(Npc npc) {
+		if (npc != null) {
+			npc.getController().onDelete();
 		}
 	}
 }
