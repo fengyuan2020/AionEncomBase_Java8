@@ -37,8 +37,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /****/
 
 @AIName("priest_elyos_preceptor")
-public class PriestElyosPreceptorAI2 extends AggressiveNpcAI2
-{
+public class PriestElyosPreceptorAI2 extends AggressiveNpcAI2 {
+
 	private AtomicBoolean is75EventStarted = new AtomicBoolean(false);
 	private AtomicBoolean is25EventStarted = new AtomicBoolean(false);
 	
@@ -117,36 +117,35 @@ public class PriestElyosPreceptorAI2 extends AggressiveNpcAI2
 			}
 		}, 1000);
 	}
-	
+
 	@Override
-	protected void handleDied() {
-		final WorldPosition p = getPosition();
-		if (p != null) {
-			deleteNpcs(p.getWorldMapInstance().getNpcs(282366)); //Boreas.
-			deleteNpcs(p.getWorldMapInstance().getNpcs(282367)); //Jumentis.
-			deleteNpcs(p.getWorldMapInstance().getNpcs(282368)); //Charna.
-		}
+	public void handleDespawned() {
+		despawnNpcs();
+		super.handleDespawned();
+	}
+
+	@Override
+	public void handleDied() {
+		despawnNpcs();
 		super.handleDied();
+	}
+
+	private void despawnNpcs() {
+		despawnNpc(getPosition().getWorldMapInstance().getNpc(282366)); //Boreas.
+		despawnNpc(getPosition().getWorldMapInstance().getNpc(282367)); //Jumentis.
+		despawnNpc(getPosition().getWorldMapInstance().getNpc(282368)); //Charna.
 	}
 	
 	@Override
 	protected void handleBackHome() {
-		final WorldPosition p = getPosition();
-		if (p != null) {
-			deleteNpcs(p.getWorldMapInstance().getNpcs(282366)); //Boreas.
-			deleteNpcs(p.getWorldMapInstance().getNpcs(282367)); //Jumentis.
-			deleteNpcs(p.getWorldMapInstance().getNpcs(282368)); //Charna.
-		}
 		is75EventStarted.set(false);
 		is25EventStarted.set(false);
 		super.handleDied();
 	}
 	
-	private void deleteNpcs(List<Npc> npcs) {
-		for (Npc npc: npcs) {
-			if (npc != null) {
-				npc.getController().onDelete();
-			}
+	private void despawnNpc(Npc npc) {
+		if (npc != null) {
+			npc.getController().onDelete();
 		}
 	}
 }
