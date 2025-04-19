@@ -1,6 +1,4 @@
 /*
-
- *
  *  Encom is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -25,6 +23,10 @@ import com.aionemu.gameserver.taskmanager.tasks.ExpireTimerTask;
 import com.aionemu.gameserver.utils.PacketSendUtility;
 
 import javolution.util.FastMap;
+
+/*
+ * Rework & Test : MATTY
+ */
 
 public class MinionList {
 	private final Player player;
@@ -64,8 +66,9 @@ public class MinionList {
 		return minions.get(minionObjId);
 	}
 
-	public MinionCommonData addNewMinion(Player player, int minionId, String name, String grade, int level) {
-		MinionCommonData minionCommonData = new MinionCommonData(minionId, player.getObjectId(), name, grade, level, 0);
+	// Add growthPoint
+	public MinionCommonData addNewMinion(Player player, int minionId, String name, String grade, int level, int growthPoint) {
+		MinionCommonData minionCommonData = new MinionCommonData(minionId, player.getObjectId(), name, grade, level, growthPoint);
 		DAOManager.getDAO(PlayerMinionsDAO.class).insertPlayerMinion(minionCommonData);
 		DAOManager.getDAO(PlayerMinionsDAO.class).saveBirthday(minionCommonData);
 		minions.put(minionId, minionCommonData);

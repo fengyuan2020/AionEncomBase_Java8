@@ -1,6 +1,4 @@
 /*
-
- *
  *  Encom is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -28,9 +26,11 @@ import com.aionemu.gameserver.model.stats.calc.functions.StatFunction;
 import com.aionemu.gameserver.model.templates.BoundRadius;
 import com.aionemu.gameserver.model.templates.stats.ModifiersTemplate;
 
-/**
+/*
  * @author Falke_34
+ * Rework & Test : MATTY
  */
+
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlRootElement(name = "MinionTemplate")
 public class MinionTemplate {

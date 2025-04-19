@@ -1,6 +1,4 @@
 /*
-
- *
  *  Encom is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -25,6 +23,10 @@ import com.aionemu.gameserver.model.templates.VisibleObjectTemplate;
 import com.aionemu.gameserver.model.templates.minion.MinionDopingBag;
 import com.aionemu.gameserver.utils.idfactory.IDFactory;
 
+/*
+ * Rework & Test : MATTY
+ */
+
 public class MinionCommonData extends VisibleObjectTemplate implements IExpirable {
 
 	private int minionId;
@@ -43,8 +45,7 @@ public class MinionCommonData extends VisibleObjectTemplate implements IExpirabl
 	private int minionSkillPoints;
 	private Timestamp minionFunctionTime;
 
-	public MinionCommonData(int minionId, int masterObjectId, String name, String minionGrade, int minionLevel,
-			int miniongrowthpoint) {
+	public MinionCommonData(int minionId, int masterObjectId, String name, String minionGrade, int minionLevel, int miniongrowthpoint) {
 		switch (this.minionObjId) {
 		case 0: {
 			this.minionObjId = IDFactory.getInstance().nextId();
