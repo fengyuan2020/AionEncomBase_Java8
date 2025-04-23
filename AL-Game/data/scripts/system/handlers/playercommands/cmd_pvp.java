@@ -40,14 +40,11 @@ public class cmd_pvp extends PlayerCommand {
     }
 
     public void execute(Player player, String...param){
-
         if (player.isAttackMode()){
             PacketSendUtility.sendMessage(player, "You cannot Go to Insane PvP while in Attack Mode!");
             return;
         }
-
         Calendar calendar = Calendar.getInstance();
-
         if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY){
             monPvP(player);
             givePvPWelcomeMsg(player, "monPvP");
@@ -74,14 +71,10 @@ public class cmd_pvp extends PlayerCommand {
 		
 	  private void monPvP(Player player){
         checkotherEvents(player);
-        if(player.getWorldId() == 600050000){ //Beluslan
-            PacketSendUtility.sendMessage(player, "You cannot use the command inside the PvP Map!");
-            return;
-        }
-        if (player.getRace() == Race.ASMODIANS && !player.isInPrison()) {
-            goTo(player, WorldMapType.KATALAM.getId(), 322.85242f, 387.63394f, 274.15488f);
-        } else if (player.getRace() == Race.ELYOS && !player.isInPrison()) {
-            goTo(player, WorldMapType.KATALAM.getId(), 450.45847f, 2628.0674f, 146.0f);
+        if (player.getRace() == Race.ASMODIANS  && player.getWorldId() != 220040000 && !player.isInPrison()) { //Beluslan
+            goTo(player, WorldMapType.BELUSLAN.getId(), 2154.291f, 1031.396f, 484.41196f);
+        } else if (player.getRace() == Race.ELYOS && player.getWorldId() != 220040000 && !player.isInPrison()) {
+            goTo(player, WorldMapType.BELUSLAN.getId(), 1883.6552f, 1298.7427f, 428.79642f);
         }
     } 				
 
@@ -125,7 +118,7 @@ public class cmd_pvp extends PlayerCommand {
     private void givePvPWelcomeMsg(Player player, String PvPMap){
         String msg = "";
         if(PvPMap.equalsIgnoreCase("monPvP")){
-            if(player.getWorldId() == 600050000){
+            if(player.getWorldId() == 220040000){
                 return;
             }
         }else if(PvPMap.equalsIgnoreCase("tuePvP")){
@@ -133,7 +126,7 @@ public class cmd_pvp extends PlayerCommand {
                 return;
             }
         }else if(PvPMap.equalsIgnoreCase("wedPvP")){
-            if(player.getWorldId() == 600050000){
+            if(player.getWorldId() == 220040000){
                 return;
             }
         }else if(PvPMap.equalsIgnoreCase("monPvP")){
@@ -141,7 +134,7 @@ public class cmd_pvp extends PlayerCommand {
                 return;
             }
         }else if(PvPMap.equalsIgnoreCase("tuePvP")) {
-            if (player.getWorldId() == 600050000) {
+            if (player.getWorldId() == 220040000) {
                 return;
             }
 	    }else if(PvPMap.equalsIgnoreCase("wedPvP")) {
@@ -156,10 +149,6 @@ public class cmd_pvp extends PlayerCommand {
             msg = "all the ASMODIANS :]";
         }
 		PacketSendUtility.sendSys3Message(player, "\uE059", "[PvP Zone] Welcome to the PvP Zone!!");
-        PacketSendUtility.sendYellowMessage(player, "\n[PvP Rules]" +
-                "\n # No Camping at Spawn Area" +
-                "\n # No Hacking" +
-                "\n # No Bug Abusing" +
-                "\n # And as always remember to kill "+ msg);
+        PacketSendUtility.sendYellowMessage(player, "\n[PvP Rules]" +  "\n # No Camping at Spawn Area" +  "\n # No Hacking" + "\n # No Bug Abusing" + "\n # And as always remember to kill "+ msg);
     }
 }

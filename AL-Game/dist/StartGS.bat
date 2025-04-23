@@ -13,7 +13,7 @@ echo.
 
 REM -------------------------------------
 REM Default parameters for a basic server.
-java -Xms4096m -Xmx8192m -XX:MaxHeapSize=8192m -Xdebug -XX:MaxNewSize=48m -XX:NewSize=48m -XX:+UseParNewGC -XX:+CMSParallelRemarkEnabled -XX:+UseConcMarkSweepGC -XX:-UseSplitVerifier -ea -javaagent:./libs/al-commons.jar -cp ./libs/*;./libs/AL-Game.jar com.aionemu.gameserver.GameServer
+java -Xms4096m -Xmx8192m -XX:MaxHeapSize=8192m -Xdebug -XX:MaxNewSize=48m -XX:NewSize=48m -XX:+UseParNewGC -XX:+CMSParallelRemarkEnabled -XX:+UseConcMarkSweepGC -ea -javaagent:./libs/al-commons.jar -cp ./libs/*;./libs/AL-Game.jar com.aionemu.gameserver.GameServer
 REM -------------------------------------
 SET CLASSPATH=%OLDCLASSPATH%
 

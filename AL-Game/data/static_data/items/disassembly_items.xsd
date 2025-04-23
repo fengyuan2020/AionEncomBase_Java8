@@ -38,7 +38,7 @@
     </xs:complexType>
     <xs:complexType name="DisassembleItem">
         <xs:attribute name="itemId" type="xs:int"/>
-        <xs:attribute name="count" type="xs:int"/>
+        <xs:attribute name="count" type="xs:string"/>
         <xs:attribute name="disuse" type="xs:boolean"/>
     </xs:complexType>
     <xs:simpleType name="PlayerClassList">
