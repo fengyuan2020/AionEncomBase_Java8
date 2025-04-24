@@ -64,19 +64,14 @@ public class _26823Reunion_With_Agent_Peregrine extends QuestHandler {
 	public boolean onDialogEvent(QuestEnv env) {
 		Player player = env.getPlayer();
 		QuestState qs = player.getQuestStateList().getQuestState(questId);
-		int var = qs.getQuestVarById(0);
 		int targetId = env.getTargetId();
 		if (qs == null || qs.getStatus() == QuestStatus.START) {
 			if (targetId == 806289) { //페레그란.
 				switch (env.getDialog()) {
                     case START_DIALOG: {
-                        if (var == 2) {
-                            return sendQuestDialog(env, 1694);
-                        }
+                         return sendQuestDialog(env, 1694);
 					} case SELECT_ACTION_1695: {
-						if (var == 2) {
-							return sendQuestDialog(env, 1695);
-						}
+						return sendQuestDialog(env, 1695);
 					} case STEP_TO_3: {
                         changeQuestStep(env, 2, 3, false);
 						return closeDialogWindow(env);
@@ -84,7 +79,7 @@ public class _26823Reunion_With_Agent_Peregrine extends QuestHandler {
                 }
 			}
 		}         
-        else if (qs == null && qs.getStatus() == QuestStatus.REWARD) {
+        else if (qs == null || qs.getStatus() == QuestStatus.REWARD) {
             if (targetId == 806290) {
                 if (env.getDialogId() == 31) {
                     return sendQuestDialog(env, 10002);
