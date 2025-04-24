@@ -452,8 +452,7 @@ public final class PlayerEnterWorldService {
 			// Intro message
 			// PacketSendUtility.sendWhiteMessage(player, serverName);
 			// PacketSendUtility.sendYellowMessage(player, serverIntro);
-			// PacketSendUtility.sendBrightYellowMessage(player, ">> 本程序为开源软件!如有付款购买,请申请退款! <<");
-			PacketSendUtility.sendBrightYellowMessage(player, ">> This program is open source software! If you have made a payment for the purchase, please apply for a refund! <<");
+			// PacketSendUtility.sendBrightYellowMessage(player, serverInfo);
 			// PacketSendUtility.sendWhiteMessage(player, alInfo);
 			// "\uE026" //Timer.
 			// "\uE027" //Speaker.
