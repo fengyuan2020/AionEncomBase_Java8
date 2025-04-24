@@ -52,19 +52,14 @@ public class _16821Lost_Agent_Viola extends QuestHandler {
 	public boolean onDialogEvent(QuestEnv env) {
 		Player player = env.getPlayer();
 		QuestState qs = player.getQuestStateList().getQuestState(questId);
-		int var = qs.getQuestVarById(0);
 		int targetId = env.getTargetId();
 		if (qs == null || qs.getStatus() == QuestStatus.START) {
 			if (targetId == 806281) { //베니오.
 				switch (env.getDialog()) {
                     case START_DIALOG: {
-                        if (var == 0) {
-                            return sendQuestDialog(env, 1011);
-                        }
+                         return sendQuestDialog(env, 1011);
 					} case SELECT_ACTION_1012: {
-						if (var == 0) {
-							return sendQuestDialog(env, 1012);
-						}
+						return sendQuestDialog(env, 1012);
 					} case STEP_TO_1: {
                         changeQuestStep(env, 0, 1, false);
 						return closeDialogWindow(env);
@@ -73,9 +68,7 @@ public class _16821Lost_Agent_Viola extends QuestHandler {
 			} if (targetId == 806426) { //부르고스.
 				switch (env.getDialog()) {
 					case START_DIALOG: {
-						if (var == 1) {
-							return sendQuestDialog(env, 1353);
-						}
+						return sendQuestDialog(env, 1353);
 					} case STEP_TO_2: {
                         changeQuestStep(env, 1, 2, false);
 						return closeDialogWindow(env);

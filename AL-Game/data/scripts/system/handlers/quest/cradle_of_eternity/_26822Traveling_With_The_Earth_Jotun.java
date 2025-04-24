@@ -63,19 +63,14 @@ public class _26822Traveling_With_The_Earth_Jotun extends QuestHandler {
 	public boolean onDialogEvent(QuestEnv env) {
 		Player player = env.getPlayer();
 		QuestState qs = player.getQuestStateList().getQuestState(questId);
-		int var = qs.getQuestVarById(0);
 		int targetId = env.getTargetId();
 		if (qs == null || qs.getStatus() == QuestStatus.START) {
 			if (targetId == 220588) { //ì „íˆ¬ì¤‘ì?¸ ëŒ€ì§€ì?˜ ëŠ?ë¹Œë¦¼.
 				switch (env.getDialog()) {
                     case START_DIALOG: {
-                        if (var == 1) {
-                            return sendQuestDialog(env, 1352);
-                        }
+                        return sendQuestDialog(env, 1352);
 					} case SELECT_ACTION_1353: {
-						if (var == 1) {
-							return sendQuestDialog(env, 1353);
-						}
+						return sendQuestDialog(env, 1353);
 					} case STEP_TO_2: {
                         changeQuestStep(env, 1, 2, false);
 						return closeDialogWindow(env);
@@ -84,13 +79,9 @@ public class _26822Traveling_With_The_Earth_Jotun extends QuestHandler {
 			} if (targetId == 220590) { //ëŒ€ì§€ì?˜ ëŠ?ë¹Œë¦¼.
 				switch (env.getDialog()) {
 					case START_DIALOG: {
-						if (var == 3) {
-							return sendQuestDialog(env, 2034);
-						}
+						return sendQuestDialog(env, 2034);
 					} case SELECT_ACTION_2035: {
-						if (var == 3) {
-							return sendQuestDialog(env, 2035);
-						}
+						return sendQuestDialog(env, 2035);
 					} case STEP_TO_4: {
                         changeQuestStep(env, 3, 4, false);
 						return closeDialogWindow(env);
@@ -98,7 +89,7 @@ public class _26822Traveling_With_The_Earth_Jotun extends QuestHandler {
 				}
 			}
 		} 
-        else if (qs == null && qs.getStatus() == QuestStatus.REWARD) {
+        else if (qs == null || qs.getStatus() == QuestStatus.REWARD) {
             if (targetId == 806283) {
                 if (env.getDialogId() == 31) {
                     return sendQuestDialog(env, 10002);

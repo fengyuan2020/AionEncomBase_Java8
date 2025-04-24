@@ -165,12 +165,8 @@ public class InGameShopEn {
 		if (AdvCustomConfig.GAMESHOP_LIMIT) {
 			if (item.getCategory() == AdvCustomConfig.GAMESHOP_CATEGORY) {
 				if (lastUsage.containsKey(player.getObjectId())) {
-					if ((System.currentTimeMillis()
-							- lastUsage.get(player.getObjectId())) < AdvCustomConfig.GAMESHOP_LIMIT_TIME * 60 * 1000) {
-						PacketSendUtility.sendMessage(player,
-								"?????????????,??????????:" + (int) ((AdvCustomConfig.GAMESHOP_LIMIT_TIME * 60 * 1000
-										- (System.currentTimeMillis() - lastUsage.get(player.getObjectId()))) / 1000)
-										+ " ?");
+					if ((System.currentTimeMillis() - lastUsage.get(player.getObjectId())) < AdvCustomConfig.GAMESHOP_LIMIT_TIME * 60 * 1000) {
+						PacketSendUtility.sendMessage(player, "?????????????,??????????:" + (int) ((AdvCustomConfig.GAMESHOP_LIMIT_TIME * 60 * 1000 - (System.currentTimeMillis() - lastUsage.get(player.getObjectId()))) / 1000) + " ?");
 						return;
 					}
 				}
@@ -206,8 +202,7 @@ public class InGameShopEn {
 
 		PlayerCommonData recipientCommonData = DAOManager.getDAO(PlayerDAO.class).loadPlayerCommonDataByName(receiver);
 		if (recipientCommonData.getMailboxLetters() >= 100) {
-			PacketSendUtility.sendPacket(player,
-					SM_SYSTEM_MESSAGE.STR_MAIL_MSG_RECIPIENT_MAILBOX_FULL(recipientCommonData.getName()));
+			PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MAIL_MSG_RECIPIENT_MAILBOX_FULL(recipientCommonData.getName()));
 			return;
 		}
 
@@ -249,9 +244,8 @@ public class InGameShopEn {
 					} else if (result == 2) {
 						IGItem item = getIGItem(request.itemObjId);
 						if (item == null) {
-							PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_INGAMESHOP_ERROR);
-							log.error("player " + player.getName() + " requested " + request.itemObjId
-									+ " that was not exists in list.");
+/* 							PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_INGAMESHOP_ERROR);
+							log.error("player " + player.getName() + " requested " + request.itemObjId + " that was not exists in list."); */
 							return;
 						}
 						PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_INGAMESHOP_NOT_ENOUGH_CASH("Toll"));
@@ -259,16 +253,13 @@ public class InGameShopEn {
 					} else if (result == 3) {
 						IGItem item = getIGItem(request.itemObjId);
 						if (item == null) {
-							PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_INGAMESHOP_ERROR);
-							log.error("player " + player.getName() + " requested " + request.itemObjId
-									+ " that was not exists in list.");
+/* 							PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_INGAMESHOP_ERROR);
+							log.error("player " + player.getName() + " requested " + request.itemObjId + " that was not exists in list."); */
 							return;
 						}
 
 						if (request.gift) {
-							SystemMailService.getInstance().sendMail(player.getName(), request.receiver, "In Game Shop",
-									request.message, item.getItemId(), item.getItemCount(), 0L, 0L,
-									LetterType.BLACKCLOUD);
+							SystemMailService.getInstance().sendMail(player.getName(), request.receiver, "In Game Shop", request.message, item.getItemId(), item.getItemCount(), 0L, 0L, LetterType.BLACKCLOUD);
 							PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_INGAMESHOP_GIFT_SUCCESS);
 							player.getClientConnection().getAccount().setToll(toll);
 							player.getClientConnection().getAccount().setLuna(luna);
@@ -292,10 +283,8 @@ public class InGameShopEn {
 	}
 
 	class DescFilter implements Comparator<Object> {
-
 		DescFilter() {
 		}
-
 		public int compare(Object o1, Object o2) {
 			Integer i1 = (Integer) o1;
 			Integer i2 = (Integer) o2;

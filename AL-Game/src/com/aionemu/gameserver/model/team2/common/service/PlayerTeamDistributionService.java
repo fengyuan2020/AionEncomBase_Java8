@@ -71,14 +71,14 @@ public class PlayerTeamDistributionService {
 				continue;
 			}
 			// Reward InGameShop.
-			switch (member.getWorldId()) {
+			/* switch (member.getWorldId()) {
 			// Idian Depths.
 			case 210090000:
 			case 220100000:
 				InGameShopEn.getInstance().addToll(member, (long) (0 * member.getRates().getTollRewardRate()));
 				PacketSendUtility.sendSys1Message(member, "\uE083", "Kamu Jangan Ngepet ya");
 				break;
-			}
+			} */
 			// Berdin's Star.
 			if (owner.getLevel() >= 10) {
 				member.getCommonData().addBerdinStar(1575000); // 0.14%
@@ -233,8 +233,7 @@ public class PlayerTeamDistributionService {
 			case 302350000: // Evergale Canyon.
 			case 310160000: // Divine Tower L.
 			case 320160000: // Divine Tower D.
-				member.getCommonData().addExp(Rnd.get(480000, 550000), RewardType.GROUP_HUNTING,
-						owner.getObjectTemplate().getNameId());
+				member.getCommonData().addExp(Rnd.get(480000, 550000), RewardType.GROUP_HUNTING, owner.getObjectTemplate().getNameId());
 				break;
 			case 300040000: // Dark Poeta.
 			case 300100000: // Steel Rake.
@@ -256,27 +255,22 @@ public class PlayerTeamDistributionService {
 			case 320100000: // Fire Temple.
 			case 320130000: // Adma Stronghold.
 			case 320150000: // Padmarashka's Cave.
-				member.getCommonData().addExp(Rnd.get(110000, 150000), RewardType.GROUP_HUNTING,
-						owner.getObjectTemplate().getNameId());
+				member.getCommonData().addExp(Rnd.get(110000, 150000), RewardType.GROUP_HUNTING, owner.getObjectTemplate().getNameId());
 				break;
 			case 210100000: // Iluma.
 			case 220110000: // Norsvold.
 				AbyssPointsService.addAp(member, owner, Rnd.get(60, 100));
-				member.getCommonData().addExp(Rnd.get(480000, 550000), RewardType.GROUP_HUNTING,
-						owner.getObjectTemplate().getNameId());
+				member.getCommonData().addExp(Rnd.get(480000, 550000), RewardType.GROUP_HUNTING, owner.getObjectTemplate().getNameId());
 				break;
 			case 600040000: // Tiamaranta's Eye.
-				member.getCommonData().addExp(Rnd.get(480000, 550000), RewardType.GROUP_HUNTING,
-						owner.getObjectTemplate().getNameId());
+				member.getCommonData().addExp(Rnd.get(480000, 550000), RewardType.GROUP_HUNTING, owner.getObjectTemplate().getNameId());
 				break;
 			case 600090000: // Kaldor.
 			case 600100000: // Levinshor.
-				member.getCommonData().addExp(Rnd.get(50000, 100000), RewardType.GROUP_HUNTING,
-						owner.getObjectTemplate().getNameId());
+				member.getCommonData().addExp(Rnd.get(50000, 100000), RewardType.GROUP_HUNTING, owner.getObjectTemplate().getNameId());
 				break;
 			default:
-				member.getCommonData().addExp(rewardXp, RewardType.GROUP_HUNTING,
-						owner.getObjectTemplate().getNameId());
+				member.getCommonData().addExp(rewardXp, RewardType.GROUP_HUNTING, owner.getObjectTemplate().getNameId());
 				break;
 			}
 			member.getCommonData().addDp(rewardDp);
@@ -294,22 +288,19 @@ public class PlayerTeamDistributionService {
 					for (String worldIds : CustomConfig.TOLL_PVE_WORLDID.split(",")) {
 						if (member.getWorldId() == Integer.parseInt(worldIds)) {
 							InGameShopEn.getInstance().addToll(member, CustomConfig.TOLL_PVE_QUANTITY);
-							PacketSendUtility.sendMessage(member,
-									"You have received " + CustomConfig.TOLL_PVE_QUANTITY + " tolls from PvE!");
+							PacketSendUtility.sendMessage(member, "You have received " + CustomConfig.TOLL_PVE_QUANTITY + " tolls from PvE!");
 						}
 					}
 
 				}
 			}
 		}
-		Player mostDamagePlayer = owner.getAggroList().getMostPlayerDamageOfMembers(team.getMembers(),
-				filteredStats.highestLevel);
+		Player mostDamagePlayer = owner.getAggroList().getMostPlayerDamageOfMembers(team.getMembers(), filteredStats.highestLevel);
 		if (mostDamagePlayer == null) {
 			return;
 		}
 		if (winner.equals(team) && (!owner.getAi2().getName().equals("chest") || filteredStats.mentorCount == 0)) {
-			DropRegistrationService.getInstance().registerDrop(owner, mostDamagePlayer, filteredStats.highestLevel,
-					filteredStats.players);
+			DropRegistrationService.getInstance().registerDrop(owner, mostDamagePlayer, filteredStats.highestLevel, filteredStats.players);
 		}
 	}
 
