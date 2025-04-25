@@ -14,15 +14,15 @@ echo.
 
 REM -------------------------------------
 REM Оптимальные параметры для ParallelGC
-REM  -XX:+UseParallelGC \          # Включить ParallelGC
-REM  -Xms2048m -Xmx8192m \         # Фиксированный размер выделения памяти
-REM  -XX:+PrintGCDetails \         # Логировать сборки мусора (для дебага)
-REM  -XX:+PrintGCDateStamps \      # Добавить даты в логи GC
-REM  -Xloggc:gc.log \              # Сохранять логи GC в файл
-REM  -Xms8g -Xmx8g \               # Больше памяти, если нужно
-REM  -XX:MaxGCPauseMillis=200 \    # Желаемая максимальная пауза GC (мс)
-REM  -XX:GCTimeRatio=99 \          # Цель: 1% времени на GC (99% на работу)
-REM  -XX:ParallelGCThreads=4 \     # Количество потоков GC (по умолчанию = кол-во ядер CPU)
+REM  -XX:+UseParallelGC \          # Enable ParallelGC
+REM  -Xms2048m -Xmx8192m \         # Fixed size of memory allocation
+REM  -XX:+PrintGCDetails \         # Log garbage collection (for debug)
+REM  -XX:+PrintGCDateStamps \      # Add dates to GC logs
+REM  -Xloggc:gc.log \              # Save GC logs to a file
+REM  -Xms8g -Xmx8g \               # More memory if needed
+REM  -XX:MaxGCPauseMillis=200 \    # Desired maximum GC pause (ms)
+REM  -XX:GCTimeRatio=99 \          # Goal: 1% of time for GC (99% for work)
+REM  -XX:ParallelGCThreads=4 \     # Number of GC threads (default = number of CPU cores)
 REM -------------------------------------
 
 java ^
