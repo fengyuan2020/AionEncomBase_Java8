@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50546
 File Encoding         : 65001
 
-Date: 2017-08-08 17:34:25
+Date: 2025-04-25 19:34:25
 */
 SET FOREIGN_KEY_CHECKS=0;
 
@@ -189,7 +189,7 @@ CREATE TABLE IF NOT EXISTS `competition_ranking` (
   `high_points` int(10) NOT NULL DEFAULT '0',
   `low_points` int(10) NOT NULL DEFAULT '0',
   `position_match` int(10) NOT NULL DEFAULT '5'
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for craft_cooldowns
@@ -223,7 +223,7 @@ CREATE TABLE `f2paccount` (
   `player_id` int(11) NOT NULL,
   `time` int(11) NOT NULL,
   PRIMARY KEY (`player_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for friends
@@ -523,7 +523,7 @@ CREATE TABLE `legion_join_requests` (
   KEY `playerId` (`playerId`),
   CONSTRAINT `legion_join_requests_ibfk_1` FOREIGN KEY (`legionId`) REFERENCES `legions` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `legion_join_requests_ibfk_2` FOREIGN KEY (`playerId`) REFERENCES `players` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for legion_members
@@ -880,7 +880,7 @@ CREATE TABLE `player_combat_points` (
   `cp_point` int(3) NOT NULL DEFAULT '1',
   `category` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`player_id`,`slot_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for player_cooldowns
@@ -1062,7 +1062,7 @@ CREATE TABLE `player_luna_shop` (
   `free_under` tinyint(1) NOT NULL,
   `free_munition` tinyint(1) NOT NULL,
   `free_chest` tinyint(1) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for player_macrosses
@@ -1422,7 +1422,7 @@ CREATE TABLE `realms` (
   `sqlpass` varchar(32) DEFAULT NULL,
   `chardb` varchar(32) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for server_variables
@@ -1527,7 +1527,7 @@ CREATE TABLE `tasks` (
   `trigger_param` text NOT NULL,
   `exec_param` text,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for threes_upgrade
@@ -1540,7 +1540,7 @@ CREATE TABLE `threes_upgrade` (
   `threeId` int(255) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_id` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records 
@@ -1602,7 +1602,7 @@ CREATE TABLE `users` (
   `ip` varchar(30) DEFAULT NULL,
   `date` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=10 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for veteran_rewards
