@@ -130,7 +130,6 @@ import com.aionemu.gameserver.services.events.LadderService;
 import com.aionemu.gameserver.services.events.PigPoppyEventService;
 import com.aionemu.gameserver.services.events.ShugoSweepService;
 import com.aionemu.gameserver.services.events.TreasureAbyssService;
-import com.aionemu.gameserver.services.gc.GarbageCollector;
 import com.aionemu.gameserver.services.instance.AsyunatarService;
 import com.aionemu.gameserver.services.instance.DredgionService2;
 import com.aionemu.gameserver.services.instance.EngulfedOphidanBridgeService;
@@ -435,12 +434,6 @@ public class GameServer {
 
 		// Reward Weekly Manager 5.3
 		AbyssRankUpdateService.getInstance().initRewardWeeklyManager();
-
-		/**
-		 * Schedules Garbage Collector to be launched at the specified time to be
-		 * optimized unused memory
-		 */
-		GarbageCollector.getInstance().start();
 
 		PacketBroadcaster.getInstance();
 
