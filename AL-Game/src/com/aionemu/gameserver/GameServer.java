@@ -171,6 +171,7 @@ import com.aionemu.gameserver.world.World;
 import com.aionemu.gameserver.world.geo.GeoService;
 import com.aionemu.gameserver.world.geo.nav.NavService;
 import com.aionemu.gameserver.world.zone.ZoneService;
+import com.aionemu.gameserver.services.gc.GarbageCollector;
 
 import ch.lambdaj.Lambda;
 import ch.qos.logback.classic.LoggerContext;
@@ -434,6 +435,12 @@ public class GameServer {
 
 		// Reward Weekly Manager 5.3
 		AbyssRankUpdateService.getInstance().initRewardWeeklyManager();
+		
+		/**
+ 		 * Schedules Garbage Collector to be launched at the specified time to be
+ 		 * optimized unused memory
+ 		 */
+ 		GarbageCollector.getInstance().start();
 
 		PacketBroadcaster.getInstance();
 

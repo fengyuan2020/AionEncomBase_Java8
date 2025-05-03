@@ -60,5 +60,13 @@ public class GSConfig {
 
 	@Property(key = "gameserver.yaadminpanel.server.enable", defaultValue = "false")
 	public static boolean SERVER_YAADMINPANEL_SWITCH_ON;
+	
+	/**
+ 	 * Memory Optimization Configs
+ 	 */
+ 	@Property(key = "gameserver.gc.enable", defaultValue = "true")
+ 	public static boolean ENABLE_MEMORY_GC;
+ 	@Property(key = "gameserver.gc.optimization.time", defaultValue = "5")
+ 	public static int GC_OPTIMIZATION_TIME;
 
 }
