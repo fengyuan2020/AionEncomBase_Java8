@@ -1,4 +1,5 @@
 /*
+
  *
  *  Encom is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser Public License as published by
@@ -39,40 +40,11 @@ import javolution.util.FastMap;
 /**
  * @author Mr. Poke
  */
-import java.lang.ThreadLocal;
-
 public class GeoMap extends Node {
-    // 对象池优化
-    private final ThreadLocal<Vector3f> tempVector1 = ThreadLocal.withInitial(Vector3f::new);
-    private final ThreadLocal<Vector3f> tempVector2 = ThreadLocal.withInitial(Vector3f::new);
-    private final ThreadLocal<Vector3f> tempVector3 = ThreadLocal.withInitial(Vector3f::new);
-    private final ThreadLocal<Triangle> tempTriangle = ThreadLocal.withInitial(Triangle::new);
-    
-    // 碰撞结果缓存优化
-    private final ThreadLocal<CollisionResults> physicalResults = ThreadLocal.withInitial(
-        () -> new CollisionResults(CollisionIntention.PHYSICAL.getId(), false, 1));
-    private final ThreadLocal<CollisionResults> doorResults = ThreadLocal.withInitial(
-        () -> new CollisionResults(CollisionIntention.DOOR.getId(), false, 1));
-    private final ThreadLocal<CollisionResults> mixedResults = ThreadLocal.withInitial(
-        () -> new CollisionResults((byte)(CollisionIntention.PHYSICAL.getId() | CollisionIntention.DOOR.getId()), false, 1));	
 
 	private short[] terrainData;
 	private List<BoundingBox> tmpBox = new ArrayList<BoundingBox>();
 	private Map<String, DoorGeometry> doors = new FastMap<String, DoorGeometry>();
-
-	// 地形数据预处理优化
-	private float[] preprocessedTerrainData;
-		
-	public void setTerrainData(short[] terrainData) {
-		this.terrainData = terrainData;
-		// 预处理地形数据
-		if (terrainData.length > 1) {
-			preprocessedTerrainData = new float[terrainData.length];
-			for (int i = 0; i < terrainData.length; i++) {
-				preprocessedTerrainData[i] = terrainData[i] / 32f;
-			}
-		}
-	}
 
 	/**
 	 * @param name
@@ -113,75 +85,101 @@ public class GeoMap extends Node {
 			}
 		}
 		if (foundDoor == null) {
+			// log.warn("Could not find static door: " + worldId + " " + meshFile + " " +
+			// templatePoint);
 			return null;
 		}
 		foundDoor.setFoundTemplate(true);
+		// log.info("Static door " + worldId + " " + meshFile + " " + templatePoint + "
+		// matched " + foundDoor.getName() +
+		// "; distance: " + distance);
 		return foundDoor.getName();
 	}
 
-	@ Deprecated
 	public boolean canPassWalker(float x, float y, float z, float targetX, float targetY, float targetZ, float limit,
 			int instanceId) {
-		// 复用Vector3f对象
-		Vector3f pos = tempVector1.get().set(x, y, z);
-		Vector3f dir = tempVector2.get().set(targetX, targetY, targetZ);
-		
-		// 使用距离平方比较优化
-		float dx = x - targetX;
-		float dy = y - targetY;
-		float distSq = dx * dx + dy * dy;
-		if (distSq > 2500f) { // 50的平方
+		float x2 = x - targetX;
+		float y2 = y - targetY;
+		float distance = (float) Math.sqrt(x2 * x2 + y2 * y2);
+		if (distance > 50.0f) {
 			return false;
 		}
-		
-		// 复用CollisionResults对象
-		CollisionResults results = physicalResults.get();
-		results.clear();
-		results.setInstanceId(instanceId);
-		
+		Vector3f pos = new Vector3f(x, y, z);
+		Vector3f dir = new Vector3f(targetX, targetY, targetZ);
 		dir.subtractLocal(pos).normalizeLocal();
 		Ray r = new Ray(pos, dir);
 		r.setLimit(limit);
-		
+		CollisionResults results = new CollisionResults(CollisionIntention.PHYSICAL.getId(), true, instanceId);
 		int collisions = this.collideWith(r, results);
 		return results.size() == 0 && collisions == 0;
 	}
 
 	public boolean canPass(float x, float y, float z, float targetX, float targetY, float targetZ, float limit,
 			int instanceId) {
-		// 复用Vector3f对象
-		Vector3f pos = tempVector1.get().set(x, y, z);
-		Vector3f dir = tempVector2.get().set(targetX, targetY, targetZ);
-		
-		// 使用距离平方比较优化
-		float dx = x - targetX;
-		float dy = y - targetY;
-		float distSq = dx * dx + dy * dy;
-		if (distSq > 4225f) { // 65的平方
-		return false;
+		float x2 = x - targetX;
+		float y2 = y - targetY;
+		float distance = (float) Math.sqrt(x2 * x2 + y2 * y2);
+		if (distance > 65.0f) {
+			return false;
 		}
-		
-		// 复用CollisionResults对象
-		CollisionResults results = physicalResults.get();
-		results.clear();
-		results.setInstanceId(instanceId);
-		
+		Vector3f pos = new Vector3f(x, y, z);
+		Vector3f dir = new Vector3f(targetX, targetY, targetZ);
 		dir.subtractLocal(pos).normalizeLocal();
 		Ray r = new Ray(pos, dir);
 		r.setLimit(limit);
-		
+		CollisionResults results = new CollisionResults(CollisionIntention.PHYSICAL.getId(), false, instanceId);
 		int collisions = this.collideWith(r, results);
 		return results.size() == 0 && collisions == 0;
 	}
 
-	@Deprecated
 	public float getZW(float x, float y) {
-		return getZ(x, y); // 直接调用优化后的方法
+		CollisionResults results = new CollisionResults(CollisionIntention.PHYSICAL.getId(), true, 1);
+		Vector3f pos = new Vector3f(x, y, 4000.0f);
+		Vector3f dir = new Vector3f(x, y, 0.0f);
+		Float limit = Float.valueOf(pos.distance(dir));
+		dir.subtractLocal(pos).normalizeLocal();
+		Ray r = new Ray(pos, dir);
+		r.setLimit(limit.floatValue());
+		this.collideWith(r, results);
+		Vector3f terrain = null;
+		terrain = this.terrainData.length == 1 ? new Vector3f(x, y, (float) this.terrainData[0] / 32.0f)
+				: this.terraionCollision(x, y, r);
+		if (terrain != null) {
+			CollisionResult result = new CollisionResult(terrain,
+					Math.max(0.0f, Math.max(4000.0f - terrain.z, terrain.z)));
+			results.addCollision(result);
+		}
+		if (results.size() == 0) {
+			return 0.0f;
+		}
+		return results.getClosestCollision().getContactPoint().z;
 	}
 
-	@Deprecated
 	public float getZW(float x, float y, float z, int instanceId) {
-		return getZ(x, y, z, instanceId); // 直接调用优化后的方法
+		CollisionResults results = new CollisionResults(CollisionIntention.PHYSICAL.getId(), true, instanceId);
+		Vector3f pos = new Vector3f(x, y, z + 2.0f);
+		Vector3f dir = new Vector3f(x, y, z - 100.0f);
+		Float limit = Float.valueOf(pos.distance(dir));
+		dir.subtractLocal(pos).normalizeLocal();
+		Ray r = new Ray(pos, dir);
+		r.setLimit(limit.floatValue());
+		this.collideWith(r, results);
+		Vector3f terrain = null;
+		if (this.terrainData.length == 1) {
+			if (this.terrainData[0] != 0) {
+				terrain = new Vector3f(x, y, (float) this.terrainData[0] / 32.0f);
+			}
+		} else {
+			terrain = this.terraionCollision(x, y, r);
+		}
+		if (terrain != null && terrain.z > 0.0f && terrain.z < z + 2.0f) {
+			CollisionResult result = new CollisionResult(terrain, Math.abs(z - terrain.z + 2.0f));
+			results.addCollision(result);
+		}
+		if (results.size() == 0) {
+			return z;
+		}
+		return results.getClosestCollision().getContactPoint().z;
 	}
 
 	public void setDoorState(int instanceId, String name, boolean isOpened) {
@@ -215,63 +213,63 @@ public class GeoMap extends Node {
 		return 0;
 	}
 
-	public float getZ(float x, float y) {
-	    // 复用CollisionResults对象
-	    CollisionResults results = physicalResults.get();
-	    results.clear();
-	    results.setInstanceId(1);
-	    
-	    Vector3f pos = tempVector1.get().set(x, y, 4000);
-	    Vector3f dir = tempVector2.get().set(x, y, 0);
-	    float limit = pos.distance(dir);
-	    dir.subtractLocal(pos).normalizeLocal();
-	    Ray r = new Ray(pos, dir);
-	    r.setLimit(limit);
-	    
-	    collideWith(r, results);
-	    Vector3f terrain = null;
-	    if (terrainData.length == 1) {
-	        terrain = tempVector3.get().set(x, y, terrainData[0] / 32f);
-	    } else {
-	        terrain = terrainCollision(x, y, r); 
-	    }
-	    if (terrain != null) {
-	        results.addCollision(new CollisionResult(terrain, Math.max(0, Math.max(4000 - terrain.z, terrain.z))));
-	    }
-	    return results.size() == 0 ? 0 : results.getClosestCollision().getContactPoint().z;
+	/**
+	 * @param terrainData The terrainData to set.
+	 */
+	public void setTerrainData(short[] terrainData) {
+		this.terrainData = terrainData;
 	}
 
-	public float getZ(float x, float y, float z, int instanceId) {
-		// 复用CollisionResults对象
-		CollisionResults results = physicalResults.get();
-		results.clear();
-		results.setInstanceId(instanceId);
-		
-		// 复用Vector3f对象
-		Vector3f pos = tempVector1.get().set(x, y, z + 2);
-		Vector3f dir = tempVector2.get().set(x, y, z - 100);
-		
-		float limit = pos.distance(dir);
+	public float getZ(float x, float y) {
+		CollisionResults results = new CollisionResults(CollisionIntention.PHYSICAL.getId(), false, 1);
+		Vector3f pos = new Vector3f(x, y, 4000);
+		Vector3f dir = new Vector3f(x, y, 0);
+		Float limit = pos.distance(dir);
 		dir.subtractLocal(pos).normalizeLocal();
 		Ray r = new Ray(pos, dir);
 		r.setLimit(limit);
-		
 		collideWith(r, results);
-		
+		Vector3f terrain = null;
+		if (terrainData.length == 1) {
+			terrain = new Vector3f(x, y, terrainData[0] / 32f);
+		} else {
+			terrain = terraionCollision(x, y, r);
+		}
+		if (terrain != null) {
+			CollisionResult result = new CollisionResult(terrain, Math.max(0, Math.max(4000 - terrain.z, terrain.z)));
+			results.addCollision(result);
+		}
+		if (results.size() == 0) {
+			return 0;
+		}
+		return results.getClosestCollision().getContactPoint().z;
+	}
+
+	public float getZ(float x, float y, float z, int instanceId) {
+		CollisionResults results = new CollisionResults(CollisionIntention.PHYSICAL.getId(), false, instanceId);
+		Vector3f pos = new Vector3f(x, y, z + 2);
+		Vector3f dir = new Vector3f(x, y, z - 100);
+		Float limit = pos.distance(dir);
+		dir.subtractLocal(pos).normalizeLocal();
+		Ray r = new Ray(pos, dir);
+		r.setLimit(limit);
+		collideWith(r, results);
 		Vector3f terrain = null;
 		if (terrainData.length == 1) {
 			if (terrainData[0] != 0) {
-				terrain = tempVector3.get().set(x, y, terrainData[0] / 32f);
+				terrain = new Vector3f(x, y, terrainData[0] / 32f);
 			}
 		} else {
-			terrain = terrainCollision(x, y, r);
+			terrain = terraionCollision(x, y, r);
 		}
-		
 		if (terrain != null && terrain.z > 0 && terrain.z < z + 2) {
-			results.addCollision(new CollisionResult(terrain, Math.abs(z - terrain.z + 2)));
+			CollisionResult result = new CollisionResult(terrain, Math.abs(z - terrain.z + 2));
+			results.addCollision(result);
 		}
-		
-		return results.size() == 0 ? z : results.getClosestCollision().getContactPoint().z;
+		if (results.size() == 0) {
+			return z;
+		}
+		return results.getClosestCollision().getContactPoint().z;
 	}
 
 	public Vector3f getClosestCollision(float x, float y, float z, float targetX, float targetY, float targetZ,
@@ -384,7 +382,7 @@ public class GeoMap extends Node {
 		for (float s = 0; s < intD; s += 2) {
 			float tempX = x + (x2 * s / ray.getLimit());
 			float tempY = y + (y2 * s / ray.getLimit());
-			Vector3f result = terrainCollision(tempX, tempY, ray);
+			Vector3f result = terraionCollision(tempX, tempY, ray);
 			if (result != null) {
 				return result;
 			}
@@ -400,110 +398,97 @@ public class GeoMap extends Node {
 		this.terrainCutoutData = arr;
 	}
 
-	// 优化后的terrainCollision方法
-    private Vector3f terrainCollision(float x, float y, Ray ray) {
-        y /= 2f; x /= 2f;
-        int xInt = (int)x, yInt = (int)y;
-        
-        // 增强边界检查
-        int size = (int)Math.sqrt(terrainData.length);
-        if (xInt < 0 || yInt < 0 || xInt >= size-1 || yInt >= size-1) {
-            return null;
-        }
+	private Vector3f terraionCollision(float x, float y, Ray ray) {
+		y /= 2f;
+		x /= 2f;
+		int xInt = (int) x;
+		int yInt = (int) y;
+		// p1-----p2
+		// || ||
+		// || ||
+		// p3-----p4
+		float p1, p2, p3, p4;
+		if (terrainData.length == 1) {
+			p1 = p2 = p3 = p4 = terrainData[0] / 32f;
+		} else {
+			int size = (int) Math.sqrt(terrainData.length);
+			try {
 
-        float p1, p2, p3, p4;
-        if (terrainData.length == 1) {
-            p1 = p2 = p3 = p4 = preprocessedTerrainData != null ? 
-                 preprocessedTerrainData[0] : terrainData[0]/32f;
-        } else {
-            try {
-                int index = yInt + xInt * size;
-                // 使用预处理数据
-                if (preprocessedTerrainData != null) {
-                    p1 = preprocessedTerrainData[index];
-                    p2 = preprocessedTerrainData[index+1];
-                    p3 = preprocessedTerrainData[index+size];
-                    p4 = preprocessedTerrainData[index+size+1];
-                } else {
-                    p1 = terrainData[index]/32f;
-                    p2 = terrainData[index+1]/32f;
-                    p3 = terrainData[index+size]/32f;
-                    p4 = terrainData[index+size+1]/32f;
-                }
-                
-                // 地形切割检查
-                if (terrainCutoutData != null && 
-                    Arrays.binarySearch(terrainCutoutData, index) >= 0) {
-                    return null;
-                }
-            } catch (Exception e) {
-                return null;
-            }
-        }
+				if (GeoDataConfig.GEO_MONONO2_IN_USE) {
+					int index = yInt + (xInt * size);
+					p1 = terrainData[index] / 32f;
+					p2 = terrainData[index + 1] / 32f;
+					p3 = terrainData[index + size] / 32f;
+					p4 = terrainData[index + size + 1] / 32f;
 
-        // 复用对象
-        Vector3f result = tempVector3.get();
-        Triangle tri = tempTriangle.get();
-        
-        // 三角形碰撞检测
-        if (p1 >= 0 && p2 >= 0 && p3 >= 0) {
-            tri.set(new Vector3f(xInt*2, yInt*2, p1),
-                   new Vector3f(xInt*2, (yInt+1)*2, p2),
-                   new Vector3f((xInt+1)*2, yInt*2, p3));
-            if (ray.intersectWhere(tri, result)) {
-                return result;
-            }
-        }
-        if (p4 >= 0 && p2 >= 0 && p3 >= 0) {
-            tri.set(new Vector3f((xInt+1)*2, (yInt+1)*2, p4),
-                   new Vector3f(xInt*2, (yInt+1)*2, p2),
-                   new Vector3f((xInt+1)*2, yInt*2, p3));
-            if (ray.intersectWhere(tri, result)) {
-                return result;
-            }
-        }
-        return null;
-    }
+					// check if the terrain quad is removed.
+					if (terrainCutoutData != null) {
+						if (Arrays.binarySearch(terrainCutoutData, index) >= 0) {
+							return null;
+						}
+					}
+				} else {
+					p1 = terrainData[(yInt + (xInt * size))] / 32f;
+					p2 = terrainData[((yInt + 1) + (xInt * size))] / 32f;
+					p3 = terrainData[((yInt) + ((xInt + 1) * size))] / 32f;
+					p4 = terrainData[((yInt + 1) + ((xInt + 1) * size))] / 32f;
+				}
+			} catch (Exception e) {
+				return null;
+			}
+		}
+		Vector3f result = new Vector3f();
+		if (p1 >= 0 && p2 >= 0 && p3 >= 0) {
+			Triangle tringle1 = new Triangle(new Vector3f(xInt * 2, yInt * 2, p1),
+					new Vector3f(xInt * 2, (yInt + 1) * 2, p2), new Vector3f((xInt + 1) * 2, yInt * 2, p3));
+			if (ray.intersectWhere(tringle1, result)) {
+				return result;
+			}
+		}
+		if (p4 >= 0 && p2 >= 0 && p3 >= 0) {
+			Triangle tringle2 = new Triangle(new Vector3f((xInt + 1) * 2, (yInt + 1) * 2, p4),
+					new Vector3f(xInt * 2, (yInt + 1) * 2, p2), new Vector3f((xInt + 1) * 2, yInt * 2, p3));
+			if (ray.intersectWhere(tringle2, result)) {
+				return result;
+			}
+		}
+		return null;
+	}
 
-	// 优化后的canSee方法
-    public boolean canSee(float x, float y, float z, float targetX, float targetY, float targetZ, 
-                         float limit, int instanceId) {
-        // 复用对象
-        Vector3f pos = tempVector1.get().set(x, y, z + 1);
-        Vector3f dir = tempVector2.get().set(targetX, targetY, targetZ + 1);
-        
-        // 距离平方优化
-        float dx = x - targetX;
-        float dy = y - targetY;
-        float distSq = dx * dx + dy * dy;
-        if (distSq > 6400f) { // 80*80
-            return false;
-        }
+	public boolean canSee(float x, float y, float z, float targetX, float targetY, float targetZ, float limit,
+			int instanceId) {
+		targetZ += 1;
+		z += 1;
+		// Another fix can see in instances
+		// if (getZ(targetX, targetY) > targetZ)
+		// return false;
 
-        // 动态步长检测
-        float distance = (float) Math.sqrt(distSq);
-        dir.subtractLocal(pos).normalizeLocal();
-        Ray r = new Ray(pos, dir);
-        r.setLimit(limit);
+		float x2 = x - targetX;
+		float y2 = y - targetY;
+		float distance = (float) Math.sqrt(x2 * x2 + y2 * y2);
+		if (distance > 80f) {
+			return false;
+		}
+		int intD = (int) Math.abs(distance);
 
-        float step = Math.max(2f, distance / 40f);
-        for (float s = step; s < distance; s += step) {
-            float ratio = s / distance;
-            if (terrainCollision(
-                targetX + (dx * ratio), 
-                targetY + (dy * ratio), 
-                r) != null) {
-                return false;
-            }
-        }
-
-        // 复用碰撞结果
-        CollisionResults results = mixedResults.get();
-        results.clear();
-        results.setInstanceId(instanceId);
-        
-        return collideWith(r, results) == 0 && results.size() == 0;
-    }
+		Vector3f pos = new Vector3f(x, y, z);
+		Vector3f dir = new Vector3f(targetX, targetY, targetZ);
+		dir.subtractLocal(pos).normalizeLocal();
+		Ray r = new Ray(pos, dir);
+		r.setLimit(limit);
+		for (float s = 2; s < intD; s += 2) {
+			float tempX = targetX + (x2 * s / distance);
+			float tempY = targetY + (y2 * s / distance);
+			Vector3f result = terraionCollision(tempX, tempY, r);
+			if (result != null) {
+				return false;
+			}
+		}
+		CollisionResults results = new CollisionResults(
+				(byte) (CollisionIntention.PHYSICAL.getId() | CollisionIntention.DOOR.getId()), false, instanceId);
+		int collisions = this.collideWith(r, results);
+		return (results.size() == 0 && collisions == 0);
+	}
 
 	/*
 	 * (non-Javadoc)

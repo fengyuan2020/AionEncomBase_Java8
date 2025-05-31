@@ -42,9 +42,8 @@ import sun.nio.ch.DirectBuffer;
  * Similar to {@link com.aionemu.gameserver.world.geo.GeoData GeoData}, this class stores
  * {@link GeoMap GeoMaps} that represent navigable space within a level. These maps are holding
  * Nav Meshes that can be used to pathfind.
- *
+ * 
  * @author Yon (Aion Reconstruction Project)
- * Modify: MATTY
  */
 public class NavData {
 
@@ -53,8 +52,7 @@ public class NavData {
 
     private static final String NAV_DIR = "./data/nav/";
 
-    private NavData() {
-    }
+    private NavData() {};
 
     boolean isLoaded() {
         return !navMaps.isEmpty();
@@ -63,29 +61,32 @@ public class NavData {
     void loadNavMaps() {
         LOG.info("Loading Navigational Maps...");
         Util.printProgressBarHeader(DataManager.WORLD_MAPS_DATA.size());
-        final List<Integer> mapsWithErrors = new ArrayList<>();
+        final List<Integer> mapsWithErrors = new ArrayList<Integer>();
         final ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
         List<Callable<Void>> tasks = new ArrayList<>();
 
         for (final WorldMapTemplate map : DataManager.WORLD_MAPS_DATA) {
-            tasks.add(() -> {
-                int mapId = map.getMapId();
-                int worldSize = map.getWorldSize();
-                GeoMap geoMap = new GeoMap(String.valueOf(mapId), worldSize);
-                try {
-                    if (loadNav(mapId, geoMap)) {
-                        synchronized (navMaps) {
-                            navMaps.put(mapId, geoMap);
+            tasks.add(new Callable<Void>() {
+                @Override
+                public Void call() throws Exception {
+                    int mapId = map.getMapId();
+                    int worldSize = map.getWorldSize();
+                    GeoMap geoMap = new GeoMap(String.valueOf(mapId), worldSize);
+                    try {
+                        if (loadNav(mapId, geoMap)) {
+                            synchronized (navMaps) {
+                                navMaps.put(mapId, geoMap);
+                            }
+                        }
+                    } catch (IOException e) {
+                        synchronized (mapsWithErrors) {
+                            mapsWithErrors.add(mapId);
                         }
                     }
-                } catch (IOException e) {
-                    synchronized (mapsWithErrors) {
-                        mapsWithErrors.add(mapId);
-                    }
+                    Util.printCurrentProgress();
+                    return null;
                 }
-                Util.printCurrentProgress();
-                return null;
             });
         }
 
@@ -109,7 +110,7 @@ public class NavData {
 
         Util.printEndProgress();
         if (!mapsWithErrors.isEmpty()) {
-            LOG.warn("Some maps did not have navigational {}", mapsWithErrors);
+            LOG.warn("Some maps did not have navigational data: {}", mapsWithErrors);
         }
     }
 
@@ -117,7 +118,7 @@ public class NavData {
      * Returns the GeoMap representing the Nav Mesh for the given Map ID.
      * <p>
      * If no such map exists, this method will return null.
-     *
+     * 
      * @param worldId -- The ID of the map to find the Nav Mesh for
      */
     public GeoMap getNavMap(int worldId) {
@@ -126,10 +127,13 @@ public class NavData {
 
     private boolean loadNav(int worldId, GeoMap map) throws IOException {
         File navFile = new File(NAV_DIR, worldId + ".nav");
-        try (RandomAccessFile raFile = new RandomAccessFile(navFile, "r");
-             FileChannel roChannel = raFile.getChannel()) {
-
-            MappedByteBuffer nav = roChannel.map(FileChannel.MapMode.READ_ONLY, 0, roChannel.size()).load();
+        RandomAccessFile raFile = null;
+        FileChannel roChannel = null;
+        MappedByteBuffer nav = null;
+        try {
+            raFile = new RandomAccessFile(navFile, "r");
+            roChannel = raFile.getChannel();
+            nav = roChannel.map(FileChannel.MapMode.READ_ONLY, 0, (int) roChannel.size()).load();
             nav.order(ByteOrder.LITTLE_ENDIAN);
 
             int floatCount = nav.getInt();
@@ -161,12 +165,14 @@ public class NavData {
                 map.attachChild(triangles[i]);
             }
             map.updateModelBound();
-
-        } catch (Exception e) {
-            LOG.error("Error loading nav data for worldId " + worldId, e);
-            return false; // Indicate failure
+        } finally {
+            try {
+                if (roChannel != null) roChannel.close();
+                if (raFile != null) raFile.close();
+            } catch (IOException e) {
+                LOG.error("Unable to close file resource: " + worldId + ".nav");
+            }
         }
-
         return true;
     }
 
@@ -181,19 +187,9 @@ public class NavData {
     }
 
     private static void destroyDirectByteBuffer(Buffer toBeDestroyed) {
-        if (toBeDestroyed == null) {
-            return;
-        }
-
-        try {
-            if (toBeDestroyed.isDirect()) {
-                Cleaner cleaner = ((DirectBuffer) toBeDestroyed).cleaner();
-                if (cleaner != null) {
-                    cleaner.clean();
-                }
-            }
-        } catch (Exception e) {
-            LOG.warn("Failed to clean direct buffer", e);
+        Cleaner cleaner = ((DirectBuffer) toBeDestroyed).cleaner();
+        if (cleaner != null) {
+            cleaner.clean();
         }
     }
 
@@ -210,4 +206,5 @@ public class NavData {
     private static final class SingletonHolder {
         protected static final NavData INSTANCE = new NavData();
     }
+
 }

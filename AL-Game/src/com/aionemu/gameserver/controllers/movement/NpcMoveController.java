@@ -1,5 +1,9 @@
 /*
  * Decompiled with CFR 0.150.
+ * 
+ * Could not load the following classes:
+ *  org.slf4j.Logger
+ *  org.slf4j.LoggerFactory
  */
 package com.aionemu.gameserver.controllers.movement;
 
@@ -33,15 +37,10 @@ import com.aionemu.gameserver.world.World;
 import com.aionemu.gameserver.world.geo.GeoService;
 import com.aionemu.gameserver.world.geo.nav.NavService;
 import java.util.List;
-import java.util.Random;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.eleanor.Global;
 import com.eleanor.processors.movement.motor.FollowMotor;
-
-/*
- * @rework: MATTY
- */
 
 public class NpcMoveController
         extends CreatureMoveController<Npc> {
@@ -64,17 +63,6 @@ public class NpcMoveController
     private float[][] cachedPath;
     private FollowMotor _followMotor;
 
-	 // Добавьте эти переменные в класс NpcMoveController
-    private long lastNavUpdate = 0;
-    private static final long NAV_UPDATE_INTERVAL = 500; // Интервал обновления пути (в миллисекундах)
-    private static final float MIN_TARGET_DISTANCE_FOR_UPDATE = 2.0f; // Минимальное расстояние, на которое должна переместиться цель для обновления пути
-    private int stuckAttempts = 0;
-    private static final int MAX_STUCK_ATTEMPTS = 3;
-    private long lastStuckCheck = 0;
-    private static final long STUCK_CHECK_INTERVAL = 1000;
-
-    private static final Random random = new Random(); // Add this line
-
     public NpcMoveController(Npc owner) {
         super(owner);
     }
@@ -83,8 +71,7 @@ public class NpcMoveController
         POINT,
         HOME,
     }
-
-    private synchronized void applyFollow(VisibleObject target) { // Синхронизируем
+    private void applyFollow(VisibleObject target) {
         if ((this._followMotor != null && this._followMotor.target == target)) {
             return;
         }
@@ -94,8 +81,7 @@ public class NpcMoveController
         this._followMotor = new FollowMotor(Global.MovementProcessor, (Npc)this.owner, target);
         this._followMotor.start();
     }
-
-    private synchronized void cancelFollow() { // Синхронизируем
+    private void cancelFollow() {
         if ((this._followMotor != null)) {
             this._followMotor.stop();
             this._followMotor = null;
@@ -169,9 +155,7 @@ public class NpcMoveController
                 AI2Logger.moveinfo(owner, "moveToDestination can't perform move");
             }
             if (started.compareAndSet(true, false)) {
-                synchronized (this) {
-                    cancelFollow();
-                }
+                cancelFollow();
                 setAndSendStopMove(owner);
             }
             updateLastMove();
@@ -186,106 +170,116 @@ public class NpcMoveController
                 AI2Logger.moveinfo(owner, "moveToDestination not started");
             }
         }
-
-        synchronized (this) {
-            switch (destination) {
-                case TARGET_OBJECT:
-                    VisibleObject target = owner.getTarget(); // todo no target
-                    if (target == null) {
-                        cancelFollow();
+        switch (destination) {
+            case TARGET_OBJECT:
+                if (GeoDataConfig.GEO_NAV_ENABLE) {
+                    returnAttempts = 0;
+                    VisibleObject target = owner.getTarget();// todo no target
+                    if (target == null) { //This check is not needed, but I'll leave it for clarity.
                         return;
                     }
-
-                    if (!(target instanceof Creature)) { // instanceof returns false if target is null.
-                        cancelFollow();
+                    if (!(target instanceof Creature)) { //instanceof returns false if target is null.
                         return;
                     }
-
-                    if (GeoDataConfig.GEO_NAV_ENABLE) {
-                       Creature creature = (Creature) target;
+                    if ((MathUtil.getDistance(target.getX(), target.getY(), pointZ, pointX, pointY, pointZ) > MOVE_CHECK_OFFSET)) {
+                        Creature creature = (Creature) target;
                         offset = owner.getController().getAttackDistanceToTarget();
                         pointX = target.getX();
                         pointY = target.getY();
                         pointZ = getTargetZ(owner, creature);
-
-                        float distanceToTarget = (float) MathUtil.getDistance(owner.getX(), owner.getY(), owner.getZ(), pointX, pointY, pointZ);
-
-                        long currentTime = System.currentTimeMillis();
-                        boolean shouldUpdateNav = currentTime - lastNavUpdate > NAV_UPDATE_INTERVAL
-                                || MathUtil.getDistance(target.getX(), target.getY(), pointZ, pointX, pointY, pointZ) > MIN_TARGET_DISTANCE_FOR_UPDATE
-                                || !cachedPathValid;
-
-                        if (shouldUpdateNav) {
-                            lastNavUpdate = currentTime;
-                            cachedPathValid = false;
-                            cachedPath = NavService.getInstance().navigateToTarget(owner, creature);
-
-                            if (cachedPath == null) {
-                                log.warn("No path found to target!");
-                                // Попробуйте простой обход препятствий
-                                stuckAttempts++;
-                                if (stuckAttempts > MAX_STUCK_ATTEMPTS) {
-                                    // слишком много попыток, останавливаем движение
-                                    abortMove();
-                                    return;
+                        cachedPathValid = false;
+                    }
+                    if (!cachedPathValid || cachedPath == null) {
+                        cachedPath = NavService.getInstance().navigateToTarget(owner, (Creature) target);
+                        if (cachedPath != null) { //Add a bit of randomness to the last point to prevent entities from stacking directly ontop of eachother.
+                            //TODO: Move to NavService and make sure this random point is on the navmesh!
+                            if (cachedPath.length != 1) {
+                                if (Rnd.nextBoolean()) {
+                                    cachedPath[cachedPath.length - 1][0] += Rnd.nextDouble() * owner.getObjectTemplate().getBoundRadius().getSide();
+                                } else {
+                                    cachedPath[cachedPath.length - 1][0] -= Rnd.nextDouble() * owner.getObjectTemplate().getBoundRadius().getSide();
                                 }
-
-                                // Simple obstacle avoidance: move in a random direction for a short time
-                                float randomAngle = random.nextFloat() * 360f;
-                                pointX = owner.getX() + (float) (Math.cos(Math.toRadians(randomAngle)) * 2);
-                                pointY = owner.getY() + (float) (Math.sin(Math.toRadians(randomAngle)) * 2);
-                                pointZ = owner.getZ();
-                                moveToLocation(pointX, pointY, pointZ, offset);
-                                return; // Exit this iteration, re-evaluate next time
-                            } else {
-                                stuckAttempts = 0; // reset if path found
+                                if (Rnd.nextBoolean()) {
+                                    cachedPath[cachedPath.length - 1][1] += Rnd.nextDouble() * owner.getObjectTemplate().getBoundRadius().getSide();
+                                } else {
+                                    cachedPath[cachedPath.length - 1][1] -= Rnd.nextDouble() * owner.getObjectTemplate().getBoundRadius().getSide();
+                                }
                             }
                         }
-
-                        if (cachedPath != null && cachedPath.length > 0) {
-                            float[] p1 = cachedPath[0];
-                            assert p1.length == 3;
-                            moveToLocation(p1[0], p1[1], getTargetZ(owner, p1[0], p1[1], p1[2]), offset);
-                        } else {
-                            if (cachedPath != null) cachedPath = null;
-                            moveToLocation(pointX, pointY, pointZ, offset);
-                        }
-                    } else {
-                        Npc npc = owner;
-
-                        if (owner.getAi2().getState() == AIState.FOLLOWING) {
-                            cancelFollow();
-                            offset = npc.getController().getAttackDistanceToTarget();
-                            moveToLocation(target.getX(), target.getY(), target.getZ(), offset);
-                            break;
-                        }
-                        applyFollow(target);
-                    }
-                    break;
-                case POINT: {
-                    cancelFollow();
-                    moveToLocation(pointX, pointY, pointZ, offset);
-                    break;
-                }
-                case HOME: {
-                     if ((!cachedPathValid || cachedPath == null) && (returnAttempts < 3)) {
-                        cachedPath = NavService.getInstance().navigateToLocation(owner, pointX, pointY, pointZ);
-                        returnAttempts++;
                         cachedPathValid = true;
                     }
-                   if ((cachedPath != null) && (cachedPath.length > 0) && (returnAttempts < 3)) {
+                    if (cachedPath != null && cachedPath.length > 0) {
                         float[] p1 = cachedPath[0];
+                        assert p1.length == 3;
                         moveToLocation(p1[0], p1[1], getTargetZ(owner, p1[0], p1[1], p1[2]), offset);
                     } else {
+                        if (cachedPath != null) cachedPath = null;
                         moveToLocation(pointX, pointY, pointZ, offset);
                     }
+                } else {
+                    Npc npc = owner;
+                    VisibleObject target = owner.getTarget();
+                    if (target == null) {
+                        cancelFollow();
+                        return;
+                    }
+                    if (!(target instanceof Creature)) {
+                        cancelFollow();
+                        return;
+                    }
+                    if (owner.getAi2().getState() == AIState.FOLLOWING) {
+                        cancelFollow();
+                        offset = npc.getController().getAttackDistanceToTarget();
+                        moveToLocation(target.getX(), target.getY(), target.getZ(), offset);
+                        break;
+                    }
+                    applyFollow(target);
+                }
+                break;
+            case POINT: {
+                cancelFollow();
+                moveToLocation(pointX, pointY, pointZ, offset);
+                break;
+            }
+            case HOME: {
+                if ((!cachedPathValid || cachedPath == null) && (returnAttempts<3)) {
+                    cachedPath = NavService.getInstance().navigateToLocation(owner, pointX, pointY, pointZ);
+                    returnAttempts++;
+                    cachedPathValid = true;
+                }
+                if ((cachedPath != null) && (cachedPath.length > 0) && (returnAttempts<3)) {
+                    float[] p1 = cachedPath[0];
+                    moveToLocation(p1[0], p1[1], getTargetZ(owner, p1[0], p1[1], p1[2]), offset);
+                } else{
+                    moveToLocation(pointX, pointY, pointZ, offset);
                 }
             }
         }
         this.updateLastMove();
     }
 
-        protected void moveToLocation(float targetX, float targetY, float targetZ, float offset) {
+    private float getTargetZ(Npc npc, Creature creature) {
+        float targetZ = creature.getZ();
+        if (GeoDataConfig.GEO_NPC_MOVE && creature.isInFlyingState() && !npc.isInFlyingState()) {
+//            if (npc.getGameStats().checkGeoNeedUpdate()) {
+            this.cachedTargetZ = GeoService.getInstance().getZ(creature);
+ //           }
+            targetZ = this.cachedTargetZ;
+        }
+        return targetZ;
+    }
+    private float getTargetZ(Npc npc, float x, float y, float z) {
+        float targetZ = z;
+        if (GeoDataConfig.GEO_NPC_MOVE && !npc.isFlying()) {
+//            if (npc.getGameStats().checkGeoNeedUpdate()) {
+            cachedTargetZ = GeoService.getInstance().getZ(npc.getWorldId(), x, y, z, 1.1F, npc.getInstanceId());
+            targetZ = cachedTargetZ;
+//            }
+        }
+        return targetZ;
+    }
+
+    protected void moveToLocation(float targetX, float targetY, float targetZ, float offset) {
         boolean directionChanged = false;
         float ownerX = ((Npc)this.owner).getX();
         float ownerY = ((Npc)this.owner).getY();
@@ -327,32 +321,23 @@ public class NpcMoveController
         if (futureDistPassed > dist) {
             futureDistPassed = dist;
         }
-       if (futureDistPassed == dist
+        if (futureDistPassed == dist
                 && (destination == Destination.TARGET_OBJECT || destination == Destination.HOME)) {
-           updateCachedPath();
+            if (cachedPath != null && cachedPath.length > 0) {
+                float[][] tempCache = new float[cachedPath.length - 1][];
+                if (tempCache.length > 0) {
+                    System.arraycopy(cachedPath, 1, tempCache, 0, cachedPath.length - 1);
+                    cachedPath = tempCache;
+                } else {
+                    cachedPath = null;
+                    cachedPathValid = false;
+                }
+            }
         }
         float distFraction = futureDistPassed / dist;
         float newX = (this.targetDestX - ownerX) * distFraction + ownerX;
         float newY = (this.targetDestY - ownerY) * distFraction + ownerY;
         float newZ = (this.targetDestZ - ownerZ) * distFraction + ownerZ;
-
-          // Проверка столкновений (базовая)
-        if (GeoDataConfig.GEO_ENABLE && GeoDataConfig.GEO_NPC_MOVE) {
-            float collisionCheckDistance = 0.5f; // Adjustable parameter
-            if (Math.abs(newX - ownerX) < collisionCheckDistance && Math.abs(newY - ownerY) < collisionCheckDistance) {
-                 // Basic Collision check
-                float geoZ = GeoService.getInstance().getZ(owner.getWorldId(), newX, newY, newZ, 0, owner.getInstanceId());
-                if (Math.abs(geoZ- newZ) > 1 ) { // высокий перепад высоты -> препятствие
-                    // Попробуйте немного изменить направление
-                    float randomAngle = random.nextFloat() * 360f;
-                     newX = ownerX + (float) (Math.cos(Math.toRadians(randomAngle)) * 0.3);
-                    newY = ownerY + (float) (Math.sin(Math.toRadians(randomAngle)) * 0.3);
-                     newZ = GeoService.getInstance().getZ(owner.getWorldId(), newX, newY, newZ, 0, owner.getInstanceId()); // get Geo Z for new Point;
-
-                }
-            }
-        }
-
         if (ownerX == newX && ownerY == newY && ((Npc)this.owner).getSpawn().getRandomWalk() > 0) {
             return;
         }
@@ -412,19 +397,19 @@ public class NpcMoveController
         this.setAndSendStopMove((Creature)this.owner);
     }
 
-	public void resetMove() {
-		if (owner.getAi2().isLogging()) {
-			AI2Logger.moveinfo(owner, "MC perform stop");
-		}
-		cancelFollow();
-		started.set(false);
-		targetDestX = 0;
-		targetDestY = 0;
-		targetDestZ = 0;
-		pointX = 0;
-		pointY = 0;
-		pointZ = 0;
-	}
+    public void resetMove() {
+        if (owner.getAi2().isLogging()) {
+            AI2Logger.moveinfo(owner, "MC perform stop");
+        }
+        cancelFollow();
+        started.set(false);
+        targetDestX = 0;
+        targetDestY = 0;
+        targetDestZ = 0;
+        pointX = 0;
+        pointY = 0;
+        pointZ = 0;
+    }
 
     public void setCurrentRoute(List<RouteStep> currentRoute) {
         if (currentRoute == null) {
@@ -571,46 +556,5 @@ public class NpcMoveController
     @Override
     public void skillMovement() {
         // TODO Auto-generated method stub
-    }
-
-    private float[] getNextPathPoint(Npc owner, float pointX, float pointY, float pointZ) {
-        if (!cachedPathValid || cachedPath == null) {
-            cachedPath = NavService.getInstance().navigateToLocation(owner, pointX, pointY, pointZ);
-            cachedPathValid = true;
-        }
-        if (cachedPath != null && cachedPath.length > 0) {
-            return cachedPath[0];
-        }
-        return null;
-    }
-
-    private void updateCachedPath() {
-        if (cachedPath != null && cachedPath.length > 0) {
-            float[][] tempCache = new float[cachedPath.length - 1][];
-            if (tempCache.length > 0) {
-                System.arraycopy(cachedPath, 1, tempCache, 0, cachedPath.length - 1);
-                cachedPath = tempCache;
-            } else {
-                cachedPath = null;
-                cachedPathValid = false;
-            }
-        }
-    }
-
-     private float getTargetZ(Npc npc, Creature creature) {
-        float targetZ = creature.getZ();
-        if (GeoDataConfig.GEO_NPC_MOVE && creature.isInFlyingState() && !npc.isInFlyingState()) {
-            this.cachedTargetZ = GeoService.getInstance().getZ(creature);
-            targetZ = this.cachedTargetZ;
-        }
-        return targetZ;
-    }
-    private float getTargetZ(Npc npc, float x, float y, float z) {
-        float targetZ = z;
-        if (GeoDataConfig.GEO_NPC_MOVE && !npc.isFlying()) {
-            cachedTargetZ = GeoService.getInstance().getZ(npc.getWorldId(), x, y, z, 1.1F, npc.getInstanceId());
-            targetZ = cachedTargetZ;
-        }
-        return targetZ;
     }
 }

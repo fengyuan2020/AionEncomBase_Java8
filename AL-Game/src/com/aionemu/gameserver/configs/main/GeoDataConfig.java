@@ -87,38 +87,4 @@ public class GeoDataConfig {
 	public static boolean GEO_MONONO2_IN_USE;
 	@Property(key = "gameserver.geo.nav.pathfinding.enable", defaultValue = "false")
 	public static boolean GEO_NAV_ENABLE;
-	
-	/**
-     * Maximum number of triangles to consider for a straight line path.
-     */
-	@Property(key = "gameserver.geo.nav.max.straight.line.triangles", defaultValue = "50")
-    public static int GEO_NAV_MAX_STRAIGHT_LINE_TRIANGLES;
-	
-    /**
-     * A value used when attempting to pathfind to a target that is not on the Nav Mesh.
-     */
-    @Property(key = "gameserver.geo.nav.arbitrary.small.value", defaultValue = "1")
-    public static float GEO_NAV_ARBITRARY_SMALL_VALUE;
-
-    /**
-     * A value used when retracing or opening the list of nodes to create a pathway corridor.
-     */
-    @Property(key = "gameserver.geo.nav.arbitrary.large.value", defaultValue = "1500")
-    public static int GEO_NAV_ARBITRARY_LARGE_VALUE;
-
-    /**
-     * A percentage of pathCost to add onto the basic path cost calculation
-     * if the next node is moving away from the target node.
-     */
-    @Property(key = "gameserver.geo.nav.path.weight", defaultValue = "0.2")
-    public static float GEO_NAV_PATH_WEIGHT;
-
-    /**
-     * A multiplier for {@link NavHeapNode#targetDist}. When the target distance is estimated,
-     * it will be multiplied by this value. This is to give nodes that are closer to the target
-     * a higher priority than nodes that are further away.
-     */
-    @Property(key = "gameserver.geo.nav.target.weight", defaultValue = "20")
-    public static float GEO_NAV_TARGET_WEIGHT;
-	
 }
