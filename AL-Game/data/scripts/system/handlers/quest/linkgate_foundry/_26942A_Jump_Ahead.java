@@ -12,7 +12,6 @@
  */
 package quest.linkgate_foundry;
 
-import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.questEngine.handlers.QuestHandler;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
@@ -42,9 +41,7 @@ public class _26942A_Jump_Ahead extends QuestHandler {
 		final Player player = env.getPlayer();
         final QuestState qs = player.getQuestStateList().getQuestState(questId);
 		int targetId = env.getTargetId();
-		if (env.getVisibleObject() instanceof Npc) {
-            targetId = ((Npc) env.getVisibleObject()).getNpcId();
-        } if (qs == null || qs.getStatus() == QuestStatus.NONE) {
+		if (qs == null || qs.getStatus() == QuestStatus.NONE) {
 		   if (targetId == 802353) { //Yasan.
 				switch (env.getDialog()) {
 					case START_DIALOG: {
@@ -78,7 +75,7 @@ public class _26942A_Jump_Ahead extends QuestHandler {
 						if (QuestService.collectItemCheck(env, true)) {
 							qs.setStatus(QuestStatus.REWARD);
 							updateQuestStatus(env);
-							return sendQuestDialog(env, 10000);
+							return sendQuestDialog(env, 5);
 						} else {
 							return sendQuestDialog(env, 10001);
 						}

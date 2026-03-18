@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-	Item Missing Template 5.8
-	Made By (Encom)
+	Item Missing Template 5.8. Made By (Encom)
  -->
 <item_templates xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
 	    <item_template id="169800476" name="[Hair Change Ticket] Coiled Plaits long&amp;smooth" desc="1761569"  level="1" mask="4222" category="NONE" max_stack_count="1" item_type="NORMAL" quality="COMMON" price="5" race="ASMODIANS" restrict="1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1" bonus_apply="INVENTORY">

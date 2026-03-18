@@ -12,7 +12,6 @@
  */
 package quest.mission;
 
-import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.questEngine.handlers.QuestHandler;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
@@ -59,10 +58,8 @@ public class _24011Funny_Floating_Fungus extends QuestHandler {
             return false;
         }
         int var = qs.getQuestVarById(0);
-        int targetId = 0;
-        if (env.getVisibleObject() instanceof Npc) {
-            targetId = ((Npc) env.getVisibleObject()).getNpcId();
-        } if (qs.getStatus() != QuestStatus.START) {
+		int targetId = env.getTargetId();
+        if (qs.getStatus() != QuestStatus.START) {
             return false;
         } if (targetId == 700092) {
             if (var > 0 && var < 6) {
@@ -85,10 +82,8 @@ public class _24011Funny_Floating_Fungus extends QuestHandler {
             return false;
         }
         int var = qs.getQuestVarById(0);
-        int targetId = 0;
-        if (env.getVisibleObject() instanceof Npc) {
-            targetId = ((Npc) env.getVisibleObject()).getNpcId();
-        } if (qs.getStatus() == QuestStatus.START) {
+		int targetId = env.getTargetId();
+        if (qs.getStatus() == QuestStatus.START) {
             if (targetId == 203558) {
                 switch (env.getDialog()) {
                     case START_DIALOG:

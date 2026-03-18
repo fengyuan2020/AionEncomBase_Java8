@@ -16,7 +16,6 @@
  */
 package quest.mission;
 
-import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.questEngine.handlers.QuestHandler;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
@@ -93,10 +92,7 @@ public class _14025Cooking_Up_Disasters extends QuestHandler {
 		if (qs == null) {
 			return false;
 		}
-		int targetId = 0;
-		if (env.getVisibleObject() instanceof Npc) {
-			targetId = ((Npc) env.getVisibleObject()).getNpcId();
-		}
+		int targetId = env.getTargetId();
 		if (qs.getStatus() == QuestStatus.REWARD) {
 			if (targetId == 203901) { // Telemachus
 				return sendQuestEndDialog(env);

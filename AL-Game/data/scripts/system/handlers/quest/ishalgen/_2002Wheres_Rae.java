@@ -66,10 +66,7 @@ public class _2002Wheres_Rae extends QuestHandler {
             return false;
         }
         int var = qs.getQuestVarById(0);
-        int targetId = 0;
-        if (env.getVisibleObject() instanceof Npc) {
-            targetId = ((Npc) env.getVisibleObject()).getNpcId();
-        }
+		int targetId = env.getTargetId();
         if (qs.getStatus() == QuestStatus.START) {
             switch (targetId) {
                 case 203519: {
@@ -230,10 +227,7 @@ public class _2002Wheres_Rae extends QuestHandler {
             return false;
         }
         int var = qs.getQuestVarById(0);
-        int targetId = 0;
-        if (env.getVisibleObject() instanceof Npc) {
-            targetId = ((Npc) env.getVisibleObject()).getNpcId();
-        }
+		int targetId = env.getTargetId();
         if (qs.getStatus() != QuestStatus.START) {
             return false;
         }

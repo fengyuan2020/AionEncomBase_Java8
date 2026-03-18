@@ -12,7 +12,6 @@
  */
 package quest.poeta;
 
-import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.questEngine.handlers.QuestHandler;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
@@ -57,9 +56,7 @@ public class _1003Illegal_Logging extends QuestHandler {
 		if (qs == null)
 			return false;
 		int var = qs.getQuestVarById(0);
-		int targetId = 0;
-		if (env.getVisibleObject() instanceof Npc)
-			targetId = ((Npc) env.getVisibleObject()).getNpcId();
+		int targetId = env.getTargetId();
 		if (qs.getStatus() == QuestStatus.START) {
 			if (targetId == 203081) {
 				switch (env.getDialog()) {
@@ -93,9 +90,7 @@ public class _1003Illegal_Logging extends QuestHandler {
 		if (qs == null)
 			return false;
 		int var = qs.getQuestVarById(0);
-		int targetId = 0;
-		if (env.getVisibleObject() instanceof Npc)
-			targetId = ((Npc) env.getVisibleObject()).getNpcId();
+		int targetId = env.getTargetId();
 		if (qs.getStatus() != QuestStatus.START)
 			return false;
 		switch (targetId) {

@@ -12,7 +12,6 @@
  */
 package quest.mission;
 
-import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.questEngine.handlers.QuestHandler;
 import com.aionemu.gameserver.questEngine.model.QuestDialog;
@@ -62,10 +61,7 @@ public class _24015Totem_Plowed extends QuestHandler {
 		}
         int var = qs.getQuestVarById(0);
 		int targetId = env.getTargetId();
-		final Npc npc = (Npc) env.getVisibleObject();
-		if (env.getVisibleObject() instanceof Npc) {
-            targetId = ((Npc) env.getVisibleObject()).getNpcId();
-        } if (qs.getStatus() == QuestStatus.START) {
+		if (qs.getStatus() == QuestStatus.START) {
             if (targetId == 203669) {
                 switch (env.getDialog()) {
                     case START_DIALOG: {

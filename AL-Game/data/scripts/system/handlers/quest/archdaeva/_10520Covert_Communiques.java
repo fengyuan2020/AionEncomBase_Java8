@@ -155,7 +155,7 @@ public class _10520Covert_Communiques extends QuestHandler {
 			}
 		} else if (qs.getStatus() == QuestStatus.REWARD) {
             if (targetId == 806076) { //Weatha.
-                if (env.getDialog() == QuestDialog.START_DIALOG) {
+                if (env.getDialog() == QuestDialog.USE_OBJECT) {
                     return sendQuestDialog(env, 10002);
                 } else {
                     int[] ilumaMission = {10521, 10522, 10523, 10524, 10525, 10526, 10527, 10528, 10529, 10530};

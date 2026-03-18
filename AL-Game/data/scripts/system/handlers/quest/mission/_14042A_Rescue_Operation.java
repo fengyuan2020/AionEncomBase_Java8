@@ -53,10 +53,8 @@ public class _14042A_Rescue_Operation extends QuestHandler {
             return false;
         }
         int var = qs.getQuestVarById(0);
-        int targetId = 0;
-        if (env.getVisibleObject() instanceof Npc) {
-            targetId = ((Npc) env.getVisibleObject()).getNpcId();
-        } if (qs.getStatus() == QuestStatus.START) {
+		int targetId = env.getTargetId();
+        if (qs.getStatus() == QuestStatus.START) {
             switch (targetId) {
                 case 278502:
                     switch (env.getDialog()) {

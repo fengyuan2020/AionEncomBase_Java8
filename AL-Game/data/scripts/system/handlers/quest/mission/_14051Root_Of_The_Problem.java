@@ -12,7 +12,6 @@
  */
 package quest.mission;
 
-import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.questEngine.handlers.QuestHandler;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
@@ -59,10 +58,8 @@ public class _14051Root_Of_The_Problem extends QuestHandler {
             return false;
         }
         int var = qs.getQuestVarById(0);
-        int targetId = 0;
-        if (env.getVisibleObject() instanceof Npc) {
-            targetId = ((Npc) env.getVisibleObject()).getNpcId();
-        } if (qs.getStatus() == QuestStatus.REWARD) {
+		int targetId = env.getTargetId();
+        if (qs.getStatus() == QuestStatus.REWARD) {
             if (targetId == 730024) {
                 return sendQuestEndDialog(env);
             }

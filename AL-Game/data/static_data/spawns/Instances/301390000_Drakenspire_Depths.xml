@@ -296,5 +296,9 @@
 			<spot x="690.4874" y="822.40784" z="1609.5748" entity_id="405"/>
 			<spot x="572.9444" y="940.03577" z="1620.0454" entity_id="407"/>
 		</spawn>
+		<!-- Orissan -->
+        <spawn npc_id="236229">
+            <spot x="811.6018" y="568.6545" z="1701.0443" h="92" alternate_id="236232" select_prob="5000"/>
+        </spawn>
 	</spawn_map>
 </spawns>

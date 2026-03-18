@@ -51,8 +51,8 @@ import java.util.concurrent.Future;
 /****/
 
 @InstanceID(301390000)
-public class DrakenspireDepthsInstance extends GeneralInstanceHandler
-{
+public class DrakenspireDepthsInstance extends GeneralInstanceHandler {
+
 	private int deathChar;
 	private Race sealSceneRace;
 	private int drakenspireProtector;
@@ -373,21 +373,6 @@ public class DrakenspireDepthsInstance extends GeneralInstanceHandler
 										spawn(209705, 815.1346f, 522.75665f, 1706.7778f, (byte) 32);
 								    }
 							    }, 2000);
-								ThreadPoolManager.getInstance().schedule(new Runnable() {
-							        @Override
-								    public void run() {
-								        switch (Rnd.get(1, 2)) {
-											case 1:
-											    spawn(236229, 812.2527f, 568.7095f, 1701.0443f, (byte) 93); //Orissan.
-												spawn(855737, 812.2527f, 568.7095f, 1701.0443f, (byte) 93); //ShapeChange Flash.
-											break;
-											case 2:
-											    spawn(236232, 812.2527f, 568.7095f, 1701.0443f, (byte) 93); //Reverted Orissan.
-												spawn(855737, 812.2527f, 568.7095f, 1701.0443f, (byte) 93); //ShapeChange Flash.
-											break;
-										}
-								    }
-							    }, 16000);
 						    break;
 						    case ASMODIANS:
 							    ThreadPoolManager.getInstance().schedule(new Runnable() {
@@ -403,21 +388,6 @@ public class DrakenspireDepthsInstance extends GeneralInstanceHandler
 										spawn(209770, 815.1346f, 522.75665f, 1706.7778f, (byte) 32);
 								    }
 							    }, 2000);
-								ThreadPoolManager.getInstance().schedule(new Runnable() {
-							        @Override
-								    public void run() {
-								        switch (Rnd.get(1, 2)) {
-											case 1:
-											    spawn(236229, 812.2527f, 568.7095f, 1701.0443f, (byte) 93); //Orissan.
-												spawn(855737, 812.2527f, 568.7095f, 1701.0443f, (byte) 93); //ShapeChange Flash.
-											break;
-											case 2:
-											    spawn(236232, 812.2527f, 568.7095f, 1701.0443f, (byte) 93); //Reverted Orissan.
-												spawn(855737, 812.2527f, 568.7095f, 1701.0443f, (byte) 93); //ShapeChange Flash.
-											break;
-										}
-								    }
-							    }, 16000);
 						    break;
 						}
 					}
@@ -425,7 +395,6 @@ public class DrakenspireDepthsInstance extends GeneralInstanceHandler
 			break;
 			case 236229: //Orissan.
 			case 236232: //Reverted Orissan.
-				deleteNpc(855737); //ShapeChange Flash.
 				if (player != null) {
 				    switch (player.getRace()) {
 					    case ELYOS:

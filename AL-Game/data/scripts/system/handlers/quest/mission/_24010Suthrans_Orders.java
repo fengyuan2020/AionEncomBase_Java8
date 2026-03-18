@@ -12,7 +12,6 @@
  */
 package quest.mission;
 
-import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.questEngine.QuestEngine;
 import com.aionemu.gameserver.questEngine.handlers.QuestHandler;
@@ -46,10 +45,8 @@ public class _24010Suthrans_Orders extends QuestHandler {
         if (qs == null) {
             return false;
         }
-        int targetId = 0;
-        if (env.getVisibleObject() instanceof Npc) {
-            targetId = ((Npc) env.getVisibleObject()).getNpcId();
-        } if (targetId != 203557) {
+		int targetId = env.getTargetId();
+        if (targetId != 203557) {
             return false;
         } if (qs.getStatus() == QuestStatus.START) {
             if (env.getDialog() == QuestDialog.START_DIALOG) {

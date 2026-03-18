@@ -12,7 +12,6 @@
  */
 package quest.mission;
 
-import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.questEngine.handlers.QuestHandler;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
@@ -56,10 +55,8 @@ public class _14015Not_Blinded_By_Vengeance extends QuestHandler {
             return false;
         }
         int var = qs.getQuestVarById(0);
-        int targetId = 0;
-        if (env.getVisibleObject() instanceof Npc) {
-            targetId = ((Npc) env.getVisibleObject()).getNpcId();
-        } if (targetId == 203098 && qs.getStatus() == QuestStatus.START) {
+		int targetId = env.getTargetId();
+        if (targetId == 203098 && qs.getStatus() == QuestStatus.START) {
             switch (env.getDialog()) {
                 case START_DIALOG:
                     if (var == 0) {

@@ -13,7 +13,6 @@
 package quest.mission;
 
 import com.aionemu.gameserver.model.TeleportAnimation;
-import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.questEngine.handlers.QuestHandler;
 import com.aionemu.gameserver.questEngine.model.QuestDialog;
@@ -143,10 +142,7 @@ public class _14054Kralling_To_Kralltumagna extends QuestHandler {
         if (qs == null || qs.getStatus() != QuestStatus.START) {
             return false;
         }
-        int targetId = 0;
-        if (env.getVisibleObject() instanceof Npc) {
-            targetId = ((Npc) env.getVisibleObject()).getNpcId();
-        }
+        int targetId = env.getTargetId();
         int var = qs.getQuestVarById(0);
         if (var == 2) {
         if (targetId == 214010 || targetId == 214013 || targetId == 214014 ||

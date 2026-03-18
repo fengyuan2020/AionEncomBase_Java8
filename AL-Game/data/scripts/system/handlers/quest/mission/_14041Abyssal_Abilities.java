@@ -12,7 +12,6 @@
  */
 package quest.mission;
 
-import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.questEngine.handlers.QuestHandler;
 import com.aionemu.gameserver.questEngine.model.QuestDialog;
@@ -59,8 +58,6 @@ public class _14041Abyssal_Abilities extends QuestHandler {
         int targetId = env.getTargetId();
         if (qs == null) {
             return false;
-        } if (env.getVisibleObject() instanceof Npc) {
-            targetId = ((Npc) env.getVisibleObject()).getNpcId();
         } if (qs.getStatus() == QuestStatus.REWARD) {
             if (targetId == 278554) {
                 if (env.getDialog() == QuestDialog.USE_OBJECT) {

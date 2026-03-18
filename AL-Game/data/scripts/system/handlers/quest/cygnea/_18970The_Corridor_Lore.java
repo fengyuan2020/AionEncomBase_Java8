@@ -58,19 +58,25 @@ public class _18970The_Corridor_Lore extends QuestHandler {
 			}
 		}
 		else if (qs.getStatus() == QuestStatus.START) {
-			if ((targetId == 804865) || (targetId == 805215)) {
+			if (targetId == 804865) {
 				if (env.getDialog() == QuestDialog.START_DIALOG) {
-					return sendQuestDialog(env, 10002);
+					return sendQuestDialog(env, 1011);
 				}
-				else if (env.getDialog() == QuestDialog.SELECT_REWARD) {
-					changeQuestStep(env, 0, 0, true);
-					return sendQuestDialog(env, 5);
+				else if (env.getDialog() == QuestDialog.SET_REWARD) {
+				    qs.setQuestVar(1);
+                    qs.setStatus(QuestStatus.REWARD);
+                    updateQuestStatus(env);
+					return closeDialogWindow(env);
 				}
 			}
 		}
 		else if (qs != null && qs.getStatus() == QuestStatus.REWARD) {
-			if ((targetId == 804865) || (targetId == 805215)) {
-				return sendQuestEndDialog(env);
+			if (targetId == 805215) {
+                if (env.getDialog() == QuestDialog.USE_OBJECT) {
+                    return sendQuestDialog(env, 10002);
+                } else {
+                    return sendQuestEndDialog(env);
+                }
 			}
 		}
 		return false;

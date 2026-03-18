@@ -12,7 +12,6 @@
  */
 package quest.ishalgen;
 
-import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.questEngine.QuestEngine;
 import com.aionemu.gameserver.questEngine.handlers.QuestHandler;
@@ -45,9 +44,7 @@ public class _2100Order_Of_The_Captain extends QuestHandler {
 		final QuestState qs = player.getQuestStateList().getQuestState(questId);
 		if (qs == null)
 			return false;
-		int targetId = 0;
-		if (env.getVisibleObject() instanceof Npc)
-			targetId = ((Npc) env.getVisibleObject()).getNpcId();
+		int targetId = env.getTargetId();
 		if (targetId != 203516)
 			return false;
 		if (qs.getStatus() == QuestStatus.START) {

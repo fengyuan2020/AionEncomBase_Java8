@@ -20,8 +20,6 @@ import com.aionemu.commons.utils.Rnd;
 
 import com.aionemu.gameserver.ai2.AIState;
 import com.aionemu.gameserver.ai2.AbstractAI;
-import com.aionemu.gameserver.ai2.NpcAI2;
-import com.aionemu.gameserver.ai2.manager.WalkManager;
 import com.aionemu.gameserver.instance.handlers.GeneralInstanceHandler;
 import com.aionemu.gameserver.instance.handlers.InstanceID;
 import com.aionemu.gameserver.model.DescriptionId;
@@ -54,29 +52,15 @@ import java.util.concurrent.Future;
 /****/
 
 @InstanceID(301500000)
-public class StonespearReachInstance extends GeneralInstanceHandler
-{
+public class StonespearReachInstance extends GeneralInstanceHandler {
+
 	private int rank;
 	private Race spawnRace;
 	private long startTime;
 	private Future<?> timerPrepare;
 	private Future<?> timerInstance;
-	private Future<?> stoneSpearTaskA1;
-	private Future<?> stoneSpearTaskA2;
-	private Future<?> stoneSpearTaskA3;
-	///////////////////////////////////
-	private Future<?> stoneSpearTaskB1;
-	private Future<?> stoneSpearTaskB2;
-	private Future<?> stoneSpearTaskB3;
-	///////////////////////////////////
-	private Future<?> stoneSpearTaskC1;
-	private Future<?> stoneSpearTaskC2;
-	private Future<?> stoneSpearTaskC3;
-	///////////////////////////////////
-	private Future<?> stoneSpearTaskD1;
-	private Future<?> stoneSpearTaskD2;
-	private Future<?> stoneSpearTaskD3;
 	private boolean isInstanceDestroyed;
+	
 	//Preparation Time.
 	private int prepareTimerSeconds = 60000; //...1Min
 	//Duration Instance Time.
@@ -87,6 +71,52 @@ public class StonespearReachInstance extends GeneralInstanceHandler
 	private final FastList<Future<?>> stonespearTask3 = FastList.newInstance();
 	private final FastList<Future<?>> stonespearTask4 = FastList.newInstance();
 	private final FastList<Future<?>> stonespearTask5 = FastList.newInstance();
+	
+	private static final float[][] SPAWN_POSITIONS = {
+		{211.05080f, 264.03802f, 96.53291f, 0},
+		{217.06422f, 248.22205f, 96.25f, 17},
+		{231.39449f, 243.60184f, 96.36497f, 31},
+		{245.20996f, 250.43109f, 96.07562f, 44},
+		{251.58972f, 264.37146f, 96.30522f, 59},
+		{243.75105f, 279.34222f, 96.25f, 77},
+		{230.97932f, 285.57825f, 96.418526f, 89},
+		{217.75461f, 277.61115f, 96.02431f, 104}
+	};
+	
+	private static final float[][] KEBABIT_POSITIONS = {
+		{208.48062f, 256.79190f, 96.25000f, 5},
+		{253.01332f, 275.73624f, 96.23518f, 69},
+		{223.37283f, 286.79090f, 96.25000f, 96},
+		{236.64775f, 241.84962f, 95.93428f, 30}
+	};
+	
+	private static final float[][] BLASTSTONE_POSITIONS = {
+		{251.47273f, 264.46713f, 96.30522f, 61},
+		{230.85971f, 285.67032f, 96.41852f, 90},
+		{211.20746f, 264.05276f, 96.53291f, 0},
+		{231.29951f, 243.66095f, 96.36497f, 29}
+	};
+	
+	private enum RaidType {
+		ROUND_1(new int[]{855765, 855766, 855767}, new int[]{855768, 855769, 855770}, new int[]{855771, 855772, 855773}),
+		ROUND_2(new int[]{855788, 855789, 855790}, new int[]{855791, 855792, 855793}, new int[]{855794, 855795, 855796}),
+		ROUND_3(new int[]{855811, 855812, 855813}, new int[]{855814, 855815, 855816}, new int[]{855817, 855818, 855819}),
+		ROUND_4(new int[]{855834, 855835, 855836}, new int[]{855837, 855838, 855839}, new int[]{855840, 855841, 855842});
+		
+		private final int[] firstWave;
+		private final int[] secondWave;
+		private final int[] thirdWave;
+		
+		RaidType(int[] firstWave, int[] secondWave, int[] thirdWave) {
+			this.firstWave = firstWave;
+			this.secondWave = secondWave;
+			this.thirdWave = thirdWave;
+		}
+		
+		public int[] getFirstWave() { return firstWave; }
+		public int[] getSecondWave() { return secondWave; }
+		public int[] getThirdWave() { return thirdWave; }
+	}
 	
 	protected StonespearReachPlayerReward getPlayerReward(Integer object) {
 		return (StonespearReachPlayerReward) instanceReward.getPlayerReward(object);
@@ -117,125 +147,161 @@ public class StonespearReachInstance extends GeneralInstanceHandler
 		final int territoryManager = spawnRace == Race.ASMODIANS ? 833489 : 833488; //Legion Territory Manager.
 		spawn(territoryManager, 165.91524f, 264.50375f, 97.454155f, (byte) 0);
     }
+	
 	private void spawnGuardianStone() {
 		final int guardianStone = spawnRace == Race.ASMODIANS ? 856466 : 855763; //Guardian Stone.
 		spawn(guardianStone, 231.26677f, 264.4961f, 95.7781f, (byte) 60);
     }
+	
+	private void spawnKebabit() {
+		for (float[] pos : KEBABIT_POSITIONS) {
+			spawn(856303, pos[0], pos[1], pos[2], (byte) pos[3]);
+		}
+	}
+	
+	private void spawnBlaststones(int npcId) {
+		for (float[] pos : BLASTSTONE_POSITIONS) {
+			spawn(npcId, pos[0], pos[1], pos[2], (byte) pos[3]);
+		}
+	}
+	
+	private void spawnRaidWave(final int npcId, int delay, final FastList<Future<?>> taskList) {
+		taskList.add(ThreadPoolManager.getInstance().schedule(new Runnable() {
+			@Override
+			public void run() {
+				for (float[] pos : SPAWN_POSITIONS) {
+					stoneSpearRaid((Npc)spawn(npcId, pos[0], pos[1], pos[2], (byte) pos[3]));
+				}
+			}
+		}, delay));
+	}
+	
+	private void spawnRepeatingRaid(int npcId, FastList<Future<?>> taskList) {
+		int[] delays = {1000, 10000, 20000, 30000, 40000, 50000, 60000};
+		for (int delay : delays) {
+			spawnRaidWave(npcId, delay, taskList);
+		}
+	}
 	
 	@Override
 	public void onDie(Npc npc) {
 		int points = 0;
 		int npcId = npc.getNpcId();
 		Player player = npc.getAggroList().getMostPlayerDamage();
+		
 		switch (npc.getObjectTemplate().getTemplateId()) {
 			case 856303: //Agitated Kebbit.
 			    points = 1500;
-			break;
+			    break;
 			case 856305: //Macadamic Jester.
 			    points = 12000;
-			break;
+			    break;
+			
 			//** ROUND 1 **//
-			case 855765: //Shulack Outrider.
-			case 855766: //Rubblespout Spirit.
-			case 855767: //Owllau Outrider.
-			case 855768: //Shulack Watcher.
-			case 855769: //Vilerock Spirit.
-			case 855770: //Owllau Watcher.
-			case 855771: //Shulack Bladesman.
-			case 855772: //Malistone Spirit.
-			case 855773: //Owllau Bladesman.
+			case 855765:
+			case 855766:
+			case 855767:
+			case 855768:
+			case 855769:
+			case 855770:
+			case 855771:
+			case 855772:
+			case 855773:
 			    points = 100;
-			break;
+			    break;
 			case 855764: //Aetheric Field Blaststone.
 			    points = 500;
-			break;
-			case 855774: //Vision Of Hamerun.
-			case 855775: //Vision Of Kromede.
-			case 855776: //Vision Of Kaliga.
+			    break;
+			case 855774:
+			case 855775:
+			case 855776:
 			    points = 12000;
 				stopInstanceTask1();
 				//The second battle will begin in 2 minutes.
 				sendMsgByRace(1402868, Race.PC_ALL, 2000);
-				ThreadPoolManager.getInstance().schedule(new Runnable() {
+				scheduleNextRound(60000, new Runnable() {
 					@Override
 					public void run() {
 						startInstanceTask2();
 					}
-				}, 60000);
-			break;
+				});
+				break;
+			
 			//** ROUND 2 **//
-			case 855788: //Shulack Gladiator.
-			case 855789: //Cinderspout Spirit.
-			case 855790: //Owllau Gladiator.
-			case 855791: //Shulack Fencer.
-			case 855792: //Vileflame Spirit.
-			case 855793: //Owllau Fencer.
-			case 855794: //Shulack Swordsman.
-			case 855795: //Malistoke Spirit.
-			case 855796: //Owllau Swordsman.
+			case 855788:
+			case 855789:
+			case 855790:
+			case 855791:
+			case 855792:
+			case 855793:
+			case 855794:
+			case 855795:
+			case 855796:
 			    points = 200;
-			break;
+			    break;
 			case 855787: //Aetheric Field Blaststone.
 			    points = 1000;
-			break;
-			case 855797: //Apparition Of Bakarma.
-			case 855798: //Apparition Of Triroan.
-			case 855799: //Apparition Of Lanmark.
+			    break;
+			case 855797:
+			case 855798:
+			case 855799:
 			    points = 21000;
 				stopInstanceTask2();
 				//The third battle will begin in 3 minutes.
 				sendMsgByRace(1402869, Race.PC_ALL, 2000);
-				ThreadPoolManager.getInstance().schedule(new Runnable() {
+				scheduleNextRound(60000, new Runnable() {
 					@Override
 					public void run() {
 						startInstanceTask3();
 					}
-				}, 60000);
-			break;
+				});
+				break;
+			
 			//** ROUND 3 **//
-			case 855811: //Shulack Reconnoiterer.
-			case 855812: //Waterspout Spirit.
-			case 855813: //Owllau Healer.
-			case 855814: //Shulack Scout.
-			case 855815: //Vilewash Spirit.
-			case 855816: //Owllau Priest.
-			case 855817: //Shulack Guardsman.
-			case 855818: //Malisalt Spirit.
-			case 855819: //Owllau Mender.
+			case 855811:
+			case 855812:
+			case 855813:
+			case 855814:
+			case 855815:
+			case 855816:
+			case 855817:
+			case 855818:
+			case 855819:
 			    points = 300;
-			break;
+			    break;
 			case 855810: //Aetheric Field Blaststone.
 			    points = 1500;
-			break;
-			case 855820: //Vision Of Calindi.
-			case 855821: //Vision Of Tahabata.
-			case 855822: //Vision Of Rudra.
+			    break;
+			case 855820:
+			case 855821:
+			case 855822:
 			    points = 30000;
 				stopInstanceTask3();
 				//The fourth battle will begin in 4 minutes.
 				sendMsgByRace(1402870, Race.PC_ALL, 2000);
-				ThreadPoolManager.getInstance().schedule(new Runnable() {
+				scheduleNextRound(60000, new Runnable() {
 					@Override
 					public void run() {
 						startInstanceTask4();
 					}
-				}, 60000);
-			break;
+				});
+				break;
+			
 			//** ROUND 4 **//
-			case 855834: //Shulack Warlock.
-			case 855835: //Galespout Spirit.
-			case 855836: //Owllau Warlock.
-			case 855837: //Shulack Mage.
-			case 855838: //Vilegust Spirit.
-			case 855839: //Owllau Mage.
-			case 855840: //Shulack Dark Warlock.
-			case 855841: //Malistorm Spirit.
-			case 855842: //Owllau Dark Warlock.
+			case 855834:
+			case 855835:
+			case 855836:
+			case 855837:
+			case 855838:
+			case 855839:
+			case 855840:
+			case 855841:
+			case 855842:
 			    points = 400;
-			break;
+			    break;
 			case 855833: //Aetheric Field Blaststone.
 			    points = 2000;
-			break;
+			    break;
 			case 855843: //Vision Of Guardian General.
 			    points = 42000;
 				ThreadPoolManager.getInstance().schedule(new Runnable() {
@@ -249,18 +315,27 @@ public class StonespearReachInstance extends GeneralInstanceHandler
 						});
 					}
 				}, 5000);
-			break;
-		} if (instanceReward.getInstanceScoreType().isStartProgress()) {
+				break;
+			default:
+				points = 0;
+				break;
+		}
+		
+		if (instanceReward.getInstanceScoreType().isStartProgress()) {
 			instanceReward.addNpcKill();
 			instanceReward.addPoints(points);
 			sendPacket(npc.getObjectTemplate().getNameId(), points);
 		}
 	}
 	
+	private void scheduleNextRound(long delay, Runnable task) {
+		ThreadPoolManager.getInstance().schedule(task, delay);
+	}
+	
 	protected void startInstanceTask1() {
     	stonespearTask1.add(ThreadPoolManager.getInstance().schedule(new Runnable() {
-            @Override
-            public void run() {
+			@Override
+			public void run() {
 				//The player has 1 min to prepare !!! [Timer Red]
 				if ((timerPrepare != null) && (!timerPrepare.isDone() || !timerPrepare.isCancelled())) {
 					//Start the instance time !!! [Timer White]
@@ -274,4073 +349,253 @@ public class StonespearReachInstance extends GeneralInstanceHandler
 				//Protect the Guardian Stone for 2 minutes.
 				sendMsgByRace(1402924, Race.PC_ALL, 2000);
 				spawn(856305, 206.64789f, 263.70578f, 96.25f, (byte) 94); //Macadamic Jester.
-				switch (Rnd.get(1, 3)) {
-				    case 1:
-					    startShulackOutriderRaid();
-				    break;
-					case 2:
-					    startRubblespoutSpiritRaid();
-				    break;
-					case 3:
-					    startOwllauOutriderRaid();
-				    break;
-				}
-            }
+				
+				startRaidRound(RaidType.ROUND_1, 0);
+			}
         }, 60000)); //...1Min
+		
 		stonespearTask1.add(ThreadPoolManager.getInstance().schedule(new Runnable() {
-            @Override
-            public void run() {
+			@Override
+			public void run() {
 				deleteNpc(855763);
 				deleteNpc(856466);
 				//You have successfully protected the Guardian Stone and the stone has disappeared.
 				sendMsgByRace(1402925, Race.PC_ALL, 0);
-				switch (Rnd.get(1, 3)) {
-				    case 1:
-					    startShulackWatcherRaid();
-				    break;
-					case 2:
-					    startVilerockSpiritRaid();
-				    break;
-					case 3:
-					    startOwllauWatcherRaid();
-				    break;
-				}
-				stoneSpearTaskA1.cancel(true);
-				//Agitated Kebbit.
-				spawn(856303, 208.48062f, 256.79190f, 96.25000f, (byte) 5);
-                spawn(856303, 253.01332f, 275.73624f, 96.23518f, (byte) 69);
-                spawn(856303, 223.37283f, 286.79090f, 96.25000f, (byte) 96);
-                spawn(856303, 236.64775f, 241.84962f, 95.93428f, (byte) 30);
-            }
+				
+				startRaidRound(RaidType.ROUND_1, 1);
+				spawnKebabit();
+			}
         }, 120000)); //...2Min
+		
 		stonespearTask1.add(ThreadPoolManager.getInstance().schedule(new Runnable() {
-            @Override
-            public void run() {
-				//Agitated Kebbit.
-				spawn(856303, 208.48062f, 256.79190f, 96.25000f, (byte) 5);
-                spawn(856303, 253.01332f, 275.73624f, 96.23518f, (byte) 69);
-                spawn(856303, 223.37283f, 286.79090f, 96.25000f, (byte) 96);
-                spawn(856303, 236.64775f, 241.84962f, 95.93428f, (byte) 30);
-            }
-        }, 180000)); //...3Min
+			@Override
+			public void run() {
+				spawnKebabit();
+			}
+		}, 180000)); //...3Min
+		
 		stonespearTask1.add(ThreadPoolManager.getInstance().schedule(new Runnable() {
-            @Override
-            public void run() {
-				switch (Rnd.get(1, 3)) {
-				    case 1:
-					    startShulackBladesmanRaid();
-				    break;
-					case 2:
-					    startMalistoneSpiritRaid();
-				    break;
-					case 3:
-					    startOwllauBladesmanRaid();
-				    break;
-				}
-				stoneSpearTaskA2.cancel(true);
-				//Aetheric Field Blaststone.
-				spawn(855764, 251.47273f, 264.46713f, 96.30522f, (byte) 61);
-				spawn(855764, 230.85971f, 285.67032f, 96.41852f, (byte) 90);
-				spawn(855764, 211.20746f, 264.05276f, 96.53291f, (byte) 0);
-				spawn(855764, 231.29951f, 243.66095f, 96.36497f, (byte) 29);
-				//Agitated Kebbit.
-				spawn(856303, 208.48062f, 256.79190f, 96.25000f, (byte) 5);
-                spawn(856303, 253.01332f, 275.73624f, 96.23518f, (byte) 69);
-                spawn(856303, 223.37283f, 286.79090f, 96.25000f, (byte) 96);
-                spawn(856303, 236.64775f, 241.84962f, 95.93428f, (byte) 30);
-            }
+			@Override
+			public void run() {
+				startRaidRound(RaidType.ROUND_1, 2);
+				spawnBlaststones(855764);
+				spawnKebabit();
+			}
         }, 240000)); //...4Min
+		
 		stonespearTask1.add(ThreadPoolManager.getInstance().schedule(new Runnable() {
-            @Override
-            public void run() {
-				switch (Rnd.get(1, 3)) {
-					case 1:
-					    spawn(855774, 231.35631f, 264.5710f, 95.77810f, (byte) 58); //Vision Of Hamerun.
-					break;
-					case 2:
-					    spawn(855775, 231.35631f, 264.5710f, 95.77810f, (byte) 58); //Vision Of Kromede.
-					break;
-					case 3:
-					    spawn(855776, 231.35631f, 264.5710f, 95.77810f, (byte) 58); //Vision Of Kaliga.
-					break;
-				}
+			@Override
+			public void run() {
+				spawnBoss(855774, 855775, 855776);
 				deleteNpc(856305);
-				stoneSpearTaskA3.cancel(true);
 				//The Guardian Stone and its attackers have all disappeared!
 				sendMsgByRace(1402901, Race.PC_ALL, 0);
-            }
+			}
         }, 300000)); //...5Min
 	}
 	
 	protected void startInstanceTask2() {
     	stonespearTask2.add(ThreadPoolManager.getInstance().schedule(new Runnable() {
-            @Override
-            public void run() {
+			@Override
+			public void run() {
 				spawnGuardianStone();
 				//Protect the Guardian Stone for 2 minutes.
 				sendMsgByRace(1402924, Race.PC_ALL, 2000);
 				spawn(856305, 206.64789f, 263.70578f, 96.25f, (byte) 94); //Macadamic Jester.
-				switch (Rnd.get(1, 3)) {
-				    case 1:
-					    startShulackGladiatorRaid();
-				    break;
-					case 2:
-					    startCinderspoutSpiritRaid();
-				    break;
-					case 3:
-					    startOwllauGladiatorRaid();
-				    break;
-				}
-            }
+				startRaidRound(RaidType.ROUND_2, 0);
+			}
         }, 60000)); //...1Min
+		
 		stonespearTask2.add(ThreadPoolManager.getInstance().schedule(new Runnable() {
-            @Override
-            public void run() {
+			@Override
+			public void run() {
 				deleteNpc(855763);
 				deleteNpc(856466);
 				//You have successfully protected the Guardian Stone and the stone has disappeared.
 				sendMsgByRace(1402925, Race.PC_ALL, 0);
-				switch (Rnd.get(1, 3)) {
-				    case 1:
-					    startShulackFencerRaid();
-				    break;
-					case 2:
-					    startVileflameSpiritRaid();
-				    break;
-					case 3:
-					    startOwllauFencerRaid();
-				    break;
-				}
-				stoneSpearTaskB1.cancel(true);
-				//Agitated Kebbit.
-				spawn(856303, 208.48062f, 256.79190f, 96.25000f, (byte) 5);
-                spawn(856303, 253.01332f, 275.73624f, 96.23518f, (byte) 69);
-                spawn(856303, 223.37283f, 286.79090f, 96.25000f, (byte) 96);
-                spawn(856303, 236.64775f, 241.84962f, 95.93428f, (byte) 30);
-            }
+				startRaidRound(RaidType.ROUND_2, 1);
+				spawnKebabit();
+			}
         }, 120000)); //...2Min
+		
 		stonespearTask2.add(ThreadPoolManager.getInstance().schedule(new Runnable() {
-            @Override
-            public void run() {
-				//Agitated Kebbit.
-				spawn(856303, 208.48062f, 256.79190f, 96.25000f, (byte) 5);
-                spawn(856303, 253.01332f, 275.73624f, 96.23518f, (byte) 69);
-                spawn(856303, 223.37283f, 286.79090f, 96.25000f, (byte) 96);
-                spawn(856303, 236.64775f, 241.84962f, 95.93428f, (byte) 30);
-            }
-        }, 180000)); //...3Min
+			@Override
+			public void run() {
+				spawnKebabit();
+			}
+		}, 180000)); //...3Min
+		
 		stonespearTask2.add(ThreadPoolManager.getInstance().schedule(new Runnable() {
-            @Override
-            public void run() {
-				switch (Rnd.get(1, 3)) {
-				    case 1:
-					    startShulackSwordsmanRaid();
-				    break;
-					case 2:
-					    startMalistokeSpiritRaid();
-				    break;
-					case 3:
-					    startOwllauSwordsmanRaid();
-				    break;
-				}
-				stoneSpearTaskB2.cancel(true);
-				//Aetheric Field Blaststone.
-				spawn(855787, 251.47273f, 264.46713f, 96.30522f, (byte) 61);
-				spawn(855787, 230.85971f, 285.67032f, 96.41852f, (byte) 90);
-				spawn(855787, 211.20746f, 264.05276f, 96.53291f, (byte) 0);
-				spawn(855787, 231.29951f, 243.66095f, 96.36497f, (byte) 29);
-				//Agitated Kebbit.
-				spawn(856303, 208.48062f, 256.79190f, 96.25000f, (byte) 5);
-                spawn(856303, 253.01332f, 275.73624f, 96.23518f, (byte) 69);
-                spawn(856303, 223.37283f, 286.79090f, 96.25000f, (byte) 96);
-                spawn(856303, 236.64775f, 241.84962f, 95.93428f, (byte) 30);
-            }
+			@Override
+			public void run() {
+				startRaidRound(RaidType.ROUND_2, 2);
+				spawnBlaststones(855787);
+				spawnKebabit();
+			}
         }, 240000)); //...4Min
+		
 		stonespearTask2.add(ThreadPoolManager.getInstance().schedule(new Runnable() {
-            @Override
-            public void run() {
-				switch (Rnd.get(1, 3)) {
-					case 1:
-					    spawn(855797, 231.35631f, 264.5710f, 95.77810f, (byte) 58); //Apparition Of Bakarma.
-					break;
-				    case 2:
-					    spawn(855798, 231.35631f, 264.5710f, 95.77810f, (byte) 58); //Apparition Of Triroan.
-					break;
-					case 3:
-					    spawn(855799, 231.35631f, 264.5710f, 95.77810f, (byte) 58); //Apparition Of Lanmark.
-					break;
-				}
+			@Override
+			public void run() {
+				spawnBoss(855797, 855798, 855799);
 				deleteNpc(856305);
-				stoneSpearTaskB3.cancel(true);
 				//The Guardian Stone and its attackers have all disappeared!
 				sendMsgByRace(1402901, Race.PC_ALL, 0);
-            }
+			}
         }, 300000)); //...5Min
 	}
 	
 	protected void startInstanceTask3() {
     	stonespearTask3.add(ThreadPoolManager.getInstance().schedule(new Runnable() {
-            @Override
-            public void run() {
+			@Override
+			public void run() {
 				spawnGuardianStone();
 				//Protect the Guardian Stone for 2 minutes.
 				sendMsgByRace(1402924, Race.PC_ALL, 2000);
 				spawn(856305, 206.64789f, 263.70578f, 96.25f, (byte) 94); //Macadamic Jester.
-				switch (Rnd.get(1, 3)) {
-				    case 1:
-					    startShulackReconnoitererRaid();
-				    break;
-					case 2:
-					    startWaterspoutSpiritRaid();
-				    break;
-					case 3:
-					    startOwllauHealerRaid();
-				    break;
-				}
-            }
+				startRaidRound(RaidType.ROUND_3, 0);
+			}
         }, 60000)); //...1Min
+		
 		stonespearTask3.add(ThreadPoolManager.getInstance().schedule(new Runnable() {
-            @Override
-            public void run() {
+			@Override
+			public void run() {
 				deleteNpc(855763);
 				deleteNpc(856466);
 				//You have successfully protected the Guardian Stone and the stone has disappeared.
 				sendMsgByRace(1402925, Race.PC_ALL, 0);
-				switch (Rnd.get(1, 3)) {
-				    case 1:
-					    startShulackScoutRaid();
-				    break;
-					case 2:
-					    startVilewashSpiritRaid();
-				    break;
-					case 3:
-					    startOwllauPriestRaid();
-				    break;
-				}
-				stoneSpearTaskC1.cancel(true);
-				//Agitated Kebbit.
-				spawn(856303, 208.48062f, 256.79190f, 96.25000f, (byte) 5);
-                spawn(856303, 253.01332f, 275.73624f, 96.23518f, (byte) 69);
-                spawn(856303, 223.37283f, 286.79090f, 96.25000f, (byte) 96);
-                spawn(856303, 236.64775f, 241.84962f, 95.93428f, (byte) 30);
-            }
+				startRaidRound(RaidType.ROUND_3, 1);
+				spawnKebabit();
+			}
         }, 120000)); //...2Min
+		
 		stonespearTask3.add(ThreadPoolManager.getInstance().schedule(new Runnable() {
-            @Override
-            public void run() {
-				//Agitated Kebbit.
-				spawn(856303, 208.48062f, 256.79190f, 96.25000f, (byte) 5);
-                spawn(856303, 253.01332f, 275.73624f, 96.23518f, (byte) 69);
-                spawn(856303, 223.37283f, 286.79090f, 96.25000f, (byte) 96);
-                spawn(856303, 236.64775f, 241.84962f, 95.93428f, (byte) 30);
-            }
-        }, 180000)); //...3Min
+			@Override
+			public void run() {
+				spawnKebabit();
+			}
+		}, 180000)); //...3Min
+		
 		stonespearTask3.add(ThreadPoolManager.getInstance().schedule(new Runnable() {
-            @Override
-            public void run() {
-				switch (Rnd.get(1, 3)) {
-				    case 1:
-					    startShulackGuardsmanRaid();
-				    break;
-					case 2:
-					    startMalisaltSpiritRaid();
-				    break;
-					case 3:
-					    startOwllauMenderRaid();
-				    break;
-				}
-				stoneSpearTaskC2.cancel(true);
-				//Aetheric Field Blaststone.
-				spawn(855810, 251.47273f, 264.46713f, 96.30522f, (byte) 61);
-				spawn(855810, 230.85971f, 285.67032f, 96.41852f, (byte) 90);
-				spawn(855810, 211.20746f, 264.05276f, 96.53291f, (byte) 0);
-				spawn(855810, 231.29951f, 243.66095f, 96.36497f, (byte) 29);
-				//Agitated Kebbit.
-				spawn(856303, 208.48062f, 256.79190f, 96.25000f, (byte) 5);
-                spawn(856303, 253.01332f, 275.73624f, 96.23518f, (byte) 69);
-                spawn(856303, 223.37283f, 286.79090f, 96.25000f, (byte) 96);
-                spawn(856303, 236.64775f, 241.84962f, 95.93428f, (byte) 30);
-            }
+			@Override
+			public void run() {
+				startRaidRound(RaidType.ROUND_3, 2);
+				spawnBlaststones(855810);
+				spawnKebabit();
+			}
         }, 240000)); //...4Min
+		
 		stonespearTask3.add(ThreadPoolManager.getInstance().schedule(new Runnable() {
-            @Override
-            public void run() {
-				switch (Rnd.get(1, 3)) {
-					case 1:
-					    spawn(855820, 231.35631f, 264.5710f, 95.77810f, (byte) 58); //Vision Of Calindi.
-					break;
-					case 2:
-					    spawn(855821, 231.35631f, 264.5710f, 95.77810f, (byte) 58); //Vision Of Tahabata.
-					break;
-					case 3:
-					    spawn(855822, 231.35631f, 264.5710f, 95.77810f, (byte) 58); //Vision Of Rudra.
-					break;
-				}
+			@Override
+			public void run() {
+				spawnBoss(855820, 855821, 855822);
 				deleteNpc(856305);
-				stoneSpearTaskC3.cancel(true);
 				//The Guardian Stone and its attackers have all disappeared!
 				sendMsgByRace(1402901, Race.PC_ALL, 0);
-            }
+			}
         }, 300000)); //...5Min
 	}
 	
 	protected void startInstanceTask4() {
     	stonespearTask4.add(ThreadPoolManager.getInstance().schedule(new Runnable() {
-            @Override
-            public void run() {
+			@Override
+			public void run() {
 				spawnGuardianStone();
 				//Protect the Guardian Stone for 2 minutes.
 				sendMsgByRace(1402924, Race.PC_ALL, 2000);
 				spawn(856305, 206.64789f, 263.70578f, 96.25f, (byte) 94); //Macadamic Jester.
-				switch (Rnd.get(1, 3)) {
-				    case 1:
-					    startShulackWarlockRaid();
-				    break;
-					case 2:
-					    startGalespoutSpiritRaid();
-				    break;
-					case 3:
-					    startOwllauWarlockRaid();
-				    break;
-				}
-            }
+				startRaidRound(RaidType.ROUND_4, 0);
+			}
         }, 60000)); //...1Min
+		
 		stonespearTask4.add(ThreadPoolManager.getInstance().schedule(new Runnable() {
-            @Override
-            public void run() {
+			@Override
+			public void run() {
 				deleteNpc(855763);
 				deleteNpc(856466);
 				//You have successfully protected the Guardian Stone and the stone has disappeared.
 				sendMsgByRace(1402925, Race.PC_ALL, 0);
-				switch (Rnd.get(1, 3)) {
-				    case 1:
-					    startShulackMageRaid();
-				    break;
-					case 2:
-					    startVilegustSpiritRaid();
-				    break;
-					case 3:
-					    startOwllauMageRaid();
-				    break;
-				}
-				stoneSpearTaskD1.cancel(true);
-				//Agitated Kebbit.
-				spawn(856303, 208.48062f, 256.79190f, 96.25000f, (byte) 5);
-                spawn(856303, 253.01332f, 275.73624f, 96.23518f, (byte) 69);
-                spawn(856303, 223.37283f, 286.79090f, 96.25000f, (byte) 96);
-                spawn(856303, 236.64775f, 241.84962f, 95.93428f, (byte) 30);
-            }
+				startRaidRound(RaidType.ROUND_4, 1);
+				spawnKebabit();
+			}
         }, 120000)); //...2Min
+		
 		stonespearTask4.add(ThreadPoolManager.getInstance().schedule(new Runnable() {
-            @Override
-            public void run() {
-				//Agitated Kebbit.
-				spawn(856303, 208.48062f, 256.79190f, 96.25000f, (byte) 5);
-                spawn(856303, 253.01332f, 275.73624f, 96.23518f, (byte) 69);
-                spawn(856303, 223.37283f, 286.79090f, 96.25000f, (byte) 96);
-                spawn(856303, 236.64775f, 241.84962f, 95.93428f, (byte) 30);
-            }
-        }, 180000)); //...3Min
+			@Override
+			public void run() {
+				spawnKebabit();
+			}
+		}, 180000)); //...3Min
+		
 		stonespearTask4.add(ThreadPoolManager.getInstance().schedule(new Runnable() {
-            @Override
-            public void run() {
-				switch (Rnd.get(1, 3)) {
-				    case 1:
-					    startShulackDarkWarlockRaid();
-				    break;
-					case 2:
-					    startMalistormSpiritRaid();
-				    break;
-					case 3:
-					    startOwllauDarkWarlockRaid();
-				    break;
-				}
-				stoneSpearTaskD2.cancel(true);
-				//Aetheric Field Blaststone.
-				spawn(855833, 251.47273f, 264.46713f, 96.30522f, (byte) 61);
-				spawn(855833, 230.85971f, 285.67032f, 96.41852f, (byte) 90);
-				spawn(855833, 211.20746f, 264.05276f, 96.53291f, (byte) 0);
-				spawn(855833, 231.29951f, 243.66095f, 96.36497f, (byte) 29);
-				//Agitated Kebbit.
-				spawn(856303, 208.48062f, 256.79190f, 96.25000f, (byte) 5);
-                spawn(856303, 253.01332f, 275.73624f, 96.23518f, (byte) 69);
-                spawn(856303, 223.37283f, 286.79090f, 96.25000f, (byte) 96);
-                spawn(856303, 236.64775f, 241.84962f, 95.93428f, (byte) 30);
-            }
+			@Override
+			public void run() {
+				startRaidRound(RaidType.ROUND_4, 2);
+				spawnBlaststones(855833);
+				spawnKebabit();
+			}
         }, 240000)); //...4Min
+		
 		stonespearTask4.add(ThreadPoolManager.getInstance().schedule(new Runnable() {
-            @Override
-            public void run() {
+			@Override
+			public void run() {
 				deleteNpc(856305);
-				stoneSpearTaskD3.cancel(true);
 				//The Guardian Stone and its attackers have all disappeared!
 				sendMsgByRace(1402901, Race.PC_ALL, 0);
 				spawn(855843, 231.35631f, 264.5710f, 95.77810f, (byte) 58); //Vision Of Guardian General.
-            }
+			}
         }, 300000)); //...5Min
+	}
+	
+	private void startRaidRound(RaidType round, int waveIndex) {
+		int[] npcIds;
+		switch (waveIndex) {
+			case 0:
+				npcIds = round.getFirstWave();
+				break;
+			case 1:
+				npcIds = round.getSecondWave();
+				break;
+			case 2:
+				npcIds = round.getThirdWave();
+				break;
+			default:
+				return;
+		}
+		int npcId = npcIds[Rnd.get(0, npcIds.length - 1)];
+		spawnRepeatingRaid(npcId, getTaskListForRound(round, waveIndex));
+	}
+	
+	private FastList<Future<?>> getTaskListForRound(RaidType round, int waveIndex) {
+		if (round == RaidType.ROUND_1) {
+			return stonespearTask1;
+		} else if (round == RaidType.ROUND_2) {
+			return stonespearTask2;
+		} else if (round == RaidType.ROUND_3) {
+			return stonespearTask3;
+		} else {
+			return stonespearTask4;
+		}
+	}
+	
+	private void spawnBoss(int... bossIds) {
+		int bossId = bossIds[Rnd.get(0, bossIds.length - 1)];
+		spawn(bossId, 231.35631f, 264.5710f, 95.77810f, (byte) 58);
 	}
 	
 	protected void startCountDown() {
 		stonespearTask5.add(ThreadPoolManager.getInstance().schedule(new Runnable() {
-            @Override
-            public void run() {
+			@Override
+			public void run() {
 				instance.doOnAllPlayers(new Visitor<Player>() {
-				    @Override
-				    public void visit(Player player) {
-					    stopInstance(player);
-				    }
-			    });
-            }
+					@Override
+					public void visit(Player player) {
+						stopInstance(player);
+					}
+				});
+			}
         }, 1800000));
     }
-	
-   /**
-	* RAID A1
-	*/
-	private void startShulackOutriderRaid() {
-		stoneSpearTaskA1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Outrider.
-				stoneSpearRaid((Npc)spawn(855765, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855765, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855765, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855765, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855765, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855765, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855765, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855765, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 1000);
-		stoneSpearTaskA1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Outrider.
-				stoneSpearRaid((Npc)spawn(855765, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855765, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855765, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855765, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855765, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855765, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855765, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855765, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 10000);
-		stoneSpearTaskA1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Outrider.
-				stoneSpearRaid((Npc)spawn(855765, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855765, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855765, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855765, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855765, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855765, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855765, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855765, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 20000);
-		stoneSpearTaskA1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Outrider.
-				stoneSpearRaid((Npc)spawn(855765, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855765, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855765, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855765, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855765, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855765, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855765, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855765, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 30000);
-		stoneSpearTaskA1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Outrider.
-				stoneSpearRaid((Npc)spawn(855765, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855765, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855765, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855765, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855765, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855765, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855765, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855765, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 40000);
-		stoneSpearTaskA1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Outrider.
-				stoneSpearRaid((Npc)spawn(855765, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855765, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855765, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855765, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855765, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855765, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855765, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855765, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 50000);
-		stoneSpearTaskA1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Outrider.
-				stoneSpearRaid((Npc)spawn(855765, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855765, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855765, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855765, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855765, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855765, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855765, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855765, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 60000);
-	}
-	private void startRubblespoutSpiritRaid() {
-		stoneSpearTaskA1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Rubblespout Spirit.
-				stoneSpearRaid((Npc)spawn(855766, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855766, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855766, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855766, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855766, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855766, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855766, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855766, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 1000);
-		stoneSpearTaskA1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Rubblespout Spirit.
-				stoneSpearRaid((Npc)spawn(855766, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855766, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855766, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855766, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855766, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855766, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855766, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855766, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 10000);
-		stoneSpearTaskA1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Rubblespout Spirit.
-				stoneSpearRaid((Npc)spawn(855766, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855766, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855766, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855766, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855766, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855766, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855766, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855766, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 20000);
-		stoneSpearTaskA1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Rubblespout Spirit.
-				stoneSpearRaid((Npc)spawn(855766, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855766, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855766, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855766, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855766, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855766, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855766, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855766, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 30000);
-		stoneSpearTaskA1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Rubblespout Spirit.
-				stoneSpearRaid((Npc)spawn(855766, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855766, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855766, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855766, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855766, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855766, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855766, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855766, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 40000);
-		stoneSpearTaskA1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Rubblespout Spirit.
-				stoneSpearRaid((Npc)spawn(855766, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855766, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855766, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855766, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855766, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855766, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855766, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855766, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 50000);
-		stoneSpearTaskA1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Rubblespout Spirit.
-				stoneSpearRaid((Npc)spawn(855766, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855766, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855766, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855766, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855766, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855766, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855766, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855766, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 60000);
-	}
-	private void startOwllauOutriderRaid() {
-		stoneSpearTaskA1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Outrider.
-				stoneSpearRaid((Npc)spawn(855767, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855767, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855767, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855767, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855767, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855767, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855767, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855767, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 1000);
-		stoneSpearTaskA1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Outrider.
-				stoneSpearRaid((Npc)spawn(855767, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855767, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855767, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855767, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855767, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855767, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855767, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855767, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 10000);
-		stoneSpearTaskA1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Outrider.
-				stoneSpearRaid((Npc)spawn(855767, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855767, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855767, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855767, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855767, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855767, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855767, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855767, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 20000);
-		stoneSpearTaskA1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Outrider.
-				stoneSpearRaid((Npc)spawn(855767, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855767, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855767, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855767, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855767, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855767, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855767, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855767, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 30000);
-		stoneSpearTaskA1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Outrider.
-				stoneSpearRaid((Npc)spawn(855767, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855767, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855767, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855767, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855767, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855767, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855767, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855767, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 40000);
-		stoneSpearTaskA1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Outrider.
-				stoneSpearRaid((Npc)spawn(855767, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855767, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855767, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855767, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855767, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855767, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855767, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855767, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 50000);
-		stoneSpearTaskA1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Outrider.
-				stoneSpearRaid((Npc)spawn(855767, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855767, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855767, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855767, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855767, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855767, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855767, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855767, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 60000);
-	}
-	
-   /**
-	* RAID A2
-	*/
-	private void startShulackWatcherRaid() {
-		stoneSpearTaskA2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Watcher.
-				stoneSpearRaid((Npc)spawn(855768, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855768, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855768, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855768, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855768, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855768, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855768, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855768, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 1000);
-		stoneSpearTaskA2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Watcher.
-				stoneSpearRaid((Npc)spawn(855768, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855768, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855768, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855768, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855768, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855768, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855768, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855768, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 10000);
-		stoneSpearTaskA2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Watcher.
-				stoneSpearRaid((Npc)spawn(855768, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855768, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855768, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855768, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855768, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855768, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855768, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855768, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 20000);
-		stoneSpearTaskA2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Watcher.
-				stoneSpearRaid((Npc)spawn(855768, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855768, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855768, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855768, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855768, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855768, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855768, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855768, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 30000);
-		stoneSpearTaskA2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Watcher.
-				stoneSpearRaid((Npc)spawn(855768, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855768, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855768, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855768, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855768, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855768, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855768, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855768, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 40000);
-		stoneSpearTaskA2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Watcher.
-				stoneSpearRaid((Npc)spawn(855768, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855768, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855768, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855768, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855768, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855768, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855768, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855768, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 50000);
-		stoneSpearTaskA2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Watcher.
-				stoneSpearRaid((Npc)spawn(855768, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855768, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855768, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855768, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855768, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855768, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855768, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855768, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 60000);
-	}
-	private void startVilerockSpiritRaid() {
-		stoneSpearTaskA2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Vilerock Spirit.
-				stoneSpearRaid((Npc)spawn(855769, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855769, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855769, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855769, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855769, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855769, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855769, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855769, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 1000);
-		stoneSpearTaskA2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Vilerock Spirit.
-				stoneSpearRaid((Npc)spawn(855769, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855769, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855769, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855769, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855769, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855769, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855769, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855769, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 10000);
-		stoneSpearTaskA2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Vilerock Spirit.
-				stoneSpearRaid((Npc)spawn(855769, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855769, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855769, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855769, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855769, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855769, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855769, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855769, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 20000);
-		stoneSpearTaskA2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Vilerock Spirit.
-				stoneSpearRaid((Npc)spawn(855769, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855769, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855769, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855769, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855769, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855769, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855769, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855769, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 30000);
-		stoneSpearTaskA2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Vilerock Spirit.
-				stoneSpearRaid((Npc)spawn(855769, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855769, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855769, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855769, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855769, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855769, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855769, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855769, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 40000);
-		stoneSpearTaskA2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Vilerock Spirit.
-				stoneSpearRaid((Npc)spawn(855769, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855769, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855769, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855769, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855769, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855769, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855769, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855769, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 50000);
-		stoneSpearTaskA2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Vilerock Spirit.
-				stoneSpearRaid((Npc)spawn(855769, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855769, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855769, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855769, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855769, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855769, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855769, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855769, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 60000);
-	}
-	private void startOwllauWatcherRaid() {
-		stoneSpearTaskA2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Watcher.
-				stoneSpearRaid((Npc)spawn(855770, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855770, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855770, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855770, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855770, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855770, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855770, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855770, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 1000);
-		stoneSpearTaskA2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Watcher.
-				stoneSpearRaid((Npc)spawn(855770, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855770, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855770, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855770, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855770, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855770, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855770, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855770, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 10000);
-		stoneSpearTaskA2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Watcher.
-				stoneSpearRaid((Npc)spawn(855770, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855770, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855770, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855770, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855770, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855770, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855770, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855770, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 20000);
-		stoneSpearTaskA2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Watcher.
-				stoneSpearRaid((Npc)spawn(855770, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855770, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855770, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855770, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855770, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855770, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855770, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855770, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 30000);
-		stoneSpearTaskA2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Watcher.
-				stoneSpearRaid((Npc)spawn(855770, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855770, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855770, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855770, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855770, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855770, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855770, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855770, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 40000);
-		stoneSpearTaskA2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Watcher.
-				stoneSpearRaid((Npc)spawn(855770, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855770, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855770, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855770, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855770, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855770, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855770, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855770, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 50000);
-		stoneSpearTaskA2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Watcher.
-				stoneSpearRaid((Npc)spawn(855770, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855770, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855770, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855770, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855770, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855770, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855770, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855770, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 60000);
-	}
-	
-   /**
-	* RAID A3
-	*/
-	private void startShulackBladesmanRaid() {
-		stoneSpearTaskA3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Bladesman.
-				stoneSpearRaid((Npc)spawn(855771, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855771, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855771, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855771, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855771, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855771, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855771, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855771, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 1000);
-		stoneSpearTaskA3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Bladesman.
-				stoneSpearRaid((Npc)spawn(855771, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855771, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855771, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855771, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855771, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855771, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855771, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855771, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 10000);
-		stoneSpearTaskA3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Bladesman.
-				stoneSpearRaid((Npc)spawn(855771, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855771, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855771, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855771, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855771, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855771, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855771, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855771, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 20000);
-		stoneSpearTaskA3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Bladesman.
-				stoneSpearRaid((Npc)spawn(855771, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855771, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855771, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855771, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855771, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855771, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855771, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855771, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 30000);
-		stoneSpearTaskA3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Bladesman.
-				stoneSpearRaid((Npc)spawn(855771, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855771, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855771, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855771, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855771, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855771, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855771, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855771, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 40000);
-		stoneSpearTaskA3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Bladesman.
-				stoneSpearRaid((Npc)spawn(855771, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855771, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855771, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855771, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855771, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855771, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855771, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855771, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 50000);
-		stoneSpearTaskA3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Bladesman.
-				stoneSpearRaid((Npc)spawn(855771, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855771, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855771, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855771, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855771, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855771, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855771, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855771, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 60000);
-	}
-	private void startMalistoneSpiritRaid() {
-		stoneSpearTaskA3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Malistone Spirit.
-				stoneSpearRaid((Npc)spawn(855772, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855772, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855772, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855772, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855772, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855772, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855772, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855772, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 1000);
-		stoneSpearTaskA3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Malistone Spirit.
-				stoneSpearRaid((Npc)spawn(855772, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855772, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855772, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855772, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855772, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855772, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855772, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855772, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 10000);
-		stoneSpearTaskA3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Malistone Spirit.
-				stoneSpearRaid((Npc)spawn(855772, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855772, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855772, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855772, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855772, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855772, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855772, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855772, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 20000);
-		stoneSpearTaskA3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Malistone Spirit.
-				stoneSpearRaid((Npc)spawn(855772, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855772, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855772, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855772, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855772, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855772, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855772, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855772, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 30000);
-		stoneSpearTaskA3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Malistone Spirit.
-				stoneSpearRaid((Npc)spawn(855772, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855772, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855772, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855772, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855772, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855772, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855772, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855772, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 40000);
-		stoneSpearTaskA3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Malistone Spirit.
-				stoneSpearRaid((Npc)spawn(855772, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855772, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855772, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855772, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855772, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855772, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855772, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855772, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 50000);
-		stoneSpearTaskA3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Malistone Spirit.
-				stoneSpearRaid((Npc)spawn(855772, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855772, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855772, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855772, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855772, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855772, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855772, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855772, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 60000);
-	}
-	private void startOwllauBladesmanRaid() {
-		stoneSpearTaskA3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Bladesman.
-				stoneSpearRaid((Npc)spawn(855773, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855773, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855773, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855773, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855773, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855773, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855773, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855773, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 1000);
-		stoneSpearTaskA3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Bladesman.
-				stoneSpearRaid((Npc)spawn(855773, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855773, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855773, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855773, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855773, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855773, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855773, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855773, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 10000);
-		stoneSpearTaskA3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Bladesman.
-				stoneSpearRaid((Npc)spawn(855773, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855773, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855773, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855773, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855773, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855773, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855773, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855773, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 20000);
-		stoneSpearTaskA3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Bladesman.
-				stoneSpearRaid((Npc)spawn(855773, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855773, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855773, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855773, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855773, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855773, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855773, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855773, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 30000);
-		stoneSpearTaskA3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Bladesman.
-				stoneSpearRaid((Npc)spawn(855773, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855773, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855773, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855773, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855773, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855773, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855773, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855773, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 40000);
-		stoneSpearTaskA3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Bladesman.
-				stoneSpearRaid((Npc)spawn(855773, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855773, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855773, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855773, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855773, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855773, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855773, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855773, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 50000);
-		stoneSpearTaskA3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Bladesman.
-				stoneSpearRaid((Npc)spawn(855773, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855773, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855773, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855773, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855773, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855773, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855773, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855773, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 60000);
-	}
-	
-   /**
-	* RAID B1
-	*/
-	private void startShulackGladiatorRaid() {
-		stoneSpearTaskB1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Gladiator.
-				stoneSpearRaid((Npc)spawn(855788, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855788, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855788, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855788, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855788, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855788, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855788, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855788, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 1000);
-		stoneSpearTaskB1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Gladiator.
-				stoneSpearRaid((Npc)spawn(855788, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855788, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855788, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855788, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855788, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855788, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855788, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855788, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 10000);
-		stoneSpearTaskB1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Gladiator.
-				stoneSpearRaid((Npc)spawn(855788, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855788, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855788, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855788, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855788, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855788, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855788, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855788, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 20000);
-		stoneSpearTaskB1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Gladiator.
-				stoneSpearRaid((Npc)spawn(855788, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855788, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855788, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855788, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855788, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855788, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855788, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855788, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 30000);
-		stoneSpearTaskB1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Gladiator.
-				stoneSpearRaid((Npc)spawn(855788, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855788, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855788, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855788, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855788, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855788, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855788, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855788, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 40000);
-		stoneSpearTaskB1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Gladiator.
-				stoneSpearRaid((Npc)spawn(855788, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855788, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855788, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855788, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855788, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855788, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855788, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855788, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 50000);
-		stoneSpearTaskB1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Gladiator.
-				stoneSpearRaid((Npc)spawn(855788, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855788, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855788, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855788, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855788, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855788, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855788, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855788, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 60000);
-	}
-	private void startCinderspoutSpiritRaid() {
-		stoneSpearTaskB1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Cinderspout Spirit.
-				stoneSpearRaid((Npc)spawn(855789, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855789, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855789, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855789, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855789, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855789, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855789, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855789, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 1000);
-		stoneSpearTaskB1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Cinderspout Spirit.
-				stoneSpearRaid((Npc)spawn(855789, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855789, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855789, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855789, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855789, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855789, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855789, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855789, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 10000);
-		stoneSpearTaskB1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Cinderspout Spirit.
-				stoneSpearRaid((Npc)spawn(855789, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855789, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855789, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855789, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855789, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855789, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855789, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855789, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 20000);
-		stoneSpearTaskB1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Cinderspout Spirit.
-				stoneSpearRaid((Npc)spawn(855789, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855789, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855789, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855789, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855789, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855789, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855789, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855789, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 30000);
-		stoneSpearTaskB1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Cinderspout Spirit.
-				stoneSpearRaid((Npc)spawn(855789, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855789, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855789, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855789, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855789, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855789, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855789, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855789, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 40000);
-		stoneSpearTaskB1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Cinderspout Spirit.
-				stoneSpearRaid((Npc)spawn(855789, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855789, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855789, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855789, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855789, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855789, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855789, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855789, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 50000);
-		stoneSpearTaskB1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Cinderspout Spirit.
-				stoneSpearRaid((Npc)spawn(855789, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855789, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855789, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855789, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855789, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855789, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855789, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855789, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 60000);
-	}
-	private void startOwllauGladiatorRaid() {
-		stoneSpearTaskB1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Gladiator.
-				stoneSpearRaid((Npc)spawn(855790, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855790, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855790, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855790, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855790, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855790, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855790, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855790, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 1000);
-		stoneSpearTaskB1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Gladiator.
-				stoneSpearRaid((Npc)spawn(855790, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855790, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855790, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855790, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855790, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855790, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855790, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855790, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 10000);
-		stoneSpearTaskB1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Gladiator.
-				stoneSpearRaid((Npc)spawn(855790, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855790, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855790, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855790, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855790, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855790, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855790, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855790, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 20000);
-		stoneSpearTaskB1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Gladiator.
-				stoneSpearRaid((Npc)spawn(855790, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855790, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855790, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855790, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855790, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855790, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855790, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855790, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 30000);
-		stoneSpearTaskB1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Gladiator.
-				stoneSpearRaid((Npc)spawn(855790, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855790, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855790, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855790, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855790, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855790, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855790, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855790, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 40000);
-		stoneSpearTaskB1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Gladiator.
-				stoneSpearRaid((Npc)spawn(855790, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855790, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855790, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855790, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855790, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855790, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855790, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855790, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 50000);
-		stoneSpearTaskB1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Gladiator.
-				stoneSpearRaid((Npc)spawn(855790, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855790, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855790, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855790, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855790, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855790, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855790, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855790, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 60000);
-	}
-	
-   /**
-	* RAID B2
-	*/
-	private void startShulackFencerRaid() {
-		stoneSpearTaskB2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Fencer.
-				stoneSpearRaid((Npc)spawn(855791, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855791, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855791, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855791, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855791, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855791, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855791, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855791, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 1000);
-		stoneSpearTaskB2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Fencer.
-				stoneSpearRaid((Npc)spawn(855791, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855791, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855791, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855791, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855791, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855791, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855791, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855791, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 10000);
-		stoneSpearTaskB2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Fencer.
-				stoneSpearRaid((Npc)spawn(855791, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855791, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855791, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855791, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855791, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855791, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855791, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855791, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 20000);
-		stoneSpearTaskB2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Fencer.
-				stoneSpearRaid((Npc)spawn(855791, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855791, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855791, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855791, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855791, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855791, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855791, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855791, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 30000);
-		stoneSpearTaskB2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Fencer.
-				stoneSpearRaid((Npc)spawn(855791, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855791, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855791, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855791, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855791, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855791, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855791, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855791, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 40000);
-		stoneSpearTaskB2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Fencer.
-				stoneSpearRaid((Npc)spawn(855791, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855791, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855791, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855791, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855791, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855791, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855791, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855791, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 50000);
-		stoneSpearTaskB2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Fencer.
-				stoneSpearRaid((Npc)spawn(855791, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855791, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855791, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855791, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855791, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855791, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855791, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855791, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 60000);
-	}
-	private void startVileflameSpiritRaid() {
-		stoneSpearTaskB2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Vileflame Spirit.
-				stoneSpearRaid((Npc)spawn(855792, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855792, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855792, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855792, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855792, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855792, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855792, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855792, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 1000);
-		stoneSpearTaskB2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Vileflame Spirit.
-				stoneSpearRaid((Npc)spawn(855792, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855792, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855792, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855792, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855792, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855792, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855792, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855792, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 10000);
-		stoneSpearTaskB2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Vileflame Spirit.
-				stoneSpearRaid((Npc)spawn(855792, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855792, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855792, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855792, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855792, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855792, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855792, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855792, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 20000);
-		stoneSpearTaskB2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Vileflame Spirit.
-				stoneSpearRaid((Npc)spawn(855792, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855792, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855792, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855792, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855792, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855792, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855792, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855792, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 30000);
-		stoneSpearTaskB2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Vileflame Spirit.
-				stoneSpearRaid((Npc)spawn(855792, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855792, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855792, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855792, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855792, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855792, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855792, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855792, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 40000);
-		stoneSpearTaskB2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Vileflame Spirit.
-				stoneSpearRaid((Npc)spawn(855792, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855792, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855792, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855792, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855792, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855792, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855792, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855792, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 50000);
-		stoneSpearTaskB2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Vileflame Spirit.
-				stoneSpearRaid((Npc)spawn(855792, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855792, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855792, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855792, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855792, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855792, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855792, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855792, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 60000);
-	}
-	private void startOwllauFencerRaid() {
-		stoneSpearTaskB2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Fencer.
-				stoneSpearRaid((Npc)spawn(855793, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855793, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855793, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855793, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855793, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855793, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855793, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855793, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 1000);
-		stoneSpearTaskB2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Fencer.
-				stoneSpearRaid((Npc)spawn(855793, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855793, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855793, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855793, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855793, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855793, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855793, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855793, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 10000);
-		stoneSpearTaskB2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Fencer.
-				stoneSpearRaid((Npc)spawn(855793, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855793, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855793, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855793, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855793, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855793, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855793, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855793, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 20000);
-		stoneSpearTaskB2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Fencer.
-				stoneSpearRaid((Npc)spawn(855793, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855793, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855793, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855793, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855793, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855793, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855793, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855793, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 30000);
-		stoneSpearTaskB2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Fencer.
-				stoneSpearRaid((Npc)spawn(855793, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855793, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855793, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855793, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855793, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855793, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855793, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855793, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 40000);
-		stoneSpearTaskB2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Fencer.
-				stoneSpearRaid((Npc)spawn(855793, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855793, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855793, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855793, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855793, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855793, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855793, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855793, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 50000);
-		stoneSpearTaskB2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Fencer.
-				stoneSpearRaid((Npc)spawn(855793, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855793, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855793, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855793, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855793, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855793, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855793, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855793, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 60000);
-	}
-	
-   /**
-	* RAID B3
-	*/
-	private void startShulackSwordsmanRaid() {
-		stoneSpearTaskB3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Swordsman.
-				stoneSpearRaid((Npc)spawn(855794, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855794, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855794, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855794, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855794, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855794, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855794, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855794, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 1000);
-		stoneSpearTaskB3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Swordsman.
-				stoneSpearRaid((Npc)spawn(855794, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855794, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855794, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855794, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855794, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855794, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855794, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855794, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 10000);
-		stoneSpearTaskB3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Swordsman.
-				stoneSpearRaid((Npc)spawn(855794, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855794, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855794, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855794, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855794, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855794, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855794, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855794, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 20000);
-		stoneSpearTaskB3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Swordsman.
-				stoneSpearRaid((Npc)spawn(855794, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855794, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855794, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855794, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855794, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855794, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855794, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855794, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 30000);
-		stoneSpearTaskB3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Swordsman.
-				stoneSpearRaid((Npc)spawn(855794, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855794, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855794, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855794, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855794, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855794, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855794, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855794, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 40000);
-		stoneSpearTaskB3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Swordsman.
-				stoneSpearRaid((Npc)spawn(855794, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855794, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855794, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855794, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855794, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855794, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855794, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855794, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 50000);
-		stoneSpearTaskB3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Swordsman.
-				stoneSpearRaid((Npc)spawn(855794, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855794, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855794, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855794, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855794, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855794, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855794, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855794, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 60000);
-	}
-	private void startMalistokeSpiritRaid() {
-		stoneSpearTaskB3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Malistoke Spirit.
-				stoneSpearRaid((Npc)spawn(855795, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855795, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855795, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855795, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855795, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855795, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855795, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855795, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 1000);
-		stoneSpearTaskB3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Malistoke Spirit.
-				stoneSpearRaid((Npc)spawn(855795, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855795, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855795, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855795, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855795, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855795, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855795, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855795, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 10000);
-		stoneSpearTaskB3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Malistoke Spirit.
-				stoneSpearRaid((Npc)spawn(855795, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855795, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855795, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855795, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855795, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855795, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855795, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855795, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 20000);
-		stoneSpearTaskB3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Malistoke Spirit.
-				stoneSpearRaid((Npc)spawn(855795, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855795, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855795, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855795, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855795, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855795, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855795, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855795, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 30000);
-		stoneSpearTaskB3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Malistoke Spirit.
-				stoneSpearRaid((Npc)spawn(855795, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855795, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855795, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855795, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855795, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855795, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855795, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855795, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 40000);
-		stoneSpearTaskB3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Malistoke Spirit.
-				stoneSpearRaid((Npc)spawn(855795, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855795, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855795, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855795, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855795, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855795, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855795, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855795, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 50000);
-		stoneSpearTaskB3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Malistoke Spirit.
-				stoneSpearRaid((Npc)spawn(855795, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855795, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855795, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855795, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855795, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855795, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855795, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855795, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 60000);
-	}
-	private void startOwllauSwordsmanRaid() {
-		stoneSpearTaskB3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Swordsman.
-				stoneSpearRaid((Npc)spawn(855796, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855796, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855796, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855796, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855796, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855796, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855796, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855796, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 1000);
-		stoneSpearTaskB3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Swordsman.
-				stoneSpearRaid((Npc)spawn(855796, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855796, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855796, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855796, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855796, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855796, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855796, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855796, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 10000);
-		stoneSpearTaskB3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Swordsman.
-				stoneSpearRaid((Npc)spawn(855796, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855796, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855796, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855796, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855796, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855796, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855796, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855796, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 20000);
-		stoneSpearTaskB3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Swordsman.
-				stoneSpearRaid((Npc)spawn(855796, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855796, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855796, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855796, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855796, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855796, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855796, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855796, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 30000);
-		stoneSpearTaskB3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Swordsman.
-				stoneSpearRaid((Npc)spawn(855796, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855796, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855796, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855796, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855796, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855796, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855796, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855796, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 40000);
-		stoneSpearTaskB3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Swordsman.
-				stoneSpearRaid((Npc)spawn(855796, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855796, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855796, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855796, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855796, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855796, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855796, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855796, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 50000);
-		stoneSpearTaskB3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Swordsman.
-				stoneSpearRaid((Npc)spawn(855796, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855796, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855796, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855796, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855796, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855796, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855796, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855796, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 60000);
-	}
-	
-   /**
-	* RAID C1
-	*/
-	private void startShulackReconnoitererRaid() {
-		stoneSpearTaskC1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Swordsman.
-				stoneSpearRaid((Npc)spawn(855811, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855811, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855811, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855811, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855811, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855811, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855811, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855811, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 1000);
-		stoneSpearTaskC1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Swordsman.
-				stoneSpearRaid((Npc)spawn(855811, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855811, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855811, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855811, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855811, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855811, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855811, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855811, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 10000);
-		stoneSpearTaskC1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Swordsman.
-				stoneSpearRaid((Npc)spawn(855811, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855811, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855811, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855811, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855811, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855811, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855811, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855811, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 20000);
-		stoneSpearTaskC1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Swordsman.
-				stoneSpearRaid((Npc)spawn(855811, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855811, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855811, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855811, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855811, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855811, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855811, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855811, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 30000);
-		stoneSpearTaskC1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Swordsman.
-				stoneSpearRaid((Npc)spawn(855811, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855811, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855811, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855811, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855811, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855811, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855811, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855811, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 40000);
-		stoneSpearTaskC1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Swordsman.
-				stoneSpearRaid((Npc)spawn(855811, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855811, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855811, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855811, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855811, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855811, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855811, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855811, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 50000);
-		stoneSpearTaskC1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Swordsman.
-				stoneSpearRaid((Npc)spawn(855811, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855811, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855811, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855811, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855811, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855811, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855811, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855811, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 60000);
-	}
-	private void startWaterspoutSpiritRaid() {
-		stoneSpearTaskC1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Waterspout Spirit.
-				stoneSpearRaid((Npc)spawn(855812, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855812, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855812, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855812, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855812, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855812, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855812, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855812, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 1000);
-		stoneSpearTaskC1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Waterspout Spirit.
-				stoneSpearRaid((Npc)spawn(855812, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855812, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855812, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855812, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855812, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855812, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855812, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855812, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 10000);
-		stoneSpearTaskC1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Waterspout Spirit.
-				stoneSpearRaid((Npc)spawn(855812, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855812, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855812, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855812, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855812, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855812, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855812, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855812, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 20000);
-		stoneSpearTaskC1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Waterspout Spirit.
-				stoneSpearRaid((Npc)spawn(855812, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855812, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855812, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855812, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855812, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855812, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855812, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855812, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 30000);
-		stoneSpearTaskC1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Waterspout Spirit.
-				stoneSpearRaid((Npc)spawn(855812, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855812, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855812, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855812, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855812, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855812, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855812, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855812, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 40000);
-		stoneSpearTaskC1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Waterspout Spirit.
-				stoneSpearRaid((Npc)spawn(855812, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855812, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855812, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855812, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855812, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855812, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855812, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855812, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 50000);
-		stoneSpearTaskC1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Waterspout Spirit.
-				stoneSpearRaid((Npc)spawn(855812, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855812, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855812, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855812, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855812, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855812, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855812, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855812, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 60000);
-	}
-	private void startOwllauHealerRaid() {
-		stoneSpearTaskC1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Healer.
-				stoneSpearRaid((Npc)spawn(855813, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855813, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855813, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855813, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855813, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855813, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855813, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855813, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 1000);
-		stoneSpearTaskC1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Healer.
-				stoneSpearRaid((Npc)spawn(855813, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855813, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855813, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855813, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855813, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855813, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855813, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855813, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 10000);
-		stoneSpearTaskC1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Healer.
-				stoneSpearRaid((Npc)spawn(855813, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855813, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855813, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855813, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855813, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855813, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855813, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855813, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 20000);
-		stoneSpearTaskC1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Healer.
-				stoneSpearRaid((Npc)spawn(855813, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855813, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855813, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855813, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855813, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855813, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855813, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855813, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 30000);
-		stoneSpearTaskC1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Healer.
-				stoneSpearRaid((Npc)spawn(855813, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855813, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855813, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855813, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855813, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855813, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855813, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855813, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 40000);
-		stoneSpearTaskC1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Healer.
-				stoneSpearRaid((Npc)spawn(855813, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855813, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855813, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855813, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855813, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855813, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855813, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855813, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 50000);
-		stoneSpearTaskC1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Healer.
-				stoneSpearRaid((Npc)spawn(855813, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855813, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855813, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855813, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855813, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855813, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855813, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855813, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 60000);
-	}
-	
-   /**
-	* RAID C2
-	*/
-	private void startShulackScoutRaid() {
-		stoneSpearTaskC2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Scout.
-				stoneSpearRaid((Npc)spawn(855814, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855814, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855814, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855814, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855814, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855814, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855814, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855814, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 1000);
-		stoneSpearTaskC2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Scout.
-				stoneSpearRaid((Npc)spawn(855814, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855814, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855814, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855814, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855814, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855814, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855814, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855814, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 10000);
-		stoneSpearTaskC2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Scout.
-				stoneSpearRaid((Npc)spawn(855814, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855814, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855814, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855814, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855814, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855814, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855814, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855814, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 20000);
-		stoneSpearTaskC2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Scout.
-				stoneSpearRaid((Npc)spawn(855814, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855814, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855814, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855814, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855814, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855814, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855814, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855814, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 30000);
-		stoneSpearTaskC2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Scout.
-				stoneSpearRaid((Npc)spawn(855814, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855814, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855814, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855814, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855814, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855814, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855814, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855814, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 40000);
-		stoneSpearTaskC2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Scout.
-				stoneSpearRaid((Npc)spawn(855814, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855814, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855814, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855814, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855814, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855814, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855814, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855814, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 50000);
-		stoneSpearTaskC2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Scout.
-				stoneSpearRaid((Npc)spawn(855814, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855814, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855814, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855814, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855814, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855814, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855814, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855814, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 60000);
-	}
-	private void startVilewashSpiritRaid() {
-		stoneSpearTaskC2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Vilewash Spirit.
-				stoneSpearRaid((Npc)spawn(855815, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855815, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855815, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855815, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855815, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855815, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855815, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855815, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 1000);
-		stoneSpearTaskC2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Vilewash Spirit.
-				stoneSpearRaid((Npc)spawn(855815, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855815, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855815, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855815, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855815, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855815, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855815, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855815, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 10000);
-		stoneSpearTaskC2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Vilewash Spirit.
-				stoneSpearRaid((Npc)spawn(855815, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855815, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855815, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855815, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855815, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855815, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855815, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855815, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 20000);
-		stoneSpearTaskC2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Vilewash Spirit.
-				stoneSpearRaid((Npc)spawn(855815, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855815, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855815, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855815, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855815, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855815, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855815, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855815, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 30000);
-		stoneSpearTaskC2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Vilewash Spirit.
-				stoneSpearRaid((Npc)spawn(855815, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855815, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855815, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855815, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855815, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855815, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855815, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855815, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 40000);
-		stoneSpearTaskC2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Vilewash Spirit.
-				stoneSpearRaid((Npc)spawn(855815, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855815, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855815, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855815, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855815, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855815, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855815, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855815, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 50000);
-		stoneSpearTaskC2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Vilewash Spirit.
-				stoneSpearRaid((Npc)spawn(855815, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855815, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855815, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855815, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855815, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855815, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855815, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855815, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 60000);
-	}
-	private void startOwllauPriestRaid() {
-		stoneSpearTaskC2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Priest.
-				stoneSpearRaid((Npc)spawn(855816, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855816, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855816, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855816, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855816, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855816, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855816, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855816, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 1000);
-		stoneSpearTaskC2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Priest.
-				stoneSpearRaid((Npc)spawn(855816, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855816, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855816, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855816, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855816, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855816, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855816, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855816, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 10000);
-		stoneSpearTaskC2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Priest.
-				stoneSpearRaid((Npc)spawn(855816, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855816, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855816, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855816, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855816, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855816, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855816, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855816, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 20000);
-		stoneSpearTaskC2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Priest.
-				stoneSpearRaid((Npc)spawn(855816, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855816, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855816, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855816, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855816, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855816, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855816, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855816, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 30000);
-		stoneSpearTaskC2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Priest.
-				stoneSpearRaid((Npc)spawn(855816, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855816, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855816, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855816, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855816, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855816, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855816, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855816, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 40000);
-		stoneSpearTaskC2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Priest.
-				stoneSpearRaid((Npc)spawn(855816, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855816, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855816, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855816, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855816, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855816, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855816, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855816, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 50000);
-		stoneSpearTaskC2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Priest.
-				stoneSpearRaid((Npc)spawn(855816, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855816, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855816, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855816, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855816, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855816, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855816, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855816, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 60000);
-	}
-	
-   /**
-	* RAID C3
-	*/
-	private void startShulackGuardsmanRaid() {
-		stoneSpearTaskC3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Guardsman.
-				stoneSpearRaid((Npc)spawn(855817, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855817, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855817, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855817, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855817, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855817, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855817, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855817, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 1000);
-		stoneSpearTaskC3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Guardsman.
-				stoneSpearRaid((Npc)spawn(855817, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855817, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855817, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855817, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855817, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855817, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855817, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855817, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 10000);
-		stoneSpearTaskC3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Guardsman.
-				stoneSpearRaid((Npc)spawn(855817, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855817, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855817, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855817, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855817, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855817, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855817, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855817, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 20000);
-		stoneSpearTaskC3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Guardsman.
-				stoneSpearRaid((Npc)spawn(855817, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855817, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855817, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855817, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855817, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855817, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855817, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855817, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 30000);
-		stoneSpearTaskC3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Guardsman.
-				stoneSpearRaid((Npc)spawn(855817, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855817, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855817, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855817, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855817, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855817, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855817, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855817, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 40000);
-		stoneSpearTaskC3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Guardsman.
-				stoneSpearRaid((Npc)spawn(855817, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855817, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855817, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855817, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855817, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855817, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855817, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855817, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 50000);
-		stoneSpearTaskC3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Guardsman.
-				stoneSpearRaid((Npc)spawn(855817, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855817, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855817, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855817, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855817, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855817, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855817, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855817, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 60000);
-	}
-	private void startMalisaltSpiritRaid() {
-		stoneSpearTaskC3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Malisalt Spirit.
-				stoneSpearRaid((Npc)spawn(855818, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855818, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855818, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855818, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855818, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855818, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855818, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855818, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 1000);
-		stoneSpearTaskC3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Malisalt Spirit.
-				stoneSpearRaid((Npc)spawn(855818, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855818, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855818, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855818, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855818, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855818, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855818, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855818, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 10000);
-		stoneSpearTaskC3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Malisalt Spirit.
-				stoneSpearRaid((Npc)spawn(855818, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855818, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855818, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855818, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855818, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855818, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855818, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855818, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 20000);
-		stoneSpearTaskC3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Malisalt Spirit.
-				stoneSpearRaid((Npc)spawn(855818, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855818, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855818, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855818, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855818, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855818, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855818, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855818, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 30000);
-		stoneSpearTaskC3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Malisalt Spirit.
-				stoneSpearRaid((Npc)spawn(855818, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855818, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855818, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855818, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855818, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855818, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855818, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855818, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 40000);
-		stoneSpearTaskC3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Malisalt Spirit.
-				stoneSpearRaid((Npc)spawn(855818, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855818, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855818, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855818, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855818, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855818, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855818, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855818, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 50000);
-		stoneSpearTaskC3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Malisalt Spirit.
-				stoneSpearRaid((Npc)spawn(855818, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855818, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855818, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855818, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855818, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855818, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855818, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855818, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 60000);
-	}
-	private void startOwllauMenderRaid() {
-		stoneSpearTaskC3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Mender.
-				stoneSpearRaid((Npc)spawn(855819, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855819, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855819, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855819, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855819, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855819, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855819, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855819, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 1000);
-		stoneSpearTaskC3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Mender.
-				stoneSpearRaid((Npc)spawn(855819, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855819, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855819, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855819, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855819, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855819, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855819, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855819, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 10000);
-		stoneSpearTaskC3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Mender.
-				stoneSpearRaid((Npc)spawn(855819, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855819, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855819, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855819, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855819, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855819, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855819, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855819, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 20000);
-		stoneSpearTaskC3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Mender.
-				stoneSpearRaid((Npc)spawn(855819, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855819, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855819, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855819, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855819, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855819, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855819, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855819, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 30000);
-		stoneSpearTaskC3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Mender.
-				stoneSpearRaid((Npc)spawn(855819, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855819, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855819, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855819, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855819, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855819, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855819, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855819, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 40000);
-		stoneSpearTaskC3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Mender.
-				stoneSpearRaid((Npc)spawn(855819, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855819, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855819, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855819, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855819, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855819, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855819, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855819, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 50000);
-		stoneSpearTaskC3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Mender.
-				stoneSpearRaid((Npc)spawn(855819, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855819, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855819, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855819, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855819, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855819, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855819, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855819, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 60000);
-	}
-	
-   /**
-	* RAID D1
-	*/
-	private void startShulackWarlockRaid() {
-		stoneSpearTaskD1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Warlock.
-				stoneSpearRaid((Npc)spawn(855834, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855834, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855834, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855834, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855834, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855834, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855834, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855834, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 1000);
-		stoneSpearTaskD1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Warlock.
-				stoneSpearRaid((Npc)spawn(855834, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855834, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855834, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855834, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855834, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855834, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855834, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855834, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 10000);
-		stoneSpearTaskD1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Warlock.
-				stoneSpearRaid((Npc)spawn(855834, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855834, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855834, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855834, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855834, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855834, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855834, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855834, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 20000);
-		stoneSpearTaskD1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Warlock.
-				stoneSpearRaid((Npc)spawn(855834, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855834, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855834, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855834, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855834, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855834, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855834, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855834, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 30000);
-		stoneSpearTaskD1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Warlock.
-				stoneSpearRaid((Npc)spawn(855834, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855834, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855834, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855834, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855834, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855834, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855834, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855834, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 40000);
-		stoneSpearTaskD1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Warlock.
-				stoneSpearRaid((Npc)spawn(855834, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855834, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855834, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855834, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855834, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855834, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855834, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855834, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 50000);
-		stoneSpearTaskD1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Warlock.
-				stoneSpearRaid((Npc)spawn(855834, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855834, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855834, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855834, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855834, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855834, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855834, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855834, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 60000);
-	}
-	private void startGalespoutSpiritRaid() {
-		stoneSpearTaskD1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Galespout Spirit.
-				stoneSpearRaid((Npc)spawn(855835, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855835, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855835, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855835, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855835, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855835, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855835, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855835, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 1000);
-		stoneSpearTaskD1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Galespout Spirit.
-				stoneSpearRaid((Npc)spawn(855835, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855835, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855835, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855835, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855835, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855835, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855835, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855835, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 10000);
-		stoneSpearTaskD1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Galespout Spirit.
-				stoneSpearRaid((Npc)spawn(855835, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855835, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855835, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855835, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855835, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855835, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855835, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855835, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 20000);
-		stoneSpearTaskD1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Galespout Spirit.
-				stoneSpearRaid((Npc)spawn(855835, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855835, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855835, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855835, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855835, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855835, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855835, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855835, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 30000);
-		stoneSpearTaskD1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Galespout Spirit.
-				stoneSpearRaid((Npc)spawn(855835, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855835, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855835, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855835, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855835, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855835, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855835, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855835, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 40000);
-		stoneSpearTaskD1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Galespout Spirit.
-				stoneSpearRaid((Npc)spawn(855835, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855835, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855835, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855835, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855835, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855835, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855835, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855835, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 50000);
-		stoneSpearTaskD1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Galespout Spirit.
-				stoneSpearRaid((Npc)spawn(855835, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855835, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855835, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855835, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855835, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855835, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855835, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855835, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 60000);
-	}
-	private void startOwllauWarlockRaid() {
-		stoneSpearTaskD1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Warlock.
-				stoneSpearRaid((Npc)spawn(855836, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855836, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855836, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855836, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855836, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855836, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855836, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855836, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 1000);
-		stoneSpearTaskD1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Warlock.
-				stoneSpearRaid((Npc)spawn(855836, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855836, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855836, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855836, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855836, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855836, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855836, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855836, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 10000);
-		stoneSpearTaskD1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Warlock.
-				stoneSpearRaid((Npc)spawn(855836, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855836, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855836, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855836, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855836, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855836, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855836, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855836, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 20000);
-		stoneSpearTaskD1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Warlock.
-				stoneSpearRaid((Npc)spawn(855836, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855836, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855836, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855836, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855836, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855836, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855836, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855836, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 30000);
-		stoneSpearTaskD1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Warlock.
-				stoneSpearRaid((Npc)spawn(855836, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855836, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855836, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855836, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855836, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855836, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855836, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855836, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 40000);
-		stoneSpearTaskD1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Warlock.
-				stoneSpearRaid((Npc)spawn(855836, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855836, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855836, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855836, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855836, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855836, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855836, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855836, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 50000);
-		stoneSpearTaskD1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Warlock.
-				stoneSpearRaid((Npc)spawn(855836, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855836, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855836, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855836, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855836, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855836, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855836, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855836, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 60000);
-	}
-	
-   /**
-	* RAID D2
-	*/
-	private void startShulackMageRaid() {
-		stoneSpearTaskD2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Mage.
-				stoneSpearRaid((Npc)spawn(855837, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855837, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855837, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855837, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855837, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855837, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855837, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855837, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 1000);
-		stoneSpearTaskD2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Mage.
-				stoneSpearRaid((Npc)spawn(855837, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855837, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855837, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855837, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855837, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855837, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855837, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855837, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 10000);
-		stoneSpearTaskD2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Mage.
-				stoneSpearRaid((Npc)spawn(855837, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855837, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855837, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855837, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855837, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855837, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855837, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855837, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 20000);
-		stoneSpearTaskD2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Mage.
-				stoneSpearRaid((Npc)spawn(855837, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855837, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855837, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855837, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855837, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855837, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855837, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855837, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 30000);
-		stoneSpearTaskD2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Mage.
-				stoneSpearRaid((Npc)spawn(855837, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855837, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855837, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855837, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855837, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855837, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855837, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855837, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 40000);
-		stoneSpearTaskD2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Mage.
-				stoneSpearRaid((Npc)spawn(855837, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855837, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855837, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855837, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855837, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855837, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855837, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855837, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 50000);
-		stoneSpearTaskD2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Mage.
-				stoneSpearRaid((Npc)spawn(855837, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855837, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855837, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855837, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855837, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855837, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855837, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855837, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 60000);
-	}
-	private void startVilegustSpiritRaid() {
-		stoneSpearTaskD2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Vilegust Spirit.
-				stoneSpearRaid((Npc)spawn(855838, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855838, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855838, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855838, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855838, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855838, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855838, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855838, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 1000);
-		stoneSpearTaskD2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Vilegust Spirit.
-				stoneSpearRaid((Npc)spawn(855838, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855838, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855838, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855838, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855838, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855838, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855838, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855838, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 10000);
-		stoneSpearTaskD2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Vilegust Spirit.
-				stoneSpearRaid((Npc)spawn(855838, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855838, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855838, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855838, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855838, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855838, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855838, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855838, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 20000);
-		stoneSpearTaskD2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Vilegust Spirit.
-				stoneSpearRaid((Npc)spawn(855838, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855838, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855838, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855838, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855838, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855838, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855838, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855838, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 30000);
-		stoneSpearTaskD2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Vilegust Spirit.
-				stoneSpearRaid((Npc)spawn(855838, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855838, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855838, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855838, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855838, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855838, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855838, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855838, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 40000);
-		stoneSpearTaskD2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Vilegust Spirit.
-				stoneSpearRaid((Npc)spawn(855838, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855838, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855838, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855838, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855838, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855838, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855838, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855838, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 50000);
-		stoneSpearTaskD2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Vilegust Spirit.
-				stoneSpearRaid((Npc)spawn(855838, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855838, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855838, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855838, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855838, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855838, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855838, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855838, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 60000);
-	}
-	private void startOwllauMageRaid() {
-		stoneSpearTaskD2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Mage.
-				stoneSpearRaid((Npc)spawn(855839, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855839, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855839, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855839, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855839, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855839, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855839, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855839, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 1000);
-		stoneSpearTaskD2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Mage.
-				stoneSpearRaid((Npc)spawn(855839, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855839, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855839, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855839, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855839, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855839, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855839, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855839, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 10000);
-		stoneSpearTaskD2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Mage.
-				stoneSpearRaid((Npc)spawn(855839, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855839, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855839, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855839, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855839, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855839, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855839, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855839, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 20000);
-		stoneSpearTaskD2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Mage.
-				stoneSpearRaid((Npc)spawn(855839, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855839, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855839, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855839, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855839, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855839, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855839, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855839, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 30000);
-		stoneSpearTaskD2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Mage.
-				stoneSpearRaid((Npc)spawn(855839, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855839, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855839, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855839, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855839, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855839, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855839, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855839, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 40000);
-		stoneSpearTaskD2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Mage.
-				stoneSpearRaid((Npc)spawn(855839, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855839, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855839, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855839, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855839, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855839, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855839, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855839, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 50000);
-		stoneSpearTaskD2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Mage.
-				stoneSpearRaid((Npc)spawn(855839, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855839, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855839, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855839, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855839, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855839, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855839, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855839, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 60000);
-	}
-	
-   /**
-	* RAID D3
-	*/
-	private void startShulackDarkWarlockRaid() {
-		stoneSpearTaskD3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Dark Warlock.
-				stoneSpearRaid((Npc)spawn(855840, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855840, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855840, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855840, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855840, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855840, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855840, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855840, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 1000);
-		stoneSpearTaskD3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Dark Warlock.
-				stoneSpearRaid((Npc)spawn(855840, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855840, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855840, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855840, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855840, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855840, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855840, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855840, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 10000);
-		stoneSpearTaskD3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Dark Warlock.
-				stoneSpearRaid((Npc)spawn(855840, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855840, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855840, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855840, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855840, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855840, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855840, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855840, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 20000);
-		stoneSpearTaskD3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Dark Warlock.
-				stoneSpearRaid((Npc)spawn(855840, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855840, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855840, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855840, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855840, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855840, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855840, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855840, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 30000);
-		stoneSpearTaskD3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Dark Warlock.
-				stoneSpearRaid((Npc)spawn(855840, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855840, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855840, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855840, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855840, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855840, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855840, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855840, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 40000);
-		stoneSpearTaskD3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Dark Warlock.
-				stoneSpearRaid((Npc)spawn(855840, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855840, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855840, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855840, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855840, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855840, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855840, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855840, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 50000);
-		stoneSpearTaskD3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Shulack Dark Warlock.
-				stoneSpearRaid((Npc)spawn(855840, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855840, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855840, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855840, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855840, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855840, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855840, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855840, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 60000);
-	}
-	private void startMalistormSpiritRaid() {
-		stoneSpearTaskD3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Malistorm Spirit.
-				stoneSpearRaid((Npc)spawn(855841, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855841, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855841, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855841, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855841, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855841, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855841, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855841, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 1000);
-		stoneSpearTaskD3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Malistorm Spirit.
-				stoneSpearRaid((Npc)spawn(855841, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855841, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855841, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855841, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855841, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855841, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855841, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855841, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 10000);
-		stoneSpearTaskD3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Malistorm Spirit.
-				stoneSpearRaid((Npc)spawn(855841, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855841, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855841, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855841, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855841, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855841, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855841, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855841, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 20000);
-		stoneSpearTaskD3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Malistorm Spirit.
-				stoneSpearRaid((Npc)spawn(855841, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855841, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855841, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855841, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855841, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855841, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855841, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855841, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 30000);
-		stoneSpearTaskD3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Malistorm Spirit.
-				stoneSpearRaid((Npc)spawn(855841, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855841, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855841, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855841, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855841, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855841, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855841, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855841, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 40000);
-		stoneSpearTaskD3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Malistorm Spirit.
-				stoneSpearRaid((Npc)spawn(855841, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855841, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855841, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855841, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855841, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855841, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855841, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855841, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 50000);
-		stoneSpearTaskD3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Malistorm Spirit.
-				stoneSpearRaid((Npc)spawn(855841, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855841, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855841, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855841, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855841, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855841, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855841, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855841, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 60000);
-	}
-	private void startOwllauDarkWarlockRaid() {
-		stoneSpearTaskD3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Dark Warlock.
-				stoneSpearRaid((Npc)spawn(855842, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855842, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855842, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855842, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855842, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855842, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855842, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855842, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 1000);
-		stoneSpearTaskD3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Dark Warlock.
-				stoneSpearRaid((Npc)spawn(855842, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855842, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855842, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855842, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855842, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855842, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855842, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855842, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 10000);
-		stoneSpearTaskD3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Dark Warlock.
-				stoneSpearRaid((Npc)spawn(855842, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855842, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855842, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855842, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855842, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855842, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855842, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855842, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 20000);
-		stoneSpearTaskD3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Dark Warlock.
-				stoneSpearRaid((Npc)spawn(855842, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855842, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855842, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855842, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855842, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855842, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855842, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855842, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 30000);
-		stoneSpearTaskD3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Dark Warlock.
-				stoneSpearRaid((Npc)spawn(855842, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855842, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855842, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855842, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855842, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855842, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855842, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855842, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 40000);
-		stoneSpearTaskD3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Dark Warlock.
-				stoneSpearRaid((Npc)spawn(855842, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855842, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855842, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855842, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855842, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855842, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855842, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855842, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 50000);
-		stoneSpearTaskD3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				//Owllau Dark Warlock.
-				stoneSpearRaid((Npc)spawn(855842, 211.05080f, 264.03802f, 96.53291f, (byte) 0));
-				stoneSpearRaid((Npc)spawn(855842, 217.06422f, 248.22205f, 96.25f, (byte) 17));
-				stoneSpearRaid((Npc)spawn(855842, 231.39449f, 243.60184f, 96.36497f, (byte) 31));
-				stoneSpearRaid((Npc)spawn(855842, 245.20996f, 250.43109f, 96.07562f, (byte) 44));
-				stoneSpearRaid((Npc)spawn(855842, 251.58972f, 264.37146f, 96.30522f, (byte) 59));
-				stoneSpearRaid((Npc)spawn(855842, 243.75105f, 279.34222f, 96.25f, (byte) 77));
-				stoneSpearRaid((Npc)spawn(855842, 230.97932f, 285.57825f, 96.418526f, (byte) 89));
-				stoneSpearRaid((Npc)spawn(855842, 217.75461f, 277.61115f, 96.02431f, (byte) 104));
-			}
-		}, 60000);
-	}
 	
 	private void stoneSpearRaid(final Npc npc) {
 		ThreadPoolManager.getInstance().schedule(new Runnable() {
@@ -4402,7 +657,8 @@ public class StonespearReachInstance extends GeneralInstanceHandler
 		StonespearReachPlayerReward playerReward = getPlayerReward(player.getObjectId());
 		if (playerReward.isRewarded()) {
 			doReward(player);
-		} if (spawnRace == null) {
+		}
+		if (spawnRace == null) {
 			spawnRace = player.getRace();
 			spawnTerritoryManager();
 		}
@@ -4443,14 +699,7 @@ public class StonespearReachInstance extends GeneralInstanceHandler
 		instanceReward.setRank(checkRank(instanceReward.getPoints()));
 		instanceReward.setInstanceScoreType(InstanceScoreType.END_PROGRESS);
 		doReward(player);
-		//sendMsg("[SUCCES]: You have finished <Stonespear Reach>");
 		sendPacket(0, 0);
-	}
-	
-	private void rewardGroup() {
-		for (Player p: instance.getPlayersInside()) {
-			doReward(p);
-		}
 	}
 	
 	@Override
@@ -4491,6 +740,7 @@ public class StonespearReachInstance extends GeneralInstanceHandler
             }
         }
     }
+	
 	private void stopInstanceTask2() {
         for (FastList.Node<Future<?>> n = stonespearTask2.head(), end = stonespearTask2.tail(); (n = n.getNext()) != end; ) {
             if (n.getValue() != null) {
@@ -4498,6 +748,7 @@ public class StonespearReachInstance extends GeneralInstanceHandler
             }
         }
     }
+	
 	private void stopInstanceTask3() {
         for (FastList.Node<Future<?>> n = stonespearTask3.head(), end = stonespearTask3.tail(); (n = n.getNext()) != end; ) {
             if (n.getValue() != null) {
@@ -4505,6 +756,7 @@ public class StonespearReachInstance extends GeneralInstanceHandler
             }
         }
     }
+	
 	private void stopInstanceTask4() {
         for (FastList.Node<Future<?>> n = stonespearTask4.head(), end = stonespearTask4.tail(); (n = n.getNext()) != end; ) {
             if (n.getValue() != null) {
@@ -4512,6 +764,7 @@ public class StonespearReachInstance extends GeneralInstanceHandler
             }
         }
     }
+	
 	private void stopInstanceTask5() {
         for (FastList.Node<Future<?>> n = stonespearTask5.head(), end = stonespearTask5.tail(); (n = n.getNext()) != end; ) {
             if (n.getValue() != null) {
@@ -4532,7 +785,8 @@ public class StonespearReachInstance extends GeneralInstanceHandler
 	public void onInstanceDestroy() {
 		if (timerInstance != null) {
 			timerInstance.cancel(false);
-		} if (timerPrepare != null) {
+		}
+		if (timerPrepare != null) {
 			timerPrepare.cancel(false);
 		}
 		stopInstanceTask1();
@@ -4589,13 +843,13 @@ public class StonespearReachInstance extends GeneralInstanceHandler
 		PacketSendUtility.sendPacket(player, new SM_QUESTION_WINDOW(SM_QUESTION_WINDOW.STR_INSTANT_DUNGEON_RESURRECT, 0, 0));
 		instance.doOnAllPlayers(new Visitor<Player>() {
 			@Override
-			public void visit(Player player) {
-				if (player.getObjectId() == player.getObjectId()) {
+			public void visit(Player p) {
+				if (p.getObjectId() == player.getObjectId()) {
 					//You were killed during the Stonespear Seige. You will be moved to the waiting area.
-					PacketSendUtility.sendPacket(player, new SM_SYSTEM_MESSAGE(1402910));
+					PacketSendUtility.sendPacket(p, new SM_SYSTEM_MESSAGE(1402910));
 				} else {
 					//"Player Name" has been killed and will be moved to the waiting area.
-					PacketSendUtility.sendPacket(player, new SM_SYSTEM_MESSAGE(1402911, player.getName()));
+					PacketSendUtility.sendPacket(p, new SM_SYSTEM_MESSAGE(1402911, player.getName()));
 				}
 			}
 		});

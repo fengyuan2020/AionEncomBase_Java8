@@ -12,7 +12,6 @@
  */
 package quest.mission;
 
-import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.questEngine.handlers.QuestHandler;
 import com.aionemu.gameserver.questEngine.model.QuestDialog;
@@ -57,10 +56,7 @@ public class _14021To_Cure_A_Curse extends QuestHandler {
     @Override
     public boolean onDialogEvent(QuestEnv env) {
         final Player player = env.getPlayer();
-        int targetId = 0;
-        if (env.getVisibleObject() instanceof Npc) {
-            targetId = ((Npc) env.getVisibleObject()).getNpcId();
-        }
+		int targetId = env.getTargetId();
         QuestState qs = player.getQuestStateList().getQuestState(questId);
         if (qs == null) {
             return false;
@@ -128,10 +124,8 @@ public class _14021To_Cure_A_Curse extends QuestHandler {
             return false;
         }
         int var = qs.getQuestVarById(0);
-        int targetId = 0;
-        if (env.getVisibleObject() instanceof Npc) {
-            targetId = ((Npc) env.getVisibleObject()).getNpcId();
-        } switch (targetId) {
+		int targetId = env.getTargetId();
+        switch (targetId) {
             case 210771:
             case 210758:
             case 210763:

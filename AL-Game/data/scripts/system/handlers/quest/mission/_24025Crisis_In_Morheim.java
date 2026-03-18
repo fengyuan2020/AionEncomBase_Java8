@@ -12,7 +12,6 @@
  */
 package quest.mission;
 
-import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.questEngine.handlers.QuestHandler;
 import com.aionemu.gameserver.questEngine.model.QuestDialog;
@@ -25,8 +24,8 @@ import com.aionemu.gameserver.services.QuestService;
 /** Author Ghostfur & Unknown (Aion-Unique)
 /****/
 
-public class _24025Crisis_In_Morheim extends QuestHandler
-{
+public class _24025Crisis_In_Morheim extends QuestHandler {
+
     private final static int questId = 24025;
 	
     public _24025Crisis_In_Morheim() {
@@ -62,10 +61,8 @@ public class _24025Crisis_In_Morheim extends QuestHandler
             return false;
         }
         int var = qs.getQuestVarById(0);
-        int targetId = 0;
-        if (env.getVisibleObject() instanceof Npc) {
-            targetId = ((Npc) env.getVisibleObject()).getNpcId();
-        } if (qs.getStatus() == QuestStatus.START) {
+		int targetId = env.getTargetId();
+        if (qs.getStatus() == QuestStatus.START) {
             switch (targetId) {
                 case 204388: {
                     switch (env.getDialog()) {

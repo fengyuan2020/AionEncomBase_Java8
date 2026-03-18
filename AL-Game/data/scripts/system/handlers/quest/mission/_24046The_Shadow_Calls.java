@@ -13,7 +13,6 @@
 package quest.mission;
 
 import com.aionemu.gameserver.model.TeleportAnimation;
-import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.questEngine.handlers.QuestHandler;
 import com.aionemu.gameserver.questEngine.model.QuestDialog;
@@ -66,8 +65,7 @@ public class _24046The_Shadow_Calls extends QuestHandler {
         if (qs == null) {
             return false;
         }
-        Npc target = (Npc) env.getVisibleObject();
-        int targetId = target.getNpcId();
+		int targetId = env.getTargetId();
         int var = qs.getQuestVarById(0);
         QuestDialog dialog = env.getDialog();
         if (qs.getStatus() == QuestStatus.START) {

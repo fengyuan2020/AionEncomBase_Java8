@@ -12,7 +12,6 @@
  */
 package quest.mission;
 
-import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.questEngine.handlers.QuestHandler;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
@@ -59,10 +58,8 @@ public class _24014Stomp_Out_The_Plot extends QuestHandler {
             return false;
         }
         final int var = qs.getQuestVarById(0);
-        int targetId = 0;
-        if (env.getVisibleObject() instanceof Npc) {
-            targetId = ((Npc) env.getVisibleObject()).getNpcId();
-        } if (qs.getStatus() == QuestStatus.START) {
+		int targetId = env.getTargetId();
+        if (qs.getStatus() == QuestStatus.START) {
             switch (targetId) {
                 case 203665:
                     switch (env.getDialog()) {
@@ -108,9 +105,7 @@ public class _24014Stomp_Out_The_Plot extends QuestHandler {
 		if (qs == null || qs.getStatus() != QuestStatus.START)
 			return false;
 		int var = qs.getQuestVarById(0);
-		int targetId = 0;
-		if (env.getVisibleObject() instanceof Npc)
-			targetId = ((Npc) env.getVisibleObject()).getNpcId();
+		int targetId = env.getTargetId();
 		if ((targetId == 210562 || targetId == 210563 || targetId == 210583) && var >= 2 && var < 5) {
 			qs.setQuestVarById(0, var + 1);
 			updateQuestStatus(env);

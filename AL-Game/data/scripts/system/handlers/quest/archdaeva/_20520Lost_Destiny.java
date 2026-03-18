@@ -152,7 +152,7 @@ public class _20520Lost_Destiny extends QuestHandler {
 			}
 		} else if (qs.getStatus() == QuestStatus.REWARD) {
             if (targetId == 806080) { //Feregran.
-                if (env.getDialog() == QuestDialog.START_DIALOG) {
+                if (env.getDialog() == QuestDialog.USE_OBJECT) {
                     return sendQuestDialog(env, 10002);
                 } else {
                     int[] norsvoldMission = {20521, 20522, 20523, 20524, 20525, 20526, 20527, 20528, 20529, 20530};

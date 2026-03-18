@@ -115,7 +115,6 @@ public class _17510Investigate_The_Fissure_Of_Oblivion extends QuestHandler {
 						changeQuestStep(env, 4, 5, false);
 						qs.setStatus(QuestStatus.REWARD);
 						updateQuestStatus(env);
-						TeleportService2.teleportTo(player, 210100000, 1318.7599f, 1239.1572f, 344.39258f, (byte) 68);
 						player.getEffectController().removeEffect(4808);
 						player.getEffectController().removeEffect(4813);
 						player.getEffectController().removeEffect(4818);
@@ -124,6 +123,7 @@ public class _17510Investigate_The_Fissure_Of_Oblivion extends QuestHandler {
 						player.getEffectController().removeEffect(4834);
 						player.getEffectController().removeEffect(4835);
 						player.getEffectController().removeEffect(4836);
+						TeleportService2.teleportTo(player, 210100000, 1318.7599f, 1239.1572f, 344.39258f, (byte) 68);
 						return closeDialogWindow(env);
 					}
                 }

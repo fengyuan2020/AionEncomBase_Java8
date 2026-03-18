@@ -13,10 +13,10 @@
 package quest.mission;
 
 import com.aionemu.commons.utils.Rnd;
+import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.ai2.manager.EmoteManager;
 import com.aionemu.gameserver.ai2.event.AIEventType;
 import com.aionemu.gameserver.model.TeleportAnimation;
-import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.questEngine.handlers.QuestHandler;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
@@ -81,10 +81,8 @@ public class _14026A_Lone_Defense extends QuestHandler {
     public boolean onDialogEvent(QuestEnv env) {
         final Player player = env.getPlayer();
         QuestState qs = player.getQuestStateList().getQuestState(questId);
-        int targetId = 0;
-        if (env.getVisibleObject() instanceof Npc) {
-            targetId = ((Npc) env.getVisibleObject()).getNpcId();
-        } if (qs == null) {
+		int targetId = env.getTargetId();
+        if (qs == null) {
             return false;
         } if (qs.getStatus() == QuestStatus.START) {
             switch (targetId) {
@@ -258,7 +256,6 @@ public class _14026A_Lone_Defense extends QuestHandler {
         spawn.getAggroList().addHate(target, 1000);
         EmoteManager.emoteStartAttacking(spawn);
         if (spawn.getAi2() != null) {
-            // Можно попробовать вызвать событие атаки
             spawn.getAi2().onGeneralEvent(AIEventType.ATTACK);
         }
     }

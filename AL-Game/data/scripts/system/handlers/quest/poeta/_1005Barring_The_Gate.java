@@ -12,8 +12,6 @@
  */
 package quest.poeta;
 
-
-import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.questEngine.handlers.QuestHandler;
 import com.aionemu.gameserver.questEngine.model.QuestDialog;
@@ -61,9 +59,7 @@ public class _1005Barring_The_Gate extends QuestHandler {
 		if (qs == null)
 			return false;
 		int var = qs.getQuestVarById(0);
-		int targetId = 0;
-		if (env.getVisibleObject() instanceof Npc)
-			targetId = ((Npc) env.getVisibleObject()).getNpcId();
+		int targetId = env.getTargetId();
 		if (qs.getStatus() == QuestStatus.START) {
 			if (targetId == 203067) {
 				switch (env.getDialog()) {

@@ -57,6 +57,7 @@ import java.util.concurrent.Future;
 
 @InstanceID(301520000)
 public class DrakenspireDepthsQInstance extends GeneralInstanceHandler {
+
 	private int deathCharQ;
 	private Race sealSceneRaceQ;
 	private Future<?> drakenspireQTask;
@@ -352,13 +353,10 @@ public class DrakenspireDepthsQInstance extends GeneralInstanceHandler {
 			break;
 			case 237213: //Frantic Phantomscorch Bonerival.
 			case 237214: //Frantic Phantomscorch Chimera.
-			case 237212: //Frantic Phantomscorch Contender.
 			    Npc phantomscorchBonerival = instance.getNpc(237213); //Frantic Phantomscorch Bonerival.
 			    Npc elitePhantomscorchChimera = instance.getNpc(237214); //Frantic Phantomscorch Chimera.
-				Npc phantomscorchContender = instance.getNpc(237212); //Frantic Phantomscorch Contender.
 			    if (isDead(phantomscorchBonerival) &&
-				    isDead(elitePhantomscorchChimera) &&
-					isDead(phantomscorchContender)) {
+				    isDead(elitePhantomscorchChimera)) {
 					if (player != null) {
 				        switch (player.getRace()) {
 					        case ELYOS:
@@ -373,13 +371,6 @@ public class DrakenspireDepthsQInstance extends GeneralInstanceHandler {
 										sendMsgByRace(1402999, Race.ELYOS, 16000);
 										spawn(209704, 821.6019f, 523.7112f, 1706.6428f, (byte) 33);
 										spawn(209705, 815.1346f, 522.75665f, 1706.7778f, (byte) 32);
-								    }
-							    }, 0);
-								ThreadPoolManager.getInstance().schedule(new Runnable() {
-							        @Override
-								    public void run() {
-										spawn(237231, 812.2527f, 568.7095f, 1701.0443f, (byte) 93); //Orissan.
-										spawn(856554, 812.2527f, 568.7095f, 1701.0443f, (byte) 93); //ShapeChange Flash.
 								    }
 							    }, 0);
 						    break;
@@ -397,20 +388,12 @@ public class DrakenspireDepthsQInstance extends GeneralInstanceHandler {
 										spawn(209770, 815.1346f, 522.75665f, 1706.7778f, (byte) 32);
 								    }
 							    }, 0);
-								ThreadPoolManager.getInstance().schedule(new Runnable() {
-							        @Override
-								    public void run() {
-										spawn(237231, 812.2527f, 568.7095f, 1701.0443f, (byte) 93); //Exhausted Orissan.
-										spawn(856554, 812.2527f, 568.7095f, 1701.0443f, (byte) 93); //ShapeChange Flash.
-								    }
-							    }, 0);
 						    break;
 						}
 					}
 			    }
 			break;
 			case 237231: //Exhausted Orissan.
-			    deleteNpc(856554); //ShapeChange Flash.
 				if (player != null) {
 				    switch (player.getRace()) {
 					    case ELYOS:

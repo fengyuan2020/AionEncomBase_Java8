@@ -14,11 +14,13 @@ package quest.fissure_of_oblivion;
 
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.questEngine.handlers.QuestHandler;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_DIALOG_WINDOW;
 import com.aionemu.gameserver.questEngine.model.QuestDialog;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
 import com.aionemu.gameserver.services.QuestService;
+import com.aionemu.gameserver.utils.PacketSendUtility;
 import com.aionemu.gameserver.world.zone.ZoneName;
 
 /****/
@@ -103,7 +105,7 @@ public class _27511The_Avatars extends QuestHandler {
         final Player player = env.getPlayer();
         final QuestState qs = player.getQuestStateList().getQuestState(questId);
 		int targetId = env.getTargetId();
-		if (qs == null || qs.getStatus() == QuestStatus.REWARD) {
+		if (qs != null && qs.getStatus() == QuestStatus.REWARD) {
             if (targetId == 806079) { //Peregrine.
                 if (env.getDialog() == QuestDialog.START_DIALOG) {
                     return sendQuestDialog(env, 10002);
@@ -111,6 +113,14 @@ public class _27511The_Avatars extends QuestHandler {
 					return sendQuestDialog(env, 5);
 				} else {
 					return sendQuestEndDialog(env);
+				}
+			}
+			else { // Bounty Quest made DragonicK? Selected item is not optional.
+				env.setDialogId(8);
+				env.setExtendedRewardIndex(1);
+				PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(806148, 0));
+				if (QuestService.finishQuest(env)) {
+					return closeDialogWindow(env);
 				}
 			}
 		}
