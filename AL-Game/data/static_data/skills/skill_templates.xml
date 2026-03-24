@@ -89679,7 +89679,7 @@
       <polymorph model="202650" type="NONE" duration2="60000" effectid="175" e="1" basiclvl="100" noresist="true" element="WIND"/>
     </effects>
   </skill_template>
-  <skill_template skill_id="4752" name="Transformation: Avatar of Fire" nameId="4579065" skill_group_name="Highdeva_fire_G2" delayId="10" stack="SKILL_HIGHDEVA_FIRE" lvl="1" skilltype="MAGICAL" skillsubtype="BUFF" tslot="BUFF" dispel_category="EXTRA" req_dispel_level="2" activation="ACTIVE" cooldown="39000" duration="1500" penalty_skill_id="9153" cancel_rate="25" noremoveatdie="true" name_desc="Highdeva_fire_G2">
+  <skill_template skill_id="4752" name="Transformation: Avatar of Fire" nameId="4579065" skill_group_name="Highdeva_fire_G2" delayId="10" stack="SKILL_HIGHDEVA_FIRE" lvl="1" skilltype="MAGICAL" skillsubtype="BUFF" tslot="BUFF" dispel_category="EXTRA" req_dispel_level="2" activation="ACTIVE" cooldown="36000" duration="1500" penalty_skill_id="9153" cancel_rate="25" noremoveatdie="true" name_desc="Highdeva_fire_G2">
     <properties first_target="ME" first_target_range="1" target_relation="FRIEND" target_type="ONLYONE"/>
     <useconditions>
       <playermove allow="false"/>
@@ -89827,7 +89827,7 @@
     </actions>
     <motion name="FlameExp" instant_skill="true"/>
   </skill_template>
-  <skill_template skill_id="4757" name="Transformation: Avatar of Water" nameId="4579091" skill_group_name="Highdeva_water_G2" delayId="10" stack="SKILL_HIGHDEVA_WATER" lvl="1" skilltype="MAGICAL" skillsubtype="BUFF" tslot="BUFF" dispel_category="EXTRA" req_dispel_level="2" activation="ACTIVE" cooldown="39000" duration="1500" penalty_skill_id="9153" cancel_rate="25" noremoveatdie="true" name_desc="Highdeva_water_G2">
+  <skill_template skill_id="4757" name="Transformation: Avatar of Water" nameId="4579091" skill_group_name="Highdeva_water_G2" delayId="10" stack="SKILL_HIGHDEVA_WATER" lvl="1" skilltype="MAGICAL" skillsubtype="BUFF" tslot="BUFF" dispel_category="EXTRA" req_dispel_level="2" activation="ACTIVE" cooldown="36000" duration="1500" penalty_skill_id="9153" cancel_rate="25" noremoveatdie="true" name_desc="Highdeva_water_G2">
     <properties first_target="ME" target_relation="FRIEND" target_type="ONLYONE"/>
     <useconditions>
       <playermove allow="false"/>
@@ -89964,7 +89964,7 @@
     </actions>
     <motion name="SpringRain" instant_skill="true"/>
   </skill_template>
-  <skill_template skill_id="4762" name="Transformation: Avatar of Earth" nameId="4579115" skill_group_name="Highdeva_earth_G2" delayId="10" stack="SKILL_HIGHDEVA_EARTH" lvl="1" skilltype="MAGICAL" skillsubtype="BUFF" tslot="BUFF" dispel_category="EXTRA" req_dispel_level="2" activation="ACTIVE" cooldown="39000" duration="1500" penalty_skill_id="9153" cancel_rate="25" noremoveatdie="true" name_desc="Highdeva_earth_G2">
+  <skill_template skill_id="4762" name="Transformation: Avatar of Earth" nameId="4579115" skill_group_name="Highdeva_earth_G2" delayId="10" stack="SKILL_HIGHDEVA_EARTH" lvl="1" skilltype="MAGICAL" skillsubtype="BUFF" tslot="BUFF" dispel_category="EXTRA" req_dispel_level="2" activation="ACTIVE" cooldown="36000" duration="1500" penalty_skill_id="9153" cancel_rate="25" noremoveatdie="true" name_desc="Highdeva_earth_G2">
     <properties first_target="ME" first_target_range="1" target_relation="FRIEND" target_type="ONLYONE"/>
     <useconditions>
       <playermove allow="false"/>
@@ -90156,7 +90156,7 @@
     </actions>
     <motion name="EarthSt" instant_skill="true"/>
   </skill_template>
-  <skill_template skill_id="4768" name="Transformation: Avatar of Wind" nameId="4579145" skill_group_name="Highdeva_wind_G2" delayId="10" stack="SKILL_HIGHDEVA_WIND" lvl="1" skilltype="MAGICAL" skillsubtype="BUFF" tslot="BUFF" dispel_category="EXTRA" req_dispel_level="2" activation="ACTIVE" cooldown="39000" duration="1500" penalty_skill_id="9153" cancel_rate="25" noremoveatdie="true" name_desc="Highdeva_wind_G2">
+  <skill_template skill_id="4768" name="Transformation: Avatar of Wind" nameId="4579145" skill_group_name="Highdeva_wind_G2" delayId="10" stack="SKILL_HIGHDEVA_WIND" lvl="1" skilltype="MAGICAL" skillsubtype="BUFF" tslot="BUFF" dispel_category="EXTRA" req_dispel_level="2" activation="ACTIVE" cooldown="36000" duration="1500" penalty_skill_id="9153" cancel_rate="25" noremoveatdie="true" name_desc="Highdeva_wind_G2">
     <properties first_target="ME" first_target_range="1" target_relation="FRIEND" target_type="ONLYONE"/>
     <useconditions>
       <playermove allow="false"/>
@@ -90975,7 +90975,7 @@
       </statboost>
     </effects>
   </skill_template>
-  <skill_template skill_id="4804" name="Transformation: Avatar of Fire" nameId="4579065" skill_group_name="Highdeva_fire_G2" delayId="10" stack="SKILL_HIGHDEVA_FIRE" lvl="1" skilltype="MAGICAL" skillsubtype="BUFF" tslot="BUFF" dispel_category="EXTRA" req_dispel_level="2" activation="ACTIVE" cooldown="39000" duration="1500" penalty_skill_id="9153" cancel_rate="25" noremoveatdie="true" name_desc="Highdeva_fire_D_G2">
+  <skill_template skill_id="4804" name="Transformation: Avatar of Fire" nameId="4579065" skill_group_name="Highdeva_fire_G2" delayId="10" stack="SKILL_HIGHDEVA_FIRE" lvl="1" skilltype="MAGICAL" skillsubtype="BUFF" tslot="BUFF" dispel_category="EXTRA" req_dispel_level="2" activation="ACTIVE" cooldown="36000" duration="1500" penalty_skill_id="9153" cancel_rate="25" noremoveatdie="true" name_desc="Highdeva_fire_D_G2">
     <properties first_target="ME" first_target_range="1" target_relation="FRIEND" target_type="ONLYONE"/>
     <useconditions>
       <playermove allow="false"/>
@@ -91030,7 +91030,7 @@
     </effects>
     <motion name="PolyFlame" instant_skill="true"/>
   </skill_template>
-  <skill_template skill_id="4805" name="Transformation: Avatar of Water" nameId="4579091" skill_group_name="Highdeva_water_G2" delayId="10" stack="SKILL_HIGHDEVA_WATER" lvl="1" skilltype="MAGICAL" skillsubtype="BUFF" tslot="BUFF" dispel_category="EXTRA" req_dispel_level="2" activation="ACTIVE" cooldown="39000" duration="1500" penalty_skill_id="9153" cancel_rate="25" noremoveatdie="true" name_desc="Highdeva_water_D_G2">
+  <skill_template skill_id="4805" name="Transformation: Avatar of Water" nameId="4579091" skill_group_name="Highdeva_water_G2" delayId="10" stack="SKILL_HIGHDEVA_WATER" lvl="1" skilltype="MAGICAL" skillsubtype="BUFF" tslot="BUFF" dispel_category="EXTRA" req_dispel_level="2" activation="ACTIVE" cooldown="36000" duration="1500" penalty_skill_id="9153" cancel_rate="25" noremoveatdie="true" name_desc="Highdeva_water_D_G2">
     <properties first_target="ME" first_target_range="1" target_relation="FRIEND" target_type="ONLYONE"/>
     <useconditions>
       <playermove allow="false"/>
@@ -91083,7 +91083,7 @@
     </effects>
     <motion name="PolyWater" instant_skill="true"/>
   </skill_template>
-  <skill_template skill_id="4806" name="Transformation: Avatar of Earth" nameId="4579115" skill_group_name="Highdeva_earth_G2" delayId="10" stack="SKILL_HIGHDEVA_EARTH" lvl="1" skilltype="MAGICAL" skillsubtype="BUFF" tslot="BUFF" dispel_category="EXTRA" req_dispel_level="2" activation="ACTIVE" cooldown="39000" duration="1500" penalty_skill_id="9153" cancel_rate="25" noremoveatdie="true" name_desc="Highdeva_earth_D_G2">
+  <skill_template skill_id="4806" name="Transformation: Avatar of Earth" nameId="4579115" skill_group_name="Highdeva_earth_G2" delayId="10" stack="SKILL_HIGHDEVA_EARTH" lvl="1" skilltype="MAGICAL" skillsubtype="BUFF" tslot="BUFF" dispel_category="EXTRA" req_dispel_level="2" activation="ACTIVE" cooldown="36000" duration="1500" penalty_skill_id="9153" cancel_rate="25" noremoveatdie="true" name_desc="Highdeva_earth_D_G2">
     <properties first_target="ME" first_target_range="1" target_relation="FRIEND" target_type="ONLYONE"/>
     <useconditions>
       <playermove allow="false"/>
@@ -91136,7 +91136,7 @@
     </effects>
     <motion name="PolyEarth" instant_skill="true"/>
   </skill_template>
-  <skill_template skill_id="4807" name="Transformation: Avatar of Wind" nameId="4579145" skill_group_name="Highdeva_wind_G2" delayId="10" stack="SKILL_HIGHDEVA_WIND" lvl="1" skilltype="MAGICAL" skillsubtype="BUFF" tslot="BUFF" dispel_category="EXTRA" req_dispel_level="2" activation="ACTIVE" cooldown="39000" duration="1500" penalty_skill_id="9153" cancel_rate="25" noremoveatdie="true" name_desc="Highdeva_wind_D_G2">
+  <skill_template skill_id="4807" name="Transformation: Avatar of Wind" nameId="4579145" skill_group_name="Highdeva_wind_G2" delayId="10" stack="SKILL_HIGHDEVA_WIND" lvl="1" skilltype="MAGICAL" skillsubtype="BUFF" tslot="BUFF" dispel_category="EXTRA" req_dispel_level="2" activation="ACTIVE" cooldown="36000" duration="1500" penalty_skill_id="9153" cancel_rate="25" noremoveatdie="true" name_desc="Highdeva_wind_D_G2">
     <properties first_target="ME" first_target_range="1" target_relation="FRIEND" target_type="ONLYONE"/>
     <useconditions>
       <playermove allow="false"/>

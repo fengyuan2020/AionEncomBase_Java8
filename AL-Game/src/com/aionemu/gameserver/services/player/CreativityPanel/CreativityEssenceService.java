@@ -1,6 +1,4 @@
 /*
-
- *
  *  Encom is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -63,12 +61,10 @@ public class CreativityEssenceService {
 					player.getCP().addPoint(player, ce.getSlot(), 0);
 				}
 				if (ce.getSlot() >= 7 && ce.getSlot() <= 14 || ce.getSlot() >= 401 && ce.getSlot() <= 408) {
-					PacketSendUtility.sendPacket(player,
-							new SM_CREATIVITY_POINTS_APPLY(0, size, ce.getSlot(), ce.getPoint()));
+					PacketSendUtility.sendPacket(player, new SM_CREATIVITY_POINTS_APPLY(0, size, ce.getSlot(), ce.getPoint()));
 				}
 				if (ce.getSlot() >= 15 && ce.getSlot() <= 400 || ce.getSlot() >= 409 && ce.getSlot() <= 456) {
-					PacketSendUtility.sendPacket(player,
-							new SM_CREATIVITY_POINTS_APPLY(0, size, ce.getSlot(), ce.getPoint()));
+					PacketSendUtility.sendPacket(player, new SM_CREATIVITY_POINTS_APPLY(0, size, ce.getSlot(), ce.getPoint()));
 				}
 			}
 			PacketSendUtility.sendPacket(player, new SM_CREATIVITY_POINTS(totalPoint, player.getCPStep(), size, true));
@@ -93,9 +89,7 @@ public class CreativityEssenceService {
 					int size = DAOManager.getDAO(PlayerCreativityPointsDAO.class).getSlotSize(player.getObjectId());
 					PacketSendUtility.sendPacket(player, new SM_CREATIVITY_POINTS(totalPoint, 2, size, false));
 					PacketSendUtility.sendPacket(player, new SM_STATS_INFO(player));
-					// You have gained Essence.
-					// Click the Essence icon displayed on the Character XP meter, SHIFT+U, or
-					// select Start Menu.
+					// You have gained Essence. Click the Essence icon displayed on the Character XP meter, SHIFT+U, or select Start Menu.
 					PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_GET_CP(point)); // TODO??
 					// Add Essence to open the Allocate Essence window.Open Allocate Essence.
 					PacketSendUtility.playerSendPacketTime(player, SM_SYSTEM_MESSAGE.STR_MSG_GET_CP_LINK, 0);
@@ -111,9 +105,7 @@ public class CreativityEssenceService {
 					int size = DAOManager.getDAO(PlayerCreativityPointsDAO.class).getSlotSize(player.getObjectId());
 					PacketSendUtility.sendPacket(player, new SM_CREATIVITY_POINTS(totalPoint, 3, size, false));
 					PacketSendUtility.sendPacket(player, new SM_STATS_INFO(player));
-					// You have gained Essence.
-					// Click the Essence icon displayed on the Character XP meter, SHIFT+U, or
-					// select Start Menu.
+					// You have gained Essence. Click the Essence icon displayed on the Character XP meter, SHIFT+U, or select Start Menu.
 					PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_GET_CP(step));
 					// Add Essence to open the Allocate Essence window.Open Allocate Essence.
 					PacketSendUtility.playerSendPacketTime(player, SM_SYSTEM_MESSAGE.STR_MSG_GET_CP_LINK, 0);
@@ -129,9 +121,7 @@ public class CreativityEssenceService {
 					int size = DAOManager.getDAO(PlayerCreativityPointsDAO.class).getSlotSize(player.getObjectId());
 					PacketSendUtility.sendPacket(player, new SM_CREATIVITY_POINTS(totalPoint, 4, size, false));
 					PacketSendUtility.sendPacket(player, new SM_STATS_INFO(player));
-					// You have gained Essence.
-					// Click the Essence icon displayed on the Character XP meter, SHIFT+U, or
-					// select Start Menu.
+					// You have gained Essence. Click the Essence icon displayed on the Character XP meter, SHIFT+U, or select Start Menu.
 					PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_GET_CP(step));
 					// Add Essence to open the Allocate Essence window.Open Allocate Essence.
 					PacketSendUtility.playerSendPacketTime(player, SM_SYSTEM_MESSAGE.STR_MSG_GET_CP_LINK, 0);
@@ -147,9 +137,7 @@ public class CreativityEssenceService {
 					int size = DAOManager.getDAO(PlayerCreativityPointsDAO.class).getSlotSize(player.getObjectId());
 					PacketSendUtility.sendPacket(player, new SM_CREATIVITY_POINTS(totalPoint, 5, size, false));
 					PacketSendUtility.sendPacket(player, new SM_STATS_INFO(player));
-					// You have gained Essence.
-					// Click the Essence icon displayed on the Character XP meter, SHIFT+U, or
-					// select Start Menu.
+					// You have gained Essence. Click the Essence icon displayed on the Character XP meter, SHIFT+U, or select Start Menu.
 					PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_GET_CP(step));
 					// Add Essence to open the Allocate Essence window.Open Allocate Essence.
 					PacketSendUtility.playerSendPacketTime(player, SM_SYSTEM_MESSAGE.STR_MSG_GET_CP_LINK, 0);
@@ -165,9 +153,7 @@ public class CreativityEssenceService {
 					int size = DAOManager.getDAO(PlayerCreativityPointsDAO.class).getSlotSize(player.getObjectId());
 					PacketSendUtility.sendPacket(player, new SM_CREATIVITY_POINTS(totalPoint, 6, size, false));
 					PacketSendUtility.sendPacket(player, new SM_STATS_INFO(player));
-					// You have gained Essence.
-					// Click the Essence icon displayed on the Character XP meter, SHIFT+U, or
-					// select Start Menu.
+					// You have gained Essence. Click the Essence icon displayed on the Character XP meter, SHIFT+U, or select Start Menu.
 					PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_GET_CP(step));
 					// Add Essence to open the Allocate Essence window.Open Allocate Essence.
 					PacketSendUtility.playerSendPacketTime(player, SM_SYSTEM_MESSAGE.STR_MSG_GET_CP_LINK, 0);
@@ -238,26 +224,21 @@ public class CreativityEssenceService {
 			player.setCreativityPoint(point);
 			int size = DAOManager.getDAO(PlayerCreativityPointsDAO.class).getSlotSize(player.getObjectId());
 			PacketSendUtility.sendPacket(player, new SM_CREATIVITY_POINTS(point, player.getCPStep()));
-			PacketSendUtility.sendPacket(player,
-					new SM_CREATIVITY_POINTS(player.getCreativityPoint(), player.getCPStep(), size, false));
+			PacketSendUtility.sendPacket(player, new SM_CREATIVITY_POINTS(player.getCreativityPoint(), player.getCPStep(), size, false));
 			int vesselCount = 0;
 			int avatarCount = 0;
 			for (PlayerCPEntry ce : player.getCP().getAllCP()) {
 				if (ce.getSlot() >= 7 && ce.getSlot() <= 14) {
 					vesselCount++;
-					PacketSendUtility.sendPacket(player,
-							new SM_CREATIVITY_POINTS_APPLY(0, vesselCount, ce.getSlot(), ce.getPoint()));
+					PacketSendUtility.sendPacket(player, new SM_CREATIVITY_POINTS_APPLY(0, vesselCount, ce.getSlot(), ce.getPoint()));
 				} else if (ce.getSlot() >= 401 && ce.getSlot() <= 408) {
 					avatarCount++;
-					PacketSendUtility.sendPacket(player,
-							new SM_CREATIVITY_POINTS_APPLY(0, avatarCount, ce.getSlot(), ce.getPoint()));
+					PacketSendUtility.sendPacket(player, new SM_CREATIVITY_POINTS_APPLY(0, avatarCount, ce.getSlot(), ce.getPoint()));
 				}
 			}
 			player.getCommonData().addAuraOfGrowth(1060000 * 10);
 			PacketSendUtility.sendPacket(player, new SM_STATS_INFO(player));
-			// You have gained Essence.
-			// Click the Essence icon displayed on the Character XP meter, SHIFT+U, or
-			// select Start Menu.
+			// You have gained Essence. Click the Essence icon displayed on the Character XP meter, SHIFT+U, or select Start Menu.
 			PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_GET_CP(point));
 			// Add Essence to open the Allocate Essence window.Open Allocate Essence.
 			PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_GET_CP_LINK);
@@ -342,8 +323,7 @@ public class CreativityEssenceService {
 			onSkillsApply(player, 0, 0, a.get(i), 0);
 		}
 		PacketSendUtility.sendPacket(player, new SM_STATS_INFO(player));
-		PacketSendUtility.sendPacket(player,
-				new SM_CREATIVITY_POINTS(player.getCreativityPoint(), player.getCPStep(), 0, false));
+		PacketSendUtility.sendPacket(player, new SM_CREATIVITY_POINTS(player.getCreativityPoint(), player.getCPStep(), 0, false));
 	}
 
 	public void onSkillsApply(Player player, int type, int size, int id, int point) {
@@ -456,7 +436,6 @@ public class CreativityEssenceService {
 				SkillLearnService.removeSkill(player, 4699); // Terraform.
 				player.getCP().removePoint(player, 13);
 				break;
-			// Ver: 5.1
 			case 402:
 				if (player.getRace() == Race.ELYOS) {
 					SkillLearnService.removeSkill(player, 4768); // Transformation: Avatar Of Wind (Elyos)
@@ -524,43 +503,30 @@ public class CreativityEssenceService {
 		player.setCreativityPoint(totalCp);
 		int size = DAOManager.getDAO(PlayerCreativityPointsDAO.class).getSlotSize(player.getObjectId());
 		PacketSendUtility.sendPacket(player, new SM_CREATIVITY_POINTS(totalCp, player.getCPStep()));
-		PacketSendUtility.sendPacket(player,
-				new SM_CREATIVITY_POINTS(player.getCreativityPoint(), player.getCPStep(), size, false));
+		PacketSendUtility.sendPacket(player, new SM_CREATIVITY_POINTS(player.getCreativityPoint(), player.getCPStep(), size, false));
 	}
 
-	public void removeEstimaCp(Player player, int objId) {
-		estimaCp = 0;
-		Item removedEstima = player.getInventory().getItemByObjId(objId);
-		if (removedEstima != null) {
-			switch (removedEstima.getEnchantLevel()) {
-			case 6:
-				estimaCp = 8;
-				break;
-			case 7:
-				estimaCp = 10;
-				break;
-			case 8:
-				estimaCp = 12;
-				break;
-			case 9:
-				estimaCp = 14;
-				break;
-			case 10:
-				estimaCp = 17;
-				break;
-			default:
-				estimaCp = (removedEstima.getEnchantLevel() + 1);
-				break;
-			}
-		}
-		currentCp = player.getCreativityPoint();
-		int totalCp = (currentCp - estimaCp);
-		player.setCreativityPoint(totalCp);
-		int size = DAOManager.getDAO(PlayerCreativityPointsDAO.class).getSlotSize(player.getObjectId());
-		PacketSendUtility.sendPacket(player, new SM_CREATIVITY_POINTS(totalCp, player.getCPStep()));
-		PacketSendUtility.sendPacket(player,
-				new SM_CREATIVITY_POINTS(player.getCreativityPoint(), player.getCPStep(), size, false));
-	}
+    public void removeEstimaCp(Player player, Item item) {
+        estimaCp = 0;
+        if (item != null) {
+            switch (item.getEnchantLevel()) {
+                case 6: estimaCp = 8; break;
+                case 7: estimaCp = 10; break;
+                case 8: estimaCp = 12; break;
+                case 9: estimaCp = 14; break;
+                case 10: estimaCp = 17; break;
+                default: estimaCp = (item.getEnchantLevel() + 1); break;
+            }
+        }
+        currentCp = player.getCreativityPoint();
+        int totalCp = (currentCp - estimaCp);
+        if (totalCp < 0) totalCp = 0;
+        player.setCreativityPoint(totalCp);
+        int size = DAOManager.getDAO(PlayerCreativityPointsDAO.class).getSlotSize(player.getObjectId());
+        PacketSendUtility.sendPacket(player, new SM_CREATIVITY_POINTS(totalCp, player.getCPStep()));
+        PacketSendUtility.sendPacket(player, new SM_CREATIVITY_POINTS(player.getCreativityPoint(), player.getCPStep(), size, false));
+        PacketSendUtility.sendPacket(player, new SM_STATS_INFO(player));
+    }
 
 	public static CreativityEssenceService getInstance() {
 		return NewSingletonHolder.INSTANCE;

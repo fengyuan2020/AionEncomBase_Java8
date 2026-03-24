@@ -176,7 +176,6 @@ import com.aionemu.gameserver.world.World;
 import com.aionemu.gameserver.world.geo.GeoService;
 import com.aionemu.gameserver.world.geo.nav.NavService;
 import com.aionemu.gameserver.world.zone.ZoneService;
-import com.aionemu.gameserver.services.gc.GarbageCollector;
 
 import ch.lambdaj.Lambda;
 import ch.qos.logback.classic.LoggerContext;
@@ -420,12 +419,6 @@ public class GameServer {
 
 		AbyssRankUpdateService.getInstance().initRewardWeeklyManager();
 		
-		/**
- 		 * Schedules Garbage Collector to be launched at the specified time to be
- 		 * optimized unused memory
- 		 */
- 		GarbageCollector.getInstance().start();
-
 		PacketBroadcaster.getInstance();
 
 		TemporarySpawnEngine.spawnAll();
@@ -597,20 +590,6 @@ public class GameServer {
          * System initialization final phase
          */
         Util.printSection(" *** System *** ");
-         
-        log.info("Running optimized garbage collection...");
-        long gcStart = System.currentTimeMillis();
-        System.gc();
-        System.runFinalization();
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            log.warn("GC wait interrupted", e);
-            Thread.currentThread().interrupt();
-        }
-        long gcTime = System.currentTimeMillis() - gcStart;
-        log.info("Garbage collection completed in {} ms", gcTime);
-        
         AEVersions.printFullVersionInfo();
         AEInfos.printAllInfos();
         Util.printSection("GameServer");
@@ -629,8 +608,7 @@ public class GameServer {
         long freeMemory = runtime.freeMemory() / (1024 * 1024);
         long usedMemory = totalMemory - freeMemory;
         long maxMemory = runtime.maxMemory() / (1024 * 1024);
-        log.info("Memory Status After GC: Allocated={} MB, Free={} MB, Used={} MB, Max={} MB", 
-                totalMemory, freeMemory, usedMemory, maxMemory);
+        log.info("Memory Status After GC: Allocated={} MB, Free={} MB, Used={} MB, Max={} MB", totalMemory, freeMemory, usedMemory, maxMemory);
         
         long startupTime = (System.currentTimeMillis() - start) / 1000;
         log.info("Server startup completed in {} Seconds", startupTime);

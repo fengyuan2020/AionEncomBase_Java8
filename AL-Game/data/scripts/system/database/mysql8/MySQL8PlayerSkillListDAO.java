@@ -28,7 +28,7 @@ public class MySQL8PlayerSkillListDAO extends PlayerSkillListDAO {
 
     private static final Logger log = LoggerFactory.getLogger(MySQL8PlayerSkillListDAO.class);
     
-    public static final String INSERT_QUERY = "INSERT INTO `player_skills` (`player_id`, `skill_id`, `skill_level`) VALUES (?, ?, ?)";
+    public static final String INSERT_QUERY = "INSERT INTO `player_skills` (`player_id`, `skill_id`, `skill_level`) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE `skill_level` = VALUES(`skill_level`)";
     
     public static final String UPDATE_QUERY = "UPDATE `player_skills` SET skill_level = ? WHERE player_id = ? AND skill_id = ?";
     
@@ -38,29 +38,26 @@ public class MySQL8PlayerSkillListDAO extends PlayerSkillListDAO {
     
     public static final String SELECT_QUERY = "SELECT `skill_id`, `skill_level`, `skin_id`, `skin_active_date`, " + "`skin_expire_time`, `skin_activated` FROM `player_skills` WHERE `player_id` = ?";
 
-    private static final Predicate<PlayerSkillEntry> skillsToInsertPredicate = 
-        new Predicate<PlayerSkillEntry>() {
-            @Override
-            public boolean apply(@Nullable PlayerSkillEntry input) {
-                return input != null && PersistentState.NEW == input.getPersistentState();
-            }
-        };
+    private static final Predicate<PlayerSkillEntry> skillsToInsertPredicate = new Predicate<PlayerSkillEntry>() {
+        @Override
+        public boolean apply(@Nullable PlayerSkillEntry input) {
+            return input != null && PersistentState.NEW == input.getPersistentState();
+        }
+    };
 
-    private static final Predicate<PlayerSkillEntry> skillsToUpdatePredicate = 
-        new Predicate<PlayerSkillEntry>() {
-            @Override
-            public boolean apply(@Nullable PlayerSkillEntry input) {
-                return input != null && PersistentState.UPDATE_REQUIRED == input.getPersistentState();
-            }
-        };
+    private static final Predicate<PlayerSkillEntry> skillsToUpdatePredicate = new Predicate<PlayerSkillEntry>() {
+        @Override
+        public boolean apply(@Nullable PlayerSkillEntry input) {
+            return input != null && PersistentState.UPDATE_REQUIRED == input.getPersistentState();
+        }
+    };
 
-    private static final Predicate<PlayerSkillEntry> skillsToDeletePredicate = 
-        new Predicate<PlayerSkillEntry>() {
-            @Override
-            public boolean apply(@Nullable PlayerSkillEntry input) {
-                return input != null && PersistentState.DELETED == input.getPersistentState();
-            }
-        };
+    private static final Predicate<PlayerSkillEntry> skillsToDeletePredicate = new Predicate<PlayerSkillEntry>() {
+        @Override
+        public boolean apply(@Nullable PlayerSkillEntry input) {
+            return input != null && PersistentState.DELETED == input.getPersistentState();
+        }
+    };
 
     @Override
     public PlayerSkillList loadSkillList(int playerId) {

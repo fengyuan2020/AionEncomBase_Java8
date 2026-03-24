@@ -11,14 +11,14 @@
     <panel_cp id="4" name="Accuracy" panelType="STAT_UP" statsId="4" statValue="1" countMax="255" cost="0" costAdj="1"/>
     <panel_cp id="5" name="Knowledge" panelType="STAT_UP" statsId="5" statValue="1" countMax="255" cost="0" costAdj="1"/>
     <panel_cp id="6" name="Will" panelType="STAT_UP" statsId="6" statValue="1" countMax="255" cost="0" costAdj="1"/>
-    <panel_cp id="7" name="Compassion of Wind" panelType="LEARN_SKILL" learnSkill="4696" additionalSkill="4697" cost="5" costAdj="0"/>
-    <panel_cp id="8" name="ALL_HIGHDEVA_1" panelType="ENCHANT_SKILL" learnSkill="4696" countMax="5" cost="1" costAdj="2"/>
-    <panel_cp id="9" name="Compassion of Fire" panelType="LEARN_SKILL" learnSkill="4700" additionalSkill="4701" cost="5" costAdj="0"/>
-    <panel_cp id="10" name="ALL_HIGHDEVA_3" panelType="ENCHANT_SKILL" learnSkill="4700" countMax="5" cost="1" costAdj="2"/>
-    <panel_cp id="11" name="Compassion of Water" panelType="LEARN_SKILL" learnSkill="4702" additionalSkill="4703" cost="5" costAdj="0"/>
-    <panel_cp id="12" name="ALL_HIGHDEVA_4" panelType="ENCHANT_SKILL" learnSkill="4702" countMax="5" cost="1" costAdj="2"/>
-    <panel_cp id="13" name="Compassion of the Earth" panelType="LEARN_SKILL" learnSkill="4698" additionalSkill="4699" cost="5" costAdj="0"/>
-    <panel_cp id="14" name="ALL_HIGHDEVA_2" panelType="ENCHANT_SKILL" learnSkill="4698" countMax="5" cost="1" costAdj="2"/>
+    <panel_cp id="7" name="Transformation: Vessel of Wind" panelType="LEARN_SKILL" learnSkill="4696" additionalSkill="4697" cost="5" costAdj="0"/>
+    <panel_cp id="8" name="Transformation: Vessel of Wind" panelType="ENCHANT_SKILL" skillId="4696" countMax="5" cost="1" costAdj="2"/>
+    <panel_cp id="9" name="Transformation: Vessel of Fire" panelType="LEARN_SKILL" learnSkill="4700" additionalSkill="4701" cost="5" costAdj="0"/>
+    <panel_cp id="10" name="Transformation: Vessel of Fire" panelType="ENCHANT_SKILL" skillId="4700" countMax="5" cost="1" costAdj="2"/>
+    <panel_cp id="11" name="Transformation: Vessel of Water" panelType="LEARN_SKILL" learnSkill="4702" additionalSkill="4703" cost="5" costAdj="0"/>
+    <panel_cp id="12" name="Transformation: Vessel of Water" panelType="ENCHANT_SKILL" skillId="4702" countMax="5" cost="1" costAdj="2"/>
+    <panel_cp id="13" name="Transformation: Vessel of Earth" panelType="LEARN_SKILL" learnSkill="4698" additionalSkill="4699" cost="5" costAdj="0"/>
+    <panel_cp id="14" name="Transformation: Vessel of Earth" panelType="ENCHANT_SKILL" skillId="4698" countMax="5" cost="1" costAdj="2"/>
     <panel_cp id="15" name="Blade of Incitement I" panelType="ENCHANT_SKILL" skillId="517" countMax="8" cost="1" costAdj="0"/>
     <panel_cp id="16" name="Crushing Blow" panelType="ENCHANT_SKILL" skillId="538" countMax="8" cost="1" costAdj="0"/>
     <panel_cp id="17" name="Aerial Lockdown" panelType="ENCHANT_SKILL" skillId="553" countMax="8" cost="1" costAdj="0"/>
@@ -347,14 +347,14 @@
     <panel_cp id="398" name="Resonance Attack" panelType="ENCHANT_SKILL" skillId="4729" countMax="8" cost="1" costAdj="0" minLevel="66"/>
     <panel_cp id="399" name="Chain Strike" panelType="ENCHANT_SKILL" skillId="4730" countMax="8" cost="1" costAdj="0" minLevel="66"/>
     <panel_cp id="400" name="Oath of Earth" panelType="ENCHANT_SKILL" skillId="4731" countMax="8" cost="1" costAdj="0" minLevel="66"/>
-    <panel_cp id="401" name="Transformation: Incarnation of Wind" panelType="LEARN_SKILL" learnSkill="4768" cost="5" costAdj="0" preCondId="8" preEnchantCount="5" minLevel="75"/>
-    <panel_cp id="402" name="Transformation: Ascension of the Wind" panelType="ENCHANT_SKILL" skillId="4705" countMax="5" cost="1" costAdj="2" minLevel="75"/>
-    <panel_cp id="403" name="Transformation: Incarnation of Fire" panelType="LEARN_SKILL" learnSkill="4752" cost="5" costAdj="0" preCondId="10" preEnchantCount="5" minLevel="75"/>
-    <panel_cp id="404" name="Transformation: Ascension of the Fire" panelType="ENCHANT_SKILL" skillId="4707" countMax="5" cost="1" costAdj="2" minLevel="75"/>
-    <panel_cp id="405" name="Transformation: Incarnation of Water" panelType="LEARN_SKILL" learnSkill="4757" cost="5" costAdj="0" preCondId="12" preEnchantCount="5" minLevel="75"/>
-    <panel_cp id="406" name="Transformation: Ascension of the Water" panelType="ENCHANT_SKILL" skillId="4708" countMax="5" cost="1" costAdj="2" minLevel="75"/>
-    <panel_cp id="407" name="Transformation: Incarnation of Earth" panelType="LEARN_SKILL" learnSkill="4762" cost="5" costAdj="0" preCondId="14" preEnchantCount="5" minLevel="75"/>
-    <panel_cp id="408" name="Transformation: Ascension of the Earth" panelType="ENCHANT_SKILL" skillId="4706" countMax="5" cost="1" costAdj="2" minLevel="75"/>
+    <panel_cp id="401" name="Transformation: Avatar of Wind" panelType="LEARN_SKILL" learnSkill="4768" cost="5" costAdj="0" preCondId="8" minLevel="75"/>
+    <panel_cp id="402" name="Transformation: Avatar of Wind" panelType="ENCHANT_SKILL" skillId="4768" countMax="5" cost="1" costAdj="2" minLevel="75"/>
+    <panel_cp id="403" name="Transformation: Avatar of Fire" panelType="LEARN_SKILL" learnSkill="4752" cost="5" costAdj="0" preCondId="10" minLevel="75"/>
+    <panel_cp id="404" name="Transformation: Avatar of Fire" panelType="ENCHANT_SKILL" skillId="4752" countMax="5" cost="1" costAdj="2" minLevel="75"/>
+    <panel_cp id="405" name="Transformation: Avatar of Water" panelType="LEARN_SKILL" learnSkill="4757" cost="5" costAdj="0" preCondId="12" minLevel="75"/>
+    <panel_cp id="406" name="Transformation: Avatar of Water" panelType="ENCHANT_SKILL" skillId="4757" countMax="5" cost="1" costAdj="2" minLevel="75"/>
+    <panel_cp id="407" name="Transformation: Avatar of Earth" panelType="LEARN_SKILL" learnSkill="4762" cost="5" costAdj="0" preCondId="14" minLevel="75"/>
+    <panel_cp id="408" name="Transformation: Avatar of Earth" panelType="ENCHANT_SKILL" skillId="4762" countMax="5" cost="1" costAdj="2" minLevel="75"/>
     <panel_cp id="409" name="Surge of Restoration" panelType="LEARN_SKILL" learnSkill="4715" cost="5" costAdj="0" minLevel="66"/>
     <panel_cp id="410" name="Wild Leap" panelType="LEARN_SKILL" learnSkill="4716" cost="10" costAdj="0" minLevel="66"/>
     <panel_cp id="411" name="Concentrated Defence Shield" panelType="LEARN_SKILL" learnSkill="4718" cost="15" costAdj="0" minLevel="66"/>

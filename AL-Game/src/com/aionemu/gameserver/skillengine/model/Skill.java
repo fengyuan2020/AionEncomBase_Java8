@@ -1,6 +1,4 @@
 /*
-
- *
  *  Encom is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -112,7 +110,6 @@ public class Skill {
 	private volatile boolean isMultiCast = false;
 
 	public enum SkillMethod {
-
 		CAST, ITEM, PASSIVE, PROVOKED;
 	}
 
@@ -127,8 +124,7 @@ public class Skill {
 	 * @param world
 	 */
 	public Skill(SkillTemplate skillTemplate, Player effector, Creature firstTarget) {
-		this(skillTemplate, effector, effector.getSkillList().getSkillLevel(skillTemplate.getSkillId()), firstTarget,
-				null);
+		this(skillTemplate, effector, effector.getSkillList().getSkillLevel(skillTemplate.getSkillId()), firstTarget, null);
 	}
 
 	public Skill(SkillTemplate skillTemplate, Player effector, Creature firstTarget, int skillLevel) {
@@ -145,8 +141,7 @@ public class Skill {
 	 * @param skillLvl
 	 * @param firstTarget
 	 */
-	public Skill(SkillTemplate skillTemplate, Creature effector, int skillLvl, Creature firstTarget,
-			ItemTemplate itemTemplate) {
+	public Skill(SkillTemplate skillTemplate, Creature effector, int skillLvl, Creature firstTarget, ItemTemplate itemTemplate) {
 		this.effectedList = new ArrayList<Creature>();
 		this.conditionChangeListener = new StartMovingListener();
 		this.firstTarget = firstTarget;
@@ -157,8 +152,7 @@ public class Skill {
 		this.duration = skillTemplate.getDuration();
 		this.itemTemplate = itemTemplate;
 		if (skillTemplate.getChargeSetName() != null) {
-			this.chargeTemplate = DataManager.CHARGE_SKILL_DATA
-					.getChargeSkillTemplateBySetName(skillTemplate.getChargeSetName());
+			this.chargeTemplate = DataManager.CHARGE_SKILL_DATA.getChargeSkillTemplateBySetName(skillTemplate.getChargeSetName());
 		}
 		if (itemTemplate != null) {
 			skillMethod = SkillMethod.ITEM;
@@ -196,8 +190,7 @@ public class Skill {
 			}
 
 			if (skillMethod == SkillMethod.ITEM && duration > 0 && player.getMoveController().isInMove()) {
-				PacketSendUtility.sendPacket(player,
-						SM_SYSTEM_MESSAGE.STR_ITEM_CANCELED(new DescriptionId(getItemTemplate().getNameId())));
+				PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_ITEM_CANCELED(new DescriptionId(getItemTemplate().getNameId())));
 				return false;
 			}
 		}
@@ -227,8 +220,7 @@ public class Skill {
 		}
 
 		// TODO: Enable non-targeted, non-point AOE skills to trigger.
-		if (targetType == 0 && effectedList.size() == 0 && firstTargetAttribute != FirstTargetAttribute.ME
-				&& targetRangeAttribute != TargetRangeAttribute.AREA) {
+		if (targetType == 0 && effectedList.size() == 0 && firstTargetAttribute != FirstTargetAttribute.ME && targetRangeAttribute != TargetRangeAttribute.AREA) {
 			log.debug("targettype failed");
 			return false;
 		}
@@ -280,13 +272,11 @@ public class Skill {
 		// log skill time if effector instance of player
 		// TODO config
 		if (effector instanceof Player) {
-			MotionLoggingService.getInstance().logTime((Player) effector, this.getSkillTemplate(), this.getHitTime(),
-					MathUtil.getDistance(effector, firstTarget));
+			MotionLoggingService.getInstance().logTime((Player) effector, this.getSkillTemplate(), this.getHitTime(), MathUtil.getDistance(effector, firstTarget));
 		}
 		boolean setCooldowns = true;
 		if (effector instanceof Player) {
-			if (this.isMulticast() && ((Player) effector).getChainSkills().getChainCount((Player) effector,
-					this.getSkillTemplate(), this.chainCategory) != 0) {
+			if (this.isMulticast() && ((Player) effector).getChainSkills().getChainCount((Player) effector, this.getSkillTemplate(), this.chainCategory) != 0) {
 				setCooldowns = false;
 			}
 		}
@@ -321,8 +311,7 @@ public class Skill {
 		int cooldown = effector.getSkillCooldown(skillTemplate);
 		if (cooldown != 0) {
 			cooldown = StigmaEnchantCoolDown(this, cooldown);
-			effector.setSkillCoolDown(skillTemplate.getDelayId(),
-					cooldown * 100 + this.duration + System.currentTimeMillis());
+			effector.setSkillCoolDown(skillTemplate.getDelayId(), cooldown * 100 + this.duration + System.currentTimeMillis());
 			effector.setSkillCoolDownBase(skillTemplate.getDelayId(), System.currentTimeMillis());
 		}
 	}
@@ -969,7 +958,7 @@ public class Skill {
 		case 4805: // Transformation: Avatar Of Water.
 		case 4806: // Transformation: Avatar Of Earth.
 		case 4807: // Transformation: Avatar Of Wind.
-			return cooldown - 300 * SkillLevel;
+			return cooldown - 2500 * SkillLevel;
 		}
 		return cooldown;
 	}
@@ -981,15 +970,13 @@ public class Skill {
 			duration = skillTemplate.getDuration();
 			return;
 		}
-		duration = effector.getGameStats().getPositiveReverseStat(StatEnum.BOOST_CASTING_TIME,
-				skillTemplate.getDuration());
+		duration = effector.getGameStats().getPositiveReverseStat(StatEnum.BOOST_CASTING_TIME, skillTemplate.getDuration());
 		switch (skillTemplate.getSubType()) {
 		case SUMMON:
 			duration = effector.getGameStats().getPositiveReverseStat(StatEnum.BOOST_CASTING_TIME_SUMMON, duration);
 			break;
 		case SUMMONHOMING:
-			duration = effector.getGameStats().getPositiveReverseStat(StatEnum.BOOST_CASTING_TIME_SUMMONHOMING,
-					duration);
+			duration = effector.getGameStats().getPositiveReverseStat(StatEnum.BOOST_CASTING_TIME_SUMMONHOMING, duration);
 			break;
 		case SUMMONTRAP:
 			duration = effector.getGameStats().getPositiveReverseStat(StatEnum.BOOST_CASTING_TIME_TRAP, duration);
@@ -1007,10 +994,8 @@ public class Skill {
 		}
 
 		// 70% of base skill duration cap
-		// No cast speed cap for skill Summoning Alacrity I(skillId: 3779) and Nimble
-		// Fingers I(skillId: 913)
-		if (!effector.getEffectController().hasAbnormalEffect(3779)
-				&& !effector.getEffectController().hasAbnormalEffect(913)) { // 4.8
+		// No cast speed cap for skill Summoning Alacrity I(skillId: 3779) and Nimble Fingers I(skillId: 913)
+		if (!effector.getEffectController().hasAbnormalEffect(3779) && !effector.getEffectController().hasAbnormalEffect(913)) { // 4.8
 			int baseDurationCap = Math.round(skillTemplate.getDuration() * 0.3f);
 			if (duration < baseDurationCap) {
 				duration = baseDurationCap;
@@ -1018,8 +1003,7 @@ public class Skill {
 		}
 
 		if (effector instanceof Player) {
-			if (this.isMulticast() && ((Player) effector).getChainSkills().getChainCount((Player) effector,
-					this.getSkillTemplate(), this.chainCategory) != 0) {
+			if (this.isMulticast() && ((Player) effector).getChainSkills().getChainCount((Player) effector, this.getSkillTemplate(), this.chainCategory) != 0) {
 				duration = 0;
 			}
 		}
@@ -1104,8 +1088,7 @@ public class Skill {
 			return true;
 		}
 
-		WeaponTypeWrapper weapons = new WeaponTypeWrapper(player.getEquipment().getMainHandWeaponType(),
-				player.getEquipment().getOffHandWeaponType());
+		WeaponTypeWrapper weapons = new WeaponTypeWrapper(player.getEquipment().getMainHandWeaponType(), player.getEquipment().getOffHandWeaponType());
 		float serverTime = motionTime.getTimeForWeapon(player.getRace(), player.getGender(), weapons);
 		int clientTime = hitTime;
 
@@ -1155,18 +1138,14 @@ public class Skill {
 					if (clientTime < 0 || checkTme < SecurityConfig.NO_ANIMATION_VALUE) {
 						if (SecurityConfig.NO_ANIMATION_KICK) {
 							player.getClientConnection().close(new SM_QUIT_RESPONSE(), false);
-							AuditLogger.info(player,
-									"Modified client_skills:" + this.getSkillId() + " (clientTime<finalTime:"
-											+ clientTime + "/" + finalTime + ") Kicking Player: " + player.getName());
+							AuditLogger.info(player, "Modified client_skills:" + this.getSkillId() + " (clientTime<finalTime:" + clientTime + "/" + finalTime + ") Kicking Player: " + player.getName());
 						} else {
-							AuditLogger.info(player, "Modified client_skills:" + this.getSkillId()
-									+ " (clientTime<finalTime:" + clientTime + "/" + finalTime + ")");
+							AuditLogger.info(player, "Modified client_skills:" + this.getSkillId() + " (clientTime<finalTime:" + clientTime + "/" + finalTime + ")");
 						}
 						return false;
 					}
 				}
-				log.warn("Possible modified client_skills:" + this.getSkillId() + " (clientTime<finalTime:" + clientTime
-						+ "/" + finalTime + ") player Name: " + player.getName());
+				log.warn("Possible modified client_skills:" + this.getSkillId() + " (clientTime<finalTime:" + clientTime + "/" + finalTime + ") player Name: " + player.getName());
 			}
 			this.serverTime = hitTime;
 		}
@@ -1192,8 +1171,7 @@ public class Skill {
 		if (effector instanceof Player && ((Player) effector).getSkillSkinList() != null) {
 			for (SkillSkin skillSkin : ((Player) effector).getSkillSkinList().getSkillSkins()) {
 				if (skillSkin.getTemplate() != null) {
-					if (skillSkin.getTemplate().getSkillGroup().equalsIgnoreCase(skillTemplate.getSkillGroup())
-							&& skillSkin.getIsActive() == 1) {
+					if (skillSkin.getTemplate().getSkillGroup().equalsIgnoreCase(skillTemplate.getSkillGroup()) && skillSkin.getIsActive() == 1) {
 						skillskinHitTIme = skillSkin.getTemplate().getAmmoSpeed();
 						skillskinId = skillSkin.getId();
 						break;
@@ -1212,8 +1190,7 @@ public class Skill {
 		if (skillMethod == SkillMethod.CAST) {
 			switch (targetType) {
 			case 0: // PlayerObjectId as Target
-				PacketSendUtility.broadcastPacketAndReceive(effector, new SM_CASTSPELL(effector.getObjectId(),
-						skillTemplate.getSkillId(), skillLevel, targetType, targetObjId, this.duration, skillskinId));
+				PacketSendUtility.broadcastPacketAndReceive(effector, new SM_CASTSPELL(effector.getObjectId(), skillTemplate.getSkillId(), skillLevel, targetType, targetObjId, this.duration, skillskinId));
 				if (effector instanceof Npc && firstTarget instanceof Player) {
 					NpcAI2 ai = (NpcAI2) effector.getAi2();
 					if (ai.poll(AIQuestion.CAN_SHOUT)) {
@@ -1223,20 +1200,15 @@ public class Skill {
 				break;
 
 			case 3: // Target not in sight?
-				PacketSendUtility.broadcastPacketAndReceive(effector, new SM_CASTSPELL(effector.getObjectId(),
-						skillTemplate.getSkillId(), skillLevel, targetType, 0, this.duration, skillskinId));
+				PacketSendUtility.broadcastPacketAndReceive(effector, new SM_CASTSPELL(effector.getObjectId(), skillTemplate.getSkillId(), skillLevel, targetType, 0, this.duration, skillskinId));
 				break;
 
 			case 1: // XYZ as Target
-				PacketSendUtility.broadcastPacketAndReceive(effector, new SM_CASTSPELL(effector.getObjectId(),
-						skillTemplate.getSkillId(), skillLevel, targetType, x, y, z, this.duration, skillskinId));
+				PacketSendUtility.broadcastPacketAndReceive(effector, new SM_CASTSPELL(effector.getObjectId(), skillTemplate.getSkillId(), skillLevel, targetType, x, y, z, this.duration, skillskinId));
 				break;
 			}
 		} else if (skillMethod == SkillMethod.ITEM && duration > 0) {
-			PacketSendUtility.broadcastPacketAndReceive(effector,
-					new SM_ITEM_USAGE_ANIMATION(effector.getObjectId(), firstTarget.getObjectId(),
-							(this.itemObjectId == 0 ? 0 : this.itemObjectId), itemTemplate.getTemplateId(),
-							this.duration, 0, 0));
+			PacketSendUtility.broadcastPacketAndReceive(effector, new SM_ITEM_USAGE_ANIMATION(effector.getObjectId(), firstTarget.getObjectId(), (this.itemObjectId == 0 ? 0 : this.itemObjectId), itemTemplate.getTemplateId(), this.duration, 0, 0));
 		}
 	}
 
@@ -1278,8 +1250,7 @@ public class Skill {
 			}
 			skillTemplate = DataManager.SKILL_DATA.getSkillTemplate(skillId);
 
-			effector.setSkillCoolDown(skillTemplate.getDelayId(),
-					skillTemplate.getCooldown() * 100 + System.currentTimeMillis());
+			effector.setSkillCoolDown(skillTemplate.getDelayId(), skillTemplate.getCooldown() * 100 + System.currentTimeMillis());
 		}
 
 		// if target out of range
@@ -1318,8 +1289,7 @@ public class Skill {
 			if (item.getActivationCount() > 1) {
 				item.setActivationCount(item.getActivationCount() - 1);
 			} else {
-				if (!((Player) effector).getInventory().decreaseByObjectId(item.getObjectId(), 1,
-						ItemUpdateType.DEC_ITEM_USE)) {
+				if (!((Player) effector).getInventory().decreaseByObjectId(item.getObjectId(), 1, ItemUpdateType.DEC_ITEM_USE)) {
 					return;
 				}
 			}
@@ -1430,13 +1400,11 @@ public class Skill {
 		// 【修复】只在客户端未发送有效hitTime时才由服务端计算
 		// 原条件存在运算符优先级问题，导致非HEAL技能的hitTime被错误覆盖
 		// 修复后：确保 hitTime <= 0 时才由服务端计算，保留客户端发送的有效值
-		if ((skillMethod == SkillMethod.CAST || skillMethod == SkillMethod.ITEM)
-				&& getSkillTemplate().getSubType() != SkillSubType.HEAL && hitTime <= 0) {
+		if ((skillMethod == SkillMethod.CAST || skillMethod == SkillMethod.ITEM) && getSkillTemplate().getSubType() != SkillSubType.HEAL && hitTime <= 0) {
 			if (skillskinHitTIme > 0) {
 				hitTime += (int) (skillskinHitTIme * effector.getDistanceToTarget() * 1.8F);
 			} else {
-				this.hitTime = ((int) ((int) (getSkillTemplate().getAmmoSpeed() * effector.getDistanceToTarget())
-						* 1.8F));
+				this.hitTime = ((int) ((int) (getSkillTemplate().getAmmoSpeed() * effector.getDistanceToTarget()) * 1.8F));
 			}
 		}
 
@@ -1487,27 +1455,21 @@ public class Skill {
 		if (skillMethod == SkillMethod.CAST) {
 			switch (targetType) {
 			case 0: // PlayerObjectId as Target
-				PacketSendUtility.broadcastPacketAndReceive(effector, new SM_CASTSPELL_RESULT(this, effects, serverTime,
-						chainSuccess, spellStatus, dashStatus, skillskinId));
+				PacketSendUtility.broadcastPacketAndReceive(effector, new SM_CASTSPELL_RESULT(this, effects, serverTime, chainSuccess, spellStatus, dashStatus, skillskinId));
 				break;
 
 			case 3: // Target not in sight?
-				PacketSendUtility.broadcastPacketAndReceive(effector, new SM_CASTSPELL_RESULT(this, effects, serverTime,
-						chainSuccess, spellStatus, dashStatus, skillskinId));
+				PacketSendUtility.broadcastPacketAndReceive(effector, new SM_CASTSPELL_RESULT(this, effects, serverTime, chainSuccess, spellStatus, dashStatus, skillskinId));
 				break;
 
 			case 1: // XYZ as Target
-				PacketSendUtility.broadcastPacketAndReceive(effector, new SM_CASTSPELL_RESULT(this, effects, serverTime,
-						chainSuccess, spellStatus, dashStatus, skillskinId, targetType));
+				PacketSendUtility.broadcastPacketAndReceive(effector, new SM_CASTSPELL_RESULT(this, effects, serverTime, chainSuccess, spellStatus, dashStatus, skillskinId, targetType));
 				break;
 			}
 		} else if (skillMethod == SkillMethod.ITEM) {
-			PacketSendUtility.broadcastPacketAndReceive(effector,
-					new SM_ITEM_USAGE_ANIMATION(effector.getObjectId(), firstTarget.getObjectId(),
-							(this.itemObjectId == 0 ? 0 : this.itemObjectId), itemTemplate.getTemplateId(), 0, 1, 0));
+			PacketSendUtility.broadcastPacketAndReceive(effector, new SM_ITEM_USAGE_ANIMATION(effector.getObjectId(), firstTarget.getObjectId(), (this.itemObjectId == 0 ? 0 : this.itemObjectId), itemTemplate.getTemplateId(), 0, 1, 0));
 			if (effector instanceof Player) {
-				PacketSendUtility.sendPacket((Player) effector,
-						SM_SYSTEM_MESSAGE.STR_USE_ITEM(new DescriptionId(getItemTemplate().getNameId())));
+				PacketSendUtility.sendPacket((Player) effector, SM_SYSTEM_MESSAGE.STR_USE_ITEM(new DescriptionId(getItemTemplate().getNameId())));
 			}
 		}
 	}
@@ -1650,17 +1612,14 @@ public class Skill {
 	 * @return true if the present skill is a targeted AOE skill
 	 */
 	public boolean isTargetAOE() {
-		return (firstTargetAttribute == FirstTargetAttribute.TARGET
-				&& targetRangeAttribute == TargetRangeAttribute.AREA);
+		return (firstTargetAttribute == FirstTargetAttribute.TARGET && targetRangeAttribute == TargetRangeAttribute.AREA);
 	}
 
 	/**
-	 * @return true if the present skill is a self buff includes items (such as
-	 *         scroll buffs)
+	 * @return true if the present skill is a self buff includes items (such as scroll buffs)
 	 */
 	public boolean isSelfBuff() {
-		return (firstTargetAttribute == FirstTargetAttribute.ME && targetRangeAttribute == TargetRangeAttribute.ONLYONE
-				&& skillTemplate.getSubType() == SkillSubType.BUFF && !skillTemplate.isDeityAvatar());
+		return (firstTargetAttribute == FirstTargetAttribute.ME && targetRangeAttribute == TargetRangeAttribute.ONLYONE && skillTemplate.getSubType() == SkillSubType.BUFF && !skillTemplate.isDeityAvatar());
 	}
 
 	/**
@@ -1855,12 +1814,10 @@ public class Skill {
 	}
 
 	public boolean shouldAffectTarget(VisibleObject object) {
-		// If creature is at least 2 meters above the terrain, ground skill cannot be
-		// applied
+		// If creature is at least 2 meters above the terrain, ground skill cannot be applied
 		if (GeoDataConfig.GEO_ENABLE) {
 			if (isGroundSkill()) {
-				if ((object.getZ() - GeoService.getInstance().getZ(object) > 1.0f)
-						|| (object.getZ() - GeoService.getInstance().getZ(object) < -2.0f)) {
+				if ((object.getZ() - GeoService.getInstance().getZ(object) > 1.0f) || (object.getZ() - GeoService.getInstance().getZ(object) < -2.0f)) {
 					return false;
 				}
 			}
@@ -1882,8 +1839,7 @@ public class Skill {
 	}
 
 	public boolean isPointPointSkill() {
-		if (this.getSkillTemplate().getProperties().getFirstTarget() == FirstTargetAttribute.POINT
-				&& this.getSkillTemplate().getProperties().getTargetType() == TargetRangeAttribute.POINT) {
+		if (this.getSkillTemplate().getProperties().getFirstTarget() == FirstTargetAttribute.POINT && this.getSkillTemplate().getProperties().getTargetType() == TargetRangeAttribute.POINT) {
 			return true;
 		}
 		return false;

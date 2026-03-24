@@ -61,7 +61,6 @@ import com.aionemu.gameserver.world.knownlist.PlayerAwareKnownList;
  * Reworked by G-Robson26
  * Rework & Test : MATTY
  */
-
 public class MinionService {
 
 	private static List<Integer> minions;
@@ -332,7 +331,6 @@ public class MinionService {
 			}
 		}
 		
-        DAOManager.getDAO(PlayerSkillListDAO.class).storeSkills(player);
 		minionCommonData.setIsLooting(false);
 		minionCommonData.setIsBuffing(false);
 		

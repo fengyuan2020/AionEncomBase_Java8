@@ -1,5 +1,4 @@
 /*
-
  *
  *  Encom is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser Public License as published by
@@ -54,7 +53,7 @@ public class SM_SKILL_LIST extends AionServerPacket {
 	public SM_SKILL_LIST(PlayerSkillEntry skillListEntry, int messageId, boolean isNew) {
 		this.skillList = new PlayerSkillEntry[] { skillListEntry };
 		this.messageId = messageId;
-		this.skillNameId = DataManager.SKILL_DATA.getSkillTemplate(skillListEntry.getSkillId()).getNameId();
+	    this.skillNameId = DataManager.SKILL_DATA.getSkillTemplate(skillListEntry.getSkillId()) != null ? DataManager.SKILL_DATA.getSkillTemplate(skillListEntry.getSkillId()).getNameId() : 0;
 		this.skillLvl = String.valueOf(skillListEntry.getSkillLevel());
 		this.isNew = isNew;
 	}

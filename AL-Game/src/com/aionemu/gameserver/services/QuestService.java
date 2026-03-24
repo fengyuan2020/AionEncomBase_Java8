@@ -448,6 +448,10 @@ public final class QuestService {
 	private static boolean checkStartConditionsImpl(QuestEnv env, boolean warn) {
 		Player player = env.getPlayer();
 		QuestTemplate template = questsData.getQuestById(env.getQuestId());
+        QuestState qs = player.getQuestStateList().getQuestState(env.getQuestId());
+        if (qs != null && qs.getStatus() != QuestStatus.NONE) {
+			return false;
+		}
 		if (template == null) {
 			return false;
 		}
@@ -458,8 +462,7 @@ public final class QuestService {
 		}
         int levelDiff = template.getMinlevelPermitted() - player.getLevel();
         if (levelDiff > 0 && template.getMinlevelPermitted() != 999) {
-            QuestState qs = player.getQuestStateList().getQuestState(env.getQuestId());
-            if (warn && qs.getStatus() == QuestStatus.NONE) {
+            if (warn) {
                   PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_QUEST_ACQUIRE_ERROR_MIN_LEVEL(Integer.toString(template.getMinlevelPermitted())));
             }
             return false;
@@ -550,7 +553,6 @@ public final class QuestService {
 				return false;
 			}
 		}
-		QuestState qs = player.getQuestStateList().getQuestState(template.getId());
 		if (qs != null && qs.getStatus() != QuestStatus.NONE) {
 			if (!qs.canRepeat()) {
 				return false;
