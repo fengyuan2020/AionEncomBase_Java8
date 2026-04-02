@@ -51,8 +51,8 @@ import java.util.concurrent.Future;
 /****/
 
 @InstanceID(300610000)
-public class RaksangRuinsInstance extends GeneralInstanceHandler
-{
+public class RaksangRuinsInstance extends GeneralInstanceHandler {
+
 	//Terror's Vault Raid
 	private Future<?> raksangRaidTaskA1;
 	private Future<?> raksangRaidTaskA2;
@@ -69,7 +69,6 @@ public class RaksangRuinsInstance extends GeneralInstanceHandler
 	private Future<?> raksangRaidTaskC2;
 	private int rakshaSoloClodwormC161An;
 	private int rakshaSoloClodwormC261An;
-	//***//
 	private Race spawnRace;
 	private Map<Integer, StaticDoor> doors;
 	protected boolean isInstanceDestroyed = false;
@@ -82,7 +81,7 @@ public class RaksangRuinsInstance extends GeneralInstanceHandler
 	
 	@Override
     public void onEnterInstance(Player player) {
-		super.onInstanceCreate(instance);
+        super.onEnterInstance(player); 
 		if (spawnRace == null) {
 			spawnRace = player.getRace();
 			SpawnAbisoRace();
@@ -627,5 +626,35 @@ public class RaksangRuinsInstance extends GeneralInstanceHandler
 		if (npc != null) {
 			npc.getController().onDelete();
 		}
+	}
+
+	private void stopInstanceTask() {
+        if (raksangRaidTaskA1 != null) {
+            raksangRaidTaskA1.cancel(true);
+        }
+        if (raksangRaidTaskA2 != null) {
+            raksangRaidTaskA2.cancel(true);
+        }
+    
+        if (raksangRaidTaskB1 != null) {
+            raksangRaidTaskB1.cancel(true);
+        }
+        if (raksangRaidTaskB2 != null) {
+            raksangRaidTaskB2.cancel(true);
+        }
+    
+        if (raksangRaidTaskC1 != null) {
+            raksangRaidTaskC1.cancel(true);
+        }
+        if (raksangRaidTaskC2 != null) {
+            raksangRaidTaskC2.cancel(true);
+       }
+    }
+
+	@Override
+	public void onInstanceDestroy() {
+		isInstanceDestroyed = true;
+		stopInstanceTask();
+		doors.clear();
 	}
 }

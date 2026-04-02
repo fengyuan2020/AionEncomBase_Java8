@@ -924,9 +924,12 @@
 		</spawn>
 		<!-- Training Dummy -->
 		<spawn npc_id="243649" respawn_time="295">
-		    <spot x="1400.2855" y="1314.0225" z="336.60355" h="58"/>
             <spot x="1400.0933" y="1309.9017" z="336.60352" h="63"/>	
             <spot x="1398.69" y="1318.27" z="336.604" h="69"/>
+		</spawn>
+		<!-- Training Dummy -->
+		<spawn npc_id="243650" respawn_time="295">
+		    <spot x="1400.2855" y="1314.0225" z="336.60355" h="58"/>
 		</spawn>
 		<!-- Helpful Legionnaire Trainee -->
 		<spawn npc_id="243651" respawn_time="295">

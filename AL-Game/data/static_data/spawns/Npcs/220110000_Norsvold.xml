@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-	ノスフォルド Spawn By (Encom)
+	Norsvold Spawn By (Encom)
  -->
 <spawns>
 	<spawn_map map_id="220110000">
-		<!-- OBJECT -->
 		<!-- Mailbox -->
 		<spawn npc_id="700079" respawn_time="295">
 			<spot x="1820.8163" y="1987.4023" z="199.18716" entity_id="815"/>
@@ -865,8 +864,11 @@
 		<!-- Training Dummy -->
 		<spawn npc_id="243653" respawn_time="295">
 		    <spot x="1816.9099" y="1958.4519" z="199.19724" h="16"/>
-            <spot x="1819.827" y="1956.0667" z="199.19724" h="16"/>
             <spot x="1820.9623" y="1951.9044" z="199.19724" h="3"/>
+		</spawn>
+		<!-- Training Dummy -->
+		<spawn npc_id="243654" respawn_time="295">
+            <spot x="1819.827" y="1956.0667" z="199.19724" h="16"/>
 		</spawn>
 		<!-- Proud Legionnaire Trainee -->
 		<spawn npc_id="243655" respawn_time="295">

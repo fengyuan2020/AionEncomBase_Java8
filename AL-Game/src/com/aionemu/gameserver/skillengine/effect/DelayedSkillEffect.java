@@ -1,6 +1,4 @@
 /*
-
- *
  *  Encom is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -39,29 +37,28 @@ public class DelayedSkillEffect extends EffectTemplate {
 
 	@Override
 	public void startEffect(final Effect effect) {
+		if (effect.getSkill() == null) {
+			return;
+		}
 		ThreadPoolManager.getInstance().schedule(new Runnable() {
 			@Override
 			public void run() {
 				if (effect.getEffected().getEffectController().hasAbnormalEffect(effect.getSkill().getSkillId())) {
 					final SkillTemplate template = DataManager.SKILL_DATA.getSkillTemplate(skillId);
 					if (template.getProperties().getTargetMaxCount() > 1) {
-						final Effect e = new Effect(effect.getEffector(), effect.getEffected(), template,
-								template.getLvl(), 0);
+						final Effect e = new Effect(effect.getEffector(), effect.getEffected(), template, template.getLvl(), 0);
 						World.getInstance().doOnAllObjects(new Visitor<VisibleObject>() {
 							@Override
 							public void visit(VisibleObject object) {
-								if (MathUtil.getDistance(effect.getEffected(), object) <= template.getProperties()
-										.getRevisionDistance()) {
-									SkillEngine.getInstance().applyEffectDirectly(template.getSkillId(),
-											effect.getEffected(), (Creature) object, template.getDuration());
+								if (MathUtil.getDistance(effect.getEffected(), object) <= template.getProperties().getRevisionDistance()) {
+									SkillEngine.getInstance().applyEffectDirectly(template.getSkillId(), effect.getEffected(), (Creature) object, template.getDuration());
 									e.applyEffect();
 									e.initialize();
 								}
 							}
 						});
 					} else {
-						Effect e = new Effect(effect.getEffector(), effect.getEffected(), template, template.getLvl(),
-								0);
+						Effect e = new Effect(effect.getEffector(), effect.getEffected(), template, template.getLvl(), 0);
 						e.initialize();
 						e.applyEffect();
 					}

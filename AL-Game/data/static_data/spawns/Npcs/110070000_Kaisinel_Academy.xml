@@ -71,9 +71,6 @@
     <spawn npc_id="835564" respawn_time="60">
       <spot x="501.478271" y="215.124390" z="127.58731" entity_id="239"/>
     </spawn>
-    <spawn npc_id="835566" respawn_time="60">
-      <spot x="501.478271" y="215.124390" z="127.58731" entity_id="239"/>
-    </spawn>
     <spawn npc_id="205315" respawn_time="60">
       <spot x="483.309052" y="251.072327" z="126.97587" h="60"/>
     </spawn>
@@ -179,7 +176,7 @@
     <spawn npc_id="804674" respawn_time="60">
       <spot x="497.372314" y="397.719696" z="126.78955"/>
     </spawn>
-    <spawn npc_id="731721" respawn_time="60">
+    <spawn npc_id="730424" respawn_time="60">
       <spot x="443.878601" y="258.603699" z="126.97165" entity_id="328"/>
     </spawn>
     <spawn npc_id="802541" respawn_time="60">

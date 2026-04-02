@@ -502,8 +502,8 @@ public class CreativityEssenceService {
 		int totalCp = (currentCp + estimaCp);
 		player.setCreativityPoint(totalCp);
 		int size = DAOManager.getDAO(PlayerCreativityPointsDAO.class).getSlotSize(player.getObjectId());
-		PacketSendUtility.sendPacket(player, new SM_CREATIVITY_POINTS(totalCp, player.getCPStep()));
-		PacketSendUtility.sendPacket(player, new SM_CREATIVITY_POINTS(player.getCreativityPoint(), player.getCPStep(), size, false));
+        PacketSendUtility.sendPacket(player, new SM_CREATIVITY_POINTS(totalCp, player.getCPStep(), size, true));
+        PacketSendUtility.sendPacket(player, new SM_STATS_INFO(player));
 	}
 
     public void removeEstimaCp(Player player, Item item) {
@@ -521,10 +521,17 @@ public class CreativityEssenceService {
         currentCp = player.getCreativityPoint();
         int totalCp = (currentCp - estimaCp);
         if (totalCp < 0) totalCp = 0;
+        int spentCp = 0;
+        for (PlayerCPEntry ce : player.getCP().getAllCP()) {
+            spentCp += ce.getPoint();
+        }
+        if (totalCp < spentCp) {
+            onResetEssence(player, 0);
+            PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_GIVE_CP_ENCHANT_CANNOT);
+        }
         player.setCreativityPoint(totalCp);
         int size = DAOManager.getDAO(PlayerCreativityPointsDAO.class).getSlotSize(player.getObjectId());
-        PacketSendUtility.sendPacket(player, new SM_CREATIVITY_POINTS(totalCp, player.getCPStep()));
-        PacketSendUtility.sendPacket(player, new SM_CREATIVITY_POINTS(player.getCreativityPoint(), player.getCPStep(), size, false));
+        PacketSendUtility.sendPacket(player, new SM_CREATIVITY_POINTS(totalCp, player.getCPStep(), size, true));
         PacketSendUtility.sendPacket(player, new SM_STATS_INFO(player));
     }
 
