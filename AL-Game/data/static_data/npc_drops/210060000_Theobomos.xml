@@ -97914,69 +97914,69 @@
 	</npc_drop>
     <npc_drop npc_id="213920">
         <drop_group name="POWER_SHARD_COMMON_LVL20" use_category="true" race="PC_ALL">
-            <drop item_id="169000005" chance="10.00" min_amount="1" max_amount="50" no_reduce="false" eachmember="false" name="Power Shard" />
+            <drop item_id="169000005" chance="10.00" min_amount="1" max_amount="50" no_reduce="false" eachmember="false" name="Power Shard"/>
         </drop_group>
         <drop_group name="KINAH" use_category="true" race="PC_ALL">
-            <drop item_id="182400001" chance="10.00" min_amount="1" max_amount="311" no_reduce="false" eachmember="false" name="Kinah" />
+            <drop item_id="182400001" chance="10.00" min_amount="1" max_amount="311" no_reduce="false" eachmember="false" name="Kinah"/>
         </drop_group>
     </npc_drop>
     <npc_drop npc_id="213921">
         <drop_group name="POWER_SHARD_COMMON_LVL20" use_category="true" race="PC_ALL">
-            <drop item_id="169000005" chance="10.00" min_amount="1" max_amount="50" no_reduce="false" eachmember="false" name="Power Shard" />
+            <drop item_id="169000005" chance="10.00" min_amount="1" max_amount="50" no_reduce="false" eachmember="false" name="Power Shard"/>
         </drop_group>
         <drop_group name="KINAH" use_category="true" race="PC_ALL">
-            <drop item_id="182400001" chance="10.00" min_amount="1" max_amount="311" no_reduce="false" eachmember="false" name="Kinah" />
+            <drop item_id="182400001" chance="10.00" min_amount="1" max_amount="311" no_reduce="false" eachmember="false" name="Kinah"/>
         </drop_group>
     </npc_drop>
     <npc_drop npc_id="213922">
         <drop_group name="POWER_SHARD_COMMON_LVL20" use_category="true" race="PC_ALL">
-            <drop item_id="169000005" chance="10.00" min_amount="1" max_amount="50" no_reduce="false" eachmember="false" name="Power Shard" />
+            <drop item_id="169000005" chance="10.00" min_amount="1" max_amount="50" no_reduce="false" eachmember="false" name="Power Shard"/>
         </drop_group>
         <drop_group name="KINAH" use_category="true" race="PC_ALL">
-            <drop item_id="182400001" chance="10.00" min_amount="1" max_amount="364" no_reduce="false" eachmember="false" name="Kinah" />
+            <drop item_id="182400001" chance="10.00" min_amount="1" max_amount="364" no_reduce="false" eachmember="false" name="Kinah"/>
         </drop_group>
     </npc_drop>
     <npc_drop npc_id="213923">
         <drop_group name="POWER_SHARD_COMMON_LVL20" use_category="true" race="PC_ALL">
-            <drop item_id="169000005" chance="10.00" min_amount="1" max_amount="50" no_reduce="false" eachmember="false" name="Power Shard" />
+            <drop item_id="169000005" chance="10.00" min_amount="1" max_amount="50" no_reduce="false" eachmember="false" name="Power Shard"/>
         </drop_group>
         <drop_group name="KINAH" use_category="true" race="PC_ALL">
-            <drop item_id="182400001" chance="10.00" min_amount="1" max_amount="364" no_reduce="false" eachmember="false" name="Kinah" />
+            <drop item_id="182400001" chance="10.00" min_amount="1" max_amount="364" no_reduce="false" eachmember="false" name="Kinah"/>
         </drop_group>
     </npc_drop>
     <npc_drop npc_id="213924">
         <drop_group name="POTION_COMMON_LVL30" use_category="true" race="PC_ALL">
-            <drop item_id="162000004" chance="10.00" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Life Potion" />
+            <drop item_id="162000004" chance="10.00" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Life Potion"/>
         </drop_group>
         <drop_group name="POWER_SHARD_COMMON_LVL20" use_category="true" race="PC_ALL">
-            <drop item_id="169000005" chance="10.00" min_amount="1" max_amount="50" no_reduce="false" eachmember="false" name="Power Shard" />
+            <drop item_id="169000005" chance="10.00" min_amount="1" max_amount="50" no_reduce="false" eachmember="false" name="Power Shard"/>
         </drop_group>
         <drop_group name="KINAH" use_category="true" race="PC_ALL">
-            <drop item_id="182400001" chance="10.00" min_amount="1" max_amount="417" no_reduce="false" eachmember="false" name="Kinah" />
+            <drop item_id="182400001" chance="10.00" min_amount="1" max_amount="417" no_reduce="false" eachmember="false" name="Kinah"/>
         </drop_group>
     </npc_drop>
     <npc_drop npc_id="213927">
         <drop_group name="POWER_SHARD_COMMON_LVL20" use_category="true" race="PC_ALL">
-            <drop item_id="169000005" chance="10.00" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Power Shard" />
+            <drop item_id="169000005" chance="10.00" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Power Shard"/>
         </drop_group>
         <drop_group name="KINAH" use_category="true" race="PC_ALL">
-            <drop item_id="182400001" chance="10.00" min_amount="1" max_amount="3091" no_reduce="false" eachmember="false" name="Kinah" />
+            <drop item_id="182400001" chance="10.00" min_amount="1" max_amount="3091" no_reduce="false" eachmember="false" name="Kinah"/>
         </drop_group>
     </npc_drop>
     <npc_drop npc_id="213928">
         <drop_group name="POWER_SHARD_COMMON_LVL20" use_category="true" race="PC_ALL">
-            <drop item_id="169000005" chance="10.00" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Power Shard" />
+            <drop item_id="169000005" chance="10.00" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Power Shard"/>
         </drop_group>
         <drop_group name="KINAH" use_category="true" race="PC_ALL">
-            <drop item_id="182400001" chance="10.00" min_amount="1" max_amount="412" no_reduce="false" eachmember="false" name="Kinah" />
+            <drop item_id="182400001" chance="10.00" min_amount="1" max_amount="412" no_reduce="false" eachmember="false" name="Kinah"/>
         </drop_group>
     </npc_drop>
     <npc_drop npc_id="213929">
         <drop_group name="POWER_SHARD_COMMON_LVL20" use_category="true" race="PC_ALL">
-            <drop item_id="169000005" chance="10.00" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Power Shard" />
+            <drop item_id="169000005" chance="10.00" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Power Shard"/>
         </drop_group>
         <drop_group name="KINAH" use_category="true" race="PC_ALL">
-            <drop item_id="182400001" chance="10.00" min_amount="1" max_amount="1025" no_reduce="false" eachmember="false" name="Kinah" />
+            <drop item_id="182400001" chance="10.00" min_amount="1" max_amount="1025" no_reduce="false" eachmember="false" name="Kinah"/>
         </drop_group>
     </npc_drop>
 </npc_drops>

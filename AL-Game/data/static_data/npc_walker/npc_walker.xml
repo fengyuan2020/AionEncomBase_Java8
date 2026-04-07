@@ -122685,7 +122685,7 @@
         <routestep step="17" x="1987.04" y="1752.62" z="152.957"/>
 	</walker_template>
     <walker_template route_id="OMEGAINGGISONANGRIEFRUINS000000000000000" pool="1">
-        <routestep step="1" x="1511.4512" y="2022.809" z="302.74417" />
+        <routestep step="1" x="1511.4512" y="2022.809" z="302.74417"/>
         <routestep step="2" x="1471.0603" y="2007.579" z="307.01877"/>
         <routestep step="3" x="1445.2809" y="1979.8856" z="307.75"/>
         <routestep step="4" x="1424.8173" y="1919.9907" z="307.62558"/>

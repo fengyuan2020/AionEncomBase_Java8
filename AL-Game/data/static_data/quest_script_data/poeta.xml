@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <quest_scripts xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="quest_script_data.xsd">
 <!--
-    Quest Poeta
-	Make By (Encom)
+    Quest Poeta. Make By (Encom)
  -->
 	<!-- Sleeping On The Job (Elyos Only) -->
 	<report_to id="1101" start_npc_ids="203049" end_npc_ids="203057"/>
@@ -20,7 +19,7 @@
 	<report_to id="1119" start_npc_ids="203075" end_npc_ids="203080" item_id="182200225"/>
 	
 	<!-- The Snuffler Headache (Elyos Only) -->
-	<item_collecting id="1105" start_npc_ids="203050" />
+	<item_collecting id="1105" start_npc_ids="203050"/>
 	<!-- Pernos's Robe (Elyos Only) -->
 	<item_collecting id="1116" start_npc_ids="203060"/>
 	<!-- Light Up The Night (Elyos Only) -->

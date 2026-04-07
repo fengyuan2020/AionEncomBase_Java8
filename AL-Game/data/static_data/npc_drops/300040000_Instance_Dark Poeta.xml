@@ -62068,34 +62068,34 @@
 	</npc_drop>
     <npc_drop npc_id="215452">
         <drop_group name="BALAUR MATS" use_category="true" race="PC_ALL">
-            <drop item_id="152014011" chance="9.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Solid Balaur Horn" />
-            <drop item_id="152014012" chance="9.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Solid Balaur Scale" />
-            <drop item_id="152014013" chance="9.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Solid Balaur Skin" />
-            <drop item_id="152014014" chance="9.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Boiling Balaur Blood Stain" />
-            <drop item_id="152014015" chance="9.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Fresh Balaur Meat" />
-            <drop item_id="186000033" chance="9.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Hot Balaur Heart" />
+            <drop item_id="152014011" chance="9.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Solid Balaur Horn"/>
+            <drop item_id="152014012" chance="9.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Solid Balaur Scale"/>
+            <drop item_id="152014013" chance="9.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Solid Balaur Skin"/>
+            <drop item_id="152014014" chance="9.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Boiling Balaur Blood Stain"/>
+            <drop item_id="152014015" chance="9.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Fresh Balaur Meat"/>
+            <drop item_id="186000033" chance="9.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Hot Balaur Heart"/>
         </drop_group>
         <drop_group name="KINAH" use_category="true" race="PC_ALL">
-            <drop item_id="182400001" chance="10.00" min_amount="1" max_amount="33855" no_reduce="false" eachmember="false" name="Kinah" />
+            <drop item_id="182400001" chance="10.00" min_amount="1" max_amount="33855" no_reduce="false" eachmember="false" name="Kinah"/>
         </drop_group>
     </npc_drop>
     <npc_drop npc_id="215225">
         <drop_group name="ARMOR_COMMON" use_category="true" race="PC_ALL">
-            <drop item_id="112100453" chance="10.00" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Immemorial Pauldrons" />
+            <drop item_id="112100453" chance="10.00" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Immemorial Pauldrons"/>
         </drop_group>
         <drop_group name="BALAUR MATS" use_category="true" race="PC_ALL">
-            <drop item_id="152014011" chance="9.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Solid Balaur Horn" />
-            <drop item_id="152014012" chance="9.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Solid Balaur Scale" />
-            <drop item_id="152014013" chance="9.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Solid Balaur Skin" />
-            <drop item_id="152014014" chance="9.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Boiling Balaur Blood Stain" />
-            <drop item_id="152014015" chance="9.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Fresh Balaur Meat" />
-            <drop item_id="186000033" chance="9.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Hot Balaur Heart" />
+            <drop item_id="152014011" chance="9.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Solid Balaur Horn"/>
+            <drop item_id="152014012" chance="9.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Solid Balaur Scale"/>
+            <drop item_id="152014013" chance="9.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Solid Balaur Skin"/>
+            <drop item_id="152014014" chance="9.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Boiling Balaur Blood Stain"/>
+            <drop item_id="152014015" chance="9.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Fresh Balaur Meat"/>
+            <drop item_id="186000033" chance="9.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Hot Balaur Heart"/>
         </drop_group>
         <drop_group name="POWER_SHARD_COMMON" use_category="true" race="PC_ALL">
-            <drop item_id="169000008" chance="10.00" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Power Shard: +30" />
+            <drop item_id="169000008" chance="10.00" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Power Shard: +30"/>
         </drop_group>
         <drop_group name="KINAH" use_category="true" race="PC_ALL">
-            <drop item_id="182400001" chance="10.00" min_amount="1" max_amount="14152" no_reduce="false" eachmember="false" name="Kinah" />
+            <drop item_id="182400001" chance="10.00" min_amount="1" max_amount="14152" no_reduce="false" eachmember="false" name="Kinah"/>
         </drop_group>
     </npc_drop>
 </npc_drops>

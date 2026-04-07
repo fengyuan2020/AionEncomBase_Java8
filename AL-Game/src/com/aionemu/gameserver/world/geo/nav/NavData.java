@@ -44,14 +44,15 @@ import com.aionemu.gameserver.model.templates.world.WorldMapTemplate;
 public class NavData {
 
     private static final Logger LOG = LoggerFactory.getLogger(NavData.class);
-    
-    // ================ CONSTANTS ================
-    
+
     /** Navigation data directory */
     private static final String NAV_DIR = "./data/nav/";
     
     /** Size of float in bytes */
     private static final int FLOAT_SIZE_BYTES = 4;
+    
+    /** Size of int in bytes */
+    private static final int INT_SIZE_BYTES = 4;
     
     /** Number of components per vertex (x, y, z) */
     private static final int VERTEX_COMPONENTS = 3;
@@ -60,18 +61,8 @@ public class NavData {
     private static final int VERTEX_STRIDE_BYTES = FLOAT_SIZE_BYTES * VERTEX_COMPONENTS;
     
     /** Header size: one int for float count (legacy format) */
-    private static final int HEADER_SIZE_BYTES = FLOAT_SIZE_BYTES;
-    
-    /** Legacy format: total float count (not vertex count) */
-    private static final int LEGACY_HEADER_SIZE_BYTES = FLOAT_SIZE_BYTES;
-    
-    // 【修正】2026-03-07 - 恢复旧版文件格式解析逻辑
-    // 旧版 .nav 文件格式：文件头存储的是总浮点数数量（floatCount），而不是顶点数量（vertexCount）
-    // 修复原因：新版代码使用了错误的文件格式解析方式，导致 nav 文件加载失败
-    // 修复方案：恢复旧版的文件格式解析逻辑，兼容旧版 nav 文件
-    
-    // ================ CACHES ================
-    
+    private static final int HEADER_SIZE_BYTES = INT_SIZE_BYTES;
+
     /**
      * Thread-safe cache of loaded navigation maps.
      * Uses ConcurrentHashMap for lock-free reads and atomic lazy loading.
@@ -211,8 +202,8 @@ public class NavData {
     /**
      * Parses .nav file and constructs navigation mesh.
      * 
-     * File format:
-     * - int: vertexCount
+     * Legacy file format:
+     * - int: floatCount (total number of floats = vertexCount * 3)
      * - float[vertexCount * 3]: vertex positions (x,y,z)
      * - int: triangleCount
      * - for each triangle:
@@ -235,32 +226,49 @@ public class NavData {
             
             try {
                 // Validate file size
-                if (nav.remaining() < LEGACY_HEADER_SIZE_BYTES) {
+                if (nav.remaining() < HEADER_SIZE_BYTES) {
                     throw new IOException("File too small: missing float count");
                 }
                 
-                // 【修正】2026-03-07 - 读取 floatCount (旧版文件格式)
-                // 旧版 .nav 文件头存储的是总浮点数数量，而不是顶点数量
-                // floatCount = vertexCount * 3 (每个顶点有3个浮点数：x, y, z)
+                // Read floatCount (legacy format - total number of floats, not vertices)
                 int floatCount = nav.getInt();
                 if (floatCount <= 0 || floatCount > 3000000) {
                     throw new IOException("Invalid float count: " + floatCount);
                 }
                 
-                // 【修正】2026-03-07 - 计算顶点数量
+                // Calculate vertex count (each vertex has 3 floats: x, y, z)
                 int vertexCount = floatCount / VERTEX_COMPONENTS;
+                if (vertexCount <= 0 || vertexCount > 1000000) {
+                    throw new IOException("Invalid vertex count: " + vertexCount);
+                }
                 
-                // 【修正】2026-03-07 - 跳过顶点数据
-                // 旧版格式：顶点数据位置 = 4 (文件头) + floatCount * 4 (浮点数据)
-                nav.position(LEGACY_HEADER_SIZE_BYTES + floatCount * FLOAT_SIZE_BYTES);
+                // Save the start position of vertex data (right after the header)
+                int vertexDataStart = nav.position();
+                
+                // Calculate total vertex data size in bytes
+                int vertexDataSize = floatCount * FLOAT_SIZE_BYTES;
+                
+                // Validate we have enough data
+                if (nav.remaining() < vertexDataSize) {
+                    throw new IOException("Vertex data truncated: need " + vertexDataSize + " bytes, have " + nav.remaining());
+                }
+                
+                // Skip vertex data for now (will be accessed via getVertices)
+                nav.position(vertexDataStart + vertexDataSize);
                 
                 // Read triangle count
-                if (nav.remaining() < FLOAT_SIZE_BYTES) {
+                if (nav.remaining() < INT_SIZE_BYTES) {
                     throw new IOException("Missing triangle count");
                 }
                 int triangleCount = nav.getInt();
                 if (triangleCount <= 0 || triangleCount > 1000000) {
                     throw new IOException("Invalid triangle count: " + triangleCount);
+                }
+                
+                // Calculate expected triangle data size: each triangle has 6 ints (3 indices + 3 connections)
+                int expectedTriangleDataBytes = triangleCount * INT_SIZE_BYTES * 6;
+                if (nav.remaining() < expectedTriangleDataBytes) {
+                    throw new IOException("Triangle data truncated: need " + expectedTriangleDataBytes + " bytes, have " + nav.remaining());
                 }
                 
                 // Parse triangles
@@ -274,8 +282,16 @@ public class NavData {
                     indices[1] = nav.getInt();
                     indices[2] = nav.getInt();
                     
-                    // Create triangle geometry
-                    triangles[i] = new NavGeometry(null, getVertices(nav, indices));
+                    // Validate indices
+                    if (indices[0] < 0 || indices[0] >= vertexCount ||
+                        indices[1] < 0 || indices[1] >= vertexCount ||
+                        indices[2] < 0 || indices[2] >= vertexCount) {
+                        throw new IOException("Invalid vertex index in triangle " + i + ": [" + indices[0] + ", " + indices[1] + ", " + indices[2] + "] max vertex index: " + (vertexCount - 1));
+                    }
+                    
+                    // Create triangle geometry with vertices
+                    float[] vertices = getVertices(nav, vertexDataStart, indices);
+                    triangles[i] = new NavGeometry(null, vertices);
                     
                     // Read edge connections
                     connections[i][0] = nav.getInt();
@@ -285,11 +301,11 @@ public class NavData {
                 
                 // Build adjacency links
                 for (int i = 0; i < triangleCount; i++) {
-                    if (connections[i][0] != -1) 
+                    if (connections[i][0] != -1 && connections[i][0] < triangleCount) 
                         triangles[i].setEdge1(triangles[connections[i][0]]);
-                    if (connections[i][1] != -1) 
+                    if (connections[i][1] != -1 && connections[i][1] < triangleCount) 
                         triangles[i].setEdge2(triangles[connections[i][1]]);
-                    if (connections[i][2] != -1) 
+                    if (connections[i][2] != -1 && connections[i][2] < triangleCount) 
                         triangles[i].setEdge3(triangles[connections[i][2]]);
                     
                     triangles[i].updateModelBound();
@@ -297,6 +313,7 @@ public class NavData {
                 }
                 
                 map.updateModelBound();
+                LOG.debug("Successfully loaded {} triangles for map {}", triangleCount, worldId);
                 
             } finally {
                 // Always release native buffer, even on error
@@ -309,22 +326,26 @@ public class NavData {
 
     /**
      * Extracts vertex coordinates from the buffer.
-     * Uses legacy format offset calculation.
      * 
      * @param nav Mapped buffer containing vertex data
-     * @param indices Indices of vertices to extract
-     * @return Array of vertex coordinates [x,y,z, x,y,z, ...]
+     * @param vertexDataStart Start position of vertex data in buffer (after header)
+     * @param indices Indices of vertices to extract (3 indices per triangle)
+     * @return Array of vertex coordinates [x,y,z, x,y,z, x,y,z] (9 floats for a triangle)
      */
-    private static float[] getVertices(MappedByteBuffer nav, int[] indices) {
-        float[] ret = new float[indices.length * VERTEX_COMPONENTS];
+    private static float[] getVertices(MappedByteBuffer nav, int vertexDataStart, int[] indices) {
+        float[] vertices = new float[indices.length * VERTEX_COMPONENTS];
+        
         for (int i = 0; i < indices.length; i++) {
-            // 【修正】2026-03-07 - 旧版格式顶点偏移计算
-            // 顶点数据从文件头后开始：offset = 4 (文件头) + (顶点索引 * 3 * 4) + (分量偏移)
-            ret[i * VERTEX_COMPONENTS] = nav.getFloat((indices[i] * FLOAT_SIZE_BYTES * VERTEX_COMPONENTS) + FLOAT_SIZE_BYTES);
-            ret[(i * VERTEX_COMPONENTS) + 1] = nav.getFloat((indices[i] * FLOAT_SIZE_BYTES * VERTEX_COMPONENTS) + (FLOAT_SIZE_BYTES * 2));
-            ret[(i * VERTEX_COMPONENTS) + 2] = nav.getFloat((indices[i] * FLOAT_SIZE_BYTES * VERTEX_COMPONENTS) + (FLOAT_SIZE_BYTES * 3));
+            // Calculate offset: start + (index * vertex_stride)
+            int vertexOffset = vertexDataStart + (indices[i] * VERTEX_STRIDE_BYTES);
+            
+            // Read X, Y, Z coordinates
+            vertices[i * VERTEX_COMPONENTS] = nav.getFloat(vertexOffset);
+            vertices[i * VERTEX_COMPONENTS + 1] = nav.getFloat(vertexOffset + FLOAT_SIZE_BYTES);
+            vertices[i * VERTEX_COMPONENTS + 2] = nav.getFloat(vertexOffset + (FLOAT_SIZE_BYTES * 2));
         }
-        return ret;
+        
+        return vertices;
     }
 
     /**

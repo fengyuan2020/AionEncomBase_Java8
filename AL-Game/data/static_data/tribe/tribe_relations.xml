@@ -46,8 +46,8 @@
     <friendly>POLYMORPHPARROT USEALL_TELEPORTER_LI USEALL_TELEPORTER_DA</friendly>
     <none>IDAB1_ERE_PRISON_DOOR</none>
   </tribe>
-  <tribe name="PET" base="PC" />
-  <tribe name="PET_DARK" base="PC_DARK" />
+  <tribe name="PET" base="PC"/>
+  <tribe name="PET_DARK" base="PC_DARK"/>
   <tribe name="AGGRESSIVESINGLEMONSTER" base="MONSTER">
     <aggressive>PC PC_DARK IDF7_ERE_LI IDF7_ERE_DA PANDORARAID_ENERGY_LIGHT PANDORARAID_ENERGY_DARK</aggressive>
     <none>F6_INVASION_DA F6_INVASION_LI IDAB1_ERE_PRISON_DOOR</none>
@@ -233,14 +233,14 @@
   <tribe name="ARCHERYBASFELT_ATARGETBASFELT_LF1" base="GENERAL">
     <aggressive>TARGETBASFELT_DF1</aggressive>
   </tribe>
-  <tribe name="TARGETBASFELT_DF1" base="MONSTER" />
+  <tribe name="TARGETBASFELT_DF1" base="MONSTER"/>
   <tribe name="ARCHERYBASFELT2_ATARGETBASFELT2_DF1" base="GENERAL_DARK">
     <aggressive>TARGETBASFELT2_DF1</aggressive>
   </tribe>
   <tribe name="ARCHERYBASFELT2_ATARGETBASFELT2_LF1" base="GENERAL">
     <aggressive>TARGETBASFELT2_DF1</aggressive>
   </tribe>
-  <tribe name="TARGETBASFELT2_DF1" base="MONSTER" />
+  <tribe name="TARGETBASFELT2_DF1" base="MONSTER"/>
   <tribe name="GUARD_FTARGETBASFELT_DF1" base="GUARD_DARK">
     <friendly>TARGETBASFELT_DF1 TARGETBASFELT2_DF1</friendly>
   </tribe>
@@ -842,7 +842,7 @@
     <aggressive>PC_DARK GENERAL_DARK GUARD_DARK PC GENERAL GUARD</aggressive>
     <support>TRICON TRICO</support>
   </tribe>
-  <tribe name="TRICO" base="MONSTER" />
+  <tribe name="TRICO" base="MONSTER"/>
   <tribe name="PROTECTGUARD_LIGHT" base="GUARD">
     <aggressive>F6_EVENT_DA F6_EVENT_ATTACKER_DA F6_EVENT_CANNON_DA</aggressive>
     <friendly>MONSTER PROTECTGUARD_LIGHT_F2A F6_EVENT_LI F6_EVENT_ATTACKER_LI F6_EVENT_CANNON_LI LDF7_EVENT</friendly>
@@ -1007,7 +1007,7 @@
   <tribe name="IDCATACOMBS_DRAKE_SUM" base="MONSTER">
     <aggressive>PC PC_DARK IDCATACOMBS_DRAKE</aggressive>
   </tribe>
-  <tribe name="DUMMY" base="MONSTER" />
+  <tribe name="DUMMY" base="MONSTER"/>
   <tribe name="HOSTILE_ALL" base="MONSTER">
     <hostile>PC PC_DARK PC_DRAGON GENERAL GUARD GENERAL_DARK GUARD_DARK GENERAL_DRAGON GUARD_DRAGON USEALL MONSTER</hostile>
   </tribe>
@@ -1033,7 +1033,7 @@
     <friendly>DRAMATASLIME</friendly>
     <support>DRAMATA</support>
   </tribe>
-  <tribe name="DRAMATATIMERA" base="MONSTER" />
+  <tribe name="DRAMATATIMERA" base="MONSTER"/>
   <tribe name="DRAMATATIMERB" base="MONSTER">
     <aggressive>DRAMATATIMERA</aggressive>
   </tribe>
@@ -1041,7 +1041,7 @@
     <aggressive>DRAKANDOOR</aggressive>
     <friendly>PC GENERAL GUARD_DARK</friendly>
   </tribe>
-  <tribe name="DRAKANDOOR" base="MONSTER" />
+  <tribe name="DRAKANDOOR" base="MONSTER"/>
   <tribe name="GHTIMER" base="MONSTER">
     <aggressive>GUARD GUARD_DARK</aggressive>
   </tribe>
@@ -1058,7 +1058,7 @@
   <tribe name="NLIZARDMAN2" base="MONSTER">
     <aggressive>PC GUARD PC_DARK GUARD_DARK</aggressive>
   </tribe>
-  <tribe name="DUMMY2" base="MONSTER" />
+  <tribe name="DUMMY2" base="MONSTER"/>
   <tribe name="DUMMY_DGUARD" base="GUARD_DARK">
     <aggressive>DUMMY</aggressive>
   </tribe>
@@ -1147,8 +1147,8 @@
   <tribe name="IDYUN_D1" base="MONSTER">
     <hostile>PC PC_DARK</hostile>
   </tribe>
-  <tribe name="IDYUN_OBJECTS" base="MONSTER" />
-  <tribe name="IDYUN_TARGET" base="MONSTER" />
+  <tribe name="IDYUN_OBJECTS" base="MONSTER"/>
+  <tribe name="IDYUN_TARGET" base="MONSTER"/>
   <tribe name="IDRAKSHA_DRAKAN" base="MONSTER">
     <aggressive>PC GUARD PC_DARK GUARD_DARK</aggressive>
     <neutral>IDRAKSHA_DRAGONTOOTH IDRAKSHA_NORMAL</neutral>
@@ -1272,8 +1272,8 @@
     <hostile>PC GUARD PC_DARK GUARD_DARK</hostile>
     <friendly>LDF4A_PUBLIC_MONSTER</friendly>
   </tribe>
-  <tribe name="YDUMMY" base="MONSTER" />
-  <tribe name="YDUMMY2" base="MONSTER" />
+  <tribe name="YDUMMY" base="MONSTER"/>
+  <tribe name="YDUMMY2" base="MONSTER"/>
   <tribe name="YDUMMY_GUARD" base="USEALL">
     <aggressive>YDUMMY</aggressive>
     <neutral>YDUMMY2</neutral>
@@ -1288,7 +1288,7 @@
     <friendly>YDUMMY YDUMMY2</friendly>
     <support>PC PC_DARK YUN_GUARD NEUTRAL_LGUARD NEUTRAL_DGUARD</support>
   </tribe>
-  <tribe name="LDF4B_WAGON" base="USEALL" />
+  <tribe name="LDF4B_WAGON" base="USEALL"/>
   <tribe name="LDF4B_SPARRING_GUARD" base="GENERAL">
     <aggressive>LDF4B_SPARRING_Y</aggressive>
     <none>PC_DARK</none>
@@ -2044,7 +2044,7 @@
     <neutral>FIELD_OBJECT_ALL FIELD_OBJECT_LIGHT FIELD_OBJECT_DARK IDF5_U1_WAR_01_REWARD</neutral>
     <support>PC_DARK IDF5_U1_WAR_01_GUARD_DARK</support>
   </tribe>
-  <tribe name="IDF5_U1_WAR_01_REWARD" base="MONSTER" />
+  <tribe name="IDF5_U1_WAR_01_REWARD" base="MONSTER"/>
   <tribe name="IDF5_U3_VRITRA" base="MONSTER">
     <aggressive>PC PC_DARK</aggressive>
     <hostile>IDF5_U3_OBJ</hostile>
@@ -2331,8 +2331,8 @@
     <hostile>WORLDRAID_MONSTER_SANDWORMSUM</hostile>
     <friendly>GUARD GUARD_DARK GUARD_DRAGON NEUTRAL_GUARD MONSTER AGGRESSIVESINGLEMONSTER AGGRESSIVESUPPORTMONSTER XDRAKAN VRITRA WORLDRAID_MONSTER</friendly>
   </tribe>
-  <tribe name="LDF5_DUMMY1" base="MONSTER" />
-  <tribe name="LDF5_DUMMY2" base="MONSTER" />
+  <tribe name="LDF5_DUMMY1" base="MONSTER"/>
+  <tribe name="LDF5_DUMMY2" base="MONSTER"/>
   <tribe name="LDF5_DUMMY1_LGUARD" base="GENERAL">
     <aggressive>LDF5_DUMMY1</aggressive>
     <neutral>LDF5_DUMMY2</neutral>
@@ -2525,8 +2525,8 @@
   <tribe name="IDSTATION_GUIDE" base="GENERAL">
     <none>PC PC_DARK IDSTATION_POLYMORPH IDSTATION_MONSTER</none>
   </tribe>
-  <tribe name="AB1_DOOR_LI" base="GENERAL" />
-  <tribe name="AB1_DOOR_DA" base="GENERAL_DARK" />
+  <tribe name="AB1_DOOR_LI" base="GENERAL"/>
+  <tribe name="AB1_DOOR_DA" base="GENERAL_DARK"/>
   <tribe name="AB1_DOORKILLER" base="NONE">
     <aggressive>AB1_DOOR_DA AB1_DOOR_LI</aggressive>
   </tribe>
@@ -2679,8 +2679,8 @@
     <aggressive>PC PC_DARK DF5_MERMAN</aggressive>
     <support>DF5_FRILLFAIMAM</support>
   </tribe>
-  <tribe name="DF5_DUMMY1" base="MONSTER" />
-  <tribe name="DF5_DUMMY2" base="MONSTER" />
+  <tribe name="DF5_DUMMY1" base="MONSTER"/>
+  <tribe name="DF5_DUMMY2" base="MONSTER"/>
   <tribe name="DF5_DUMMY1_DGUARD" base="GENERAL_DARK">
     <aggressive>DF5_DUMMY1</aggressive>
     <neutral>DF5_DUMMY2</neutral>
@@ -2699,8 +2699,8 @@
   <tribe name="DF5_MERMAN_MURATUN" base="USEALL">
     <hostile>DF5_MERMAN</hostile>
   </tribe>
-  <tribe name="LF5_DUMMY1" base="MONSTER" />
-  <tribe name="LF5_DUMMY2" base="MONSTER" />
+  <tribe name="LF5_DUMMY1" base="MONSTER"/>
+  <tribe name="LF5_DUMMY2" base="MONSTER"/>
   <tribe name="LF5_DUMMY1_LGUARD" base="GUARD">
     <aggressive>LF5_DUMMY1</aggressive>
     <neutral>LF5_DUMMY2 DUMMY LDF5_DUMMY1 LDF5_DUMMY2</neutral>
@@ -3379,7 +3379,7 @@
   <tribe name="IDTRANSFORM_TRANS_NPC" base="GENERAL">
     <aggressive>IDTRANSFORM_DRAGON_CINEMA</aggressive>
   </tribe>
-  <tribe name="ERESUKIGAL_ENEMY" base="USEALL" />
+  <tribe name="ERESUKIGAL_ENEMY" base="USEALL"/>
   <tribe name="DREADGION_TANK" base="MONSTER">
     <aggressive>ERESUKIGAL_ENEMY_WEAPON</aggressive>
     <neutral>PC PC_DARK</neutral>
@@ -3411,8 +3411,8 @@
   <tribe name="ERESUKIGAL_ENEMY_WEAPON_02" base="USEALL">
     <hostile>ERESUKIGAL DREADGION_MODULE ERESUKIGAL_DREAD</hostile>
   </tribe>
-  <tribe name="DREADGION_MODULE_WEAPON" base="NONE" />
-  <tribe name="DREADGION_SUB_NPC" base="NONE" />
+  <tribe name="DREADGION_MODULE_WEAPON" base="NONE"/>
+  <tribe name="DREADGION_SUB_NPC" base="NONE"/>
   <tribe name="ERESUKIGAL_BOMB" base="MONSTER">
     <none>ERESUKIGAL_ENEMY_WEAPON_02</none>
   </tribe>
@@ -3611,7 +3611,7 @@
     <aggressive>PC PC_DARK IDINFINITY_MEAT</aggressive>
     <support>IDINFINITY</support>
   </tribe>
-  <tribe name="IDINFINITY_MEAT" base="USEALL" />
+  <tribe name="IDINFINITY_MEAT" base="USEALL"/>
   <tribe name="IDINFINITY_NAMED" base="MONSTER">
     <aggressive>PC PC_DARK</aggressive>
     <hostile>IDINFINITY_TARGET</hostile>
@@ -3733,7 +3733,7 @@
     <aggressive>PC PC_DARK IDF7_WEAPON_NEPILIM IDF7_WEAPON_POLYMORPH</aggressive>
     <support>IDF7_WEAPON</support>
   </tribe>
-  <tribe name="IDF7_WEAPON_BOX" base="MONSTER" />
+  <tribe name="IDF7_WEAPON_BOX" base="MONSTER"/>
   <tribe name="IDF7_WEAPON_OIL" base="MONSTER">
     <hostile>IDF7_WEAPON PC PC_DARK</hostile>
   </tribe>
@@ -3895,8 +3895,8 @@
   <tribe name="IDBC_NPC_DARK" base="GENERAL_DARK">
     <friendly>PC_DARK IDBC_DARK_BOSS</friendly>
   </tribe>
-  <tribe name="PANDORARAID_ENERGY_LIGHT" base="FIELD_OBJECT_LIGHT" />
-  <tribe name="PANDORARAID_ENERGY_DARK" base="FIELD_OBJECT_DARK" />
+  <tribe name="PANDORARAID_ENERGY_LIGHT" base="FIELD_OBJECT_LIGHT"/>
+  <tribe name="PANDORARAID_ENERGY_DARK" base="FIELD_OBJECT_DARK"/>
   <tribe name="IDBC_POL_LIGHT" base="PC">
     <friendly>IDBC_LIGHT IDBC_NPC_LIGHT</friendly>
   </tribe>
@@ -3907,8 +3907,8 @@
     <aggressive>PANDORARAID_ENERGY_LIGHT PANDORARAID_ENERGY_DARK LDF8_LEGION_DIGGER_L LDF8_LEGION_DIGGER_D</aggressive>
     <neutral>PC PC_DARK</neutral>
   </tribe>
-  <tribe name="LDF7_SEP_EVENT_L" base="GENERAL" />
-  <tribe name="LDF7_SEP_EVENT_D" base="GENERAL_DARK" />
+  <tribe name="LDF7_SEP_EVENT_L" base="GENERAL"/>
+  <tribe name="LDF7_SEP_EVENT_D" base="GENERAL_DARK"/>
   <tribe name="EVENT_OCT_BEHOLDER_REAL" base="GENERAL">
     <hostile>EVENT_OCT_DEBRIE_POLYMORPH</hostile>
     <friendly>GENERAL_DARK</friendly>
@@ -3964,7 +3964,7 @@
     <aggressive>PC</aggressive>
     <friendly>MONSTER PROTECTGUARD_DARK_F2A F6_EVENT_DA F6_EVENT_ATTACKER_DA F6_EVENT_CANNON_DA LDF7_EVENT XDRAKAN XDRAKAN_ELEMENTALIST XDRAKAN_PET XDRAKAN_PRIEST XDRAKAN_SERVANT</friendly>
   </tribe>
-  <tribe name="LDF8_DEF_NAKI" base="USEALL" />
+  <tribe name="LDF8_DEF_NAKI" base="USEALL"/>
   <tribe name="IDF8_HOUSE_BOSS" base="MONSTER">
     <aggressive>PC PC_DARK IDF8_HOUSE_FIRE</aggressive>
     <friendly>IDF8_HOUSE_BOSS</friendly>

@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-	Portal Location
-	Made By (Encom)
+	Portal Location. Made By (Encom)
  -->
 <portal_locs xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="portal_loc.xsd">
-	<!-- ZONES ELYOS -->
 	<!-- Sanctum -->
 	<portal_loc world_id="110010000" loc_id="1100100" x="1364.1963" y="1516.2437" z="569.1655" h="103"/> <!-- Obelisk 5.3 -->
 	<portal_loc world_id="110010000" loc_id="1100101" x="2006.8076" y="1478.2644" z="592.2286" h="53"/>
@@ -129,8 +127,7 @@
 	<!-- Oriel 3.0 -->
 	<portal_loc world_id="700010000" loc_id="7000100" x="1274.8541" y="1867.3999" z="97.44662" h="41"/>
 	<portal_loc world_id="700010000" loc_id="7000101" x="1294" y="1863" z="97.635" h="71"/>
-	
-	<!-- ZONES ASMODIANS -->
+
 	<!-- Pandaemonium -->
 	<portal_loc world_id="120010000" loc_id="1200100" x="1608.1211" y="1389.1041" z="193.12836" h="43"/> <!-- Obelisk 5.3 -->
 	<portal_loc world_id="120010000" loc_id="1200102" x="1392" y="1060.3" z="206.1" h="0"/>
@@ -274,7 +271,7 @@
 	<portal_loc world_id="400010000" loc_id="4000108" x="2205.0696" y="2418.8618" z="1364.4973" h="26"/> <!-- Dark Poeta Exit -->
 	<portal_loc world_id="400010000" loc_id="4000109" x="1781.1814" y="149.26476" z="2938.2583" h="93"/> <!-- Redemption Landing Entrance -->
 	<portal_loc world_id="400010000" loc_id="4000110" x="1778.265" y="167.84805" z="2938.3198" h="33"/> <!-- Redemption Landing Exit -->
-	<portal_loc world_id="400010000" loc_id="4000111" x="975.7076" y="2876.7795" z="3034.0413" h="34" /> <!-- Harbinger's Landing Entrance -->
+	<portal_loc world_id="400010000" loc_id="4000111" x="975.7076" y="2876.7795" z="3034.0413" h="34"/> <!-- Harbinger's Landing Entrance -->
 	<portal_loc world_id="400010000" loc_id="4000112" x="980.22296" y="2857.692" z="3034.0693" h="95"/> <!-- Harbinger's Landing Exit -->
 	<!-- Shugo Negociator 5.3 -->
 	<portal_loc world_id="400010000" loc_id="4000113" x="499.559" y="777.7003" z="1485.0754" h="36"/> <!-- Oharunerk's Boat -->
