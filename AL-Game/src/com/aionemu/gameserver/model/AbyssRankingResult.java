@@ -1,6 +1,4 @@
 /*
-
- *
  *  Encom is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -33,13 +31,12 @@ public class AbyssRankingResult {
 	private int playerId;
 
 	private String legionName;
-	private int cp;
+	private long cp;
 	private int legionId;
 	private int legionLevel;
 	private int legionMembers;
 
-	public AbyssRankingResult(String playerName, int playerAbyssRank, int playerId, int ap, int gp, int title,
-			PlayerClass playerClass, int playerLevel, String legionName, int oldRankPos, int rankPos) {
+	public AbyssRankingResult(String playerName, int playerAbyssRank, int playerId, int ap, int gp, int title, PlayerClass playerClass, int playerLevel, String legionName, int oldRankPos, int rankPos) {
 		this.playerName = playerName;
 		this.playerAbyssRank = playerAbyssRank;
 		this.playerId = playerId;
@@ -53,8 +50,7 @@ public class AbyssRankingResult {
 		this.rankPos = rankPos;
 	}
 
-	public AbyssRankingResult(int cp, String legionName, int legionId, int legionLevel, int legionMembers,
-			int oldRankPos, int rankPos) {
+	public AbyssRankingResult(long cp, String legionName, int legionId, int legionLevel, int legionMembers, int oldRankPos, int rankPos) {
 		this.oldRankPos = oldRankPos;
 		this.rankPos = rankPos;
 		this.cp = cp;
@@ -111,7 +107,7 @@ public class AbyssRankingResult {
 		return legionName;
 	}
 
-	public int getLegionCP() {
+	public long getLegionCP() {
 		return cp;
 	}
 

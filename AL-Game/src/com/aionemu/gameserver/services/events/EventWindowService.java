@@ -1,5 +1,4 @@
 /*
- *
  *  Encom is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -79,7 +78,6 @@ public class EventWindowService {
 			}
 			if (player.getLevel() >= eventsWindow.getMinLevel() && player.getLevel() <= eventsWindow.getMaxLevel()) {
 				activeEventsForPlayer.put(eventsWindow.getId(), eventsWindow);
-				log.info("[EventWindowService] Start " + eventsWindow.getPeriodStart() + " End " + eventsWindow.getPeriodEnd());
 			}
 		}
 		return activeEventsForPlayer;
@@ -106,8 +104,7 @@ public class EventWindowService {
 			}
 			sendActiveEventsForPlayer.put(eventsWindow.getId(), eventsWindow);
 			if (!playerEventsWindowDAO.getEventsWindow(accountId).contains(eventsWindow.getId())) {
-				playerEventsWindowDAO.insert(accountId, eventsWindow.getId(),
-						new Timestamp(System.currentTimeMillis()));
+				playerEventsWindowDAO.insert(accountId, eventsWindow.getId(), new Timestamp(System.currentTimeMillis()));
 			} else {
 				playerEventsWindowDAO.store(accountId, eventsWindow.getId(), new Timestamp(System.currentTimeMillis()), elapsed); // Temp for updating TiemStamp
 			}

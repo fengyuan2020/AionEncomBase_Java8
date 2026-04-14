@@ -92,6 +92,7 @@ public class RvrService {
 	}
 
 	public void startRvr(final int id) {
+		if (CustomConfig.RVR_ENABLED) {
 		final Rvrlf3df3<?> directPortal;
 		synchronized (this) {
 			if (activeRvr.containsKey(id)) {
@@ -110,6 +111,7 @@ public class RvrService {
 				stopRvr(id);
 			}
 		}, duration * 3600 * 1000);
+        }
 	}
 
 	public void stopRvr(int id) {

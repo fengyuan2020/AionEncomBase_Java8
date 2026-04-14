@@ -618,7 +618,6 @@ public class DialogService {
             case 44: {
                 // Flight & Teleport.
                 if (CustomConfig.ENABLE_SIMPLE_2NDCLASS) {
-                    // Просто показываем карту без проверки уровня
                     TeleportService2.showMap(player, targetObjectId, npc.getNpcId());
                 } else {
                     int level = player.getLevel();

@@ -1,6 +1,4 @@
 /*
-
- *
  *  Encom is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -255,16 +253,16 @@ public class GatherableController extends VisibleObjectController<Gatherable> {
 	 */
 	public void startGatherProtection(Player player) {
 		if (CraftConfig.PROTECTION_GATHER_ENABLE) {
-			player.getEffectController().setAbnormal(AbnormalState.HIDE.getId());
 			player.setVisualState(CreatureVisualState.HIDE3);
 			PacketSendUtility.broadcastPacket(player, new SM_PLAYER_STATE(player), true);
 		}
 	}
 
 	public void stopGatherProtection(Player player) {
-		player.getEffectController().unsetAbnormal(AbnormalState.HIDE.getId());
-		player.unsetVisualState(CreatureVisualState.HIDE3);
-		PacketSendUtility.broadcastPacket(player, new SM_PLAYER_STATE(player), true);
+        if (CraftConfig.PROTECTION_GATHER_ENABLE) {
+		    player.unsetVisualState(CreatureVisualState.HIDE3);
+		    PacketSendUtility.broadcastPacket(player, new SM_PLAYER_STATE(player), true);
+        }
 	}
 
 	@Override

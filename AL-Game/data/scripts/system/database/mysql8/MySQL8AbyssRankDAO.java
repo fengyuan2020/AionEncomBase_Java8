@@ -244,7 +244,7 @@ public class MySQL8AbyssRankDAO extends AbyssRankDAO {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     String name = rs.getString("legions.name");
-                    int cp = rs.getInt("legions.contribution_points");
+                    long cp = rs.getLong("legions.contribution_points");
                     int legionId = rs.getInt("legions.id");
                     int legionLevel = rs.getInt("lvl");
                     int legionMembers = getLegionMembersCount(legionId);

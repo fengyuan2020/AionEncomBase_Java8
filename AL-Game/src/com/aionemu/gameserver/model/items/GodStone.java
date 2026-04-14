@@ -1,6 +1,4 @@
 /*
-
- *
  *  Encom is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -113,9 +111,7 @@ public class GodStone extends ItemStone {
     }
 
     private boolean validateEquipConditions(Player player) {
-        return godstoneInfo != null && 
-               godItem != null && 
-               getEquippedItem(player) != null;
+        return godstoneInfo != null && godItem != null && getEquippedItem(player) != null;
     }
 
     private Item getEquippedItem(Player player) {
@@ -132,12 +128,10 @@ public class GodStone extends ItemStone {
     }
 
     private float calculateBreakChance() {
-        return Math.min(godstoneInfo.getBreakprob() / 1000f, 0.9f) / 
-               Math.max(CustomConfig.ILLUSION_GODSTONE_BREAK_RATE, 0.1f);
+        return Math.min(godstoneInfo.getBreakprob() / 1000f, 0.9f) / Math.max(CustomConfig.ILLUSION_GODSTONE_BREAK_RATE, 0.1f);
     }
 
-    private void setupAttackListener(Player player, Item equippedItem, 
-                                   int handProbability, float breakChance) {
+    private void setupAttackListener(Player player, Item equippedItem, int handProbability, float breakChance) {
         actionListener = new ActionObserver(ObserverType.ATTACK) {
             @Override
             public void attack(Creature creature) {
@@ -147,8 +141,7 @@ public class GodStone extends ItemStone {
         player.getObserveController().addObserver(actionListener);
     }
     
-    private void handleAttack(Player player, Creature creature, Item equippedItem,
-                            int handProbability, float breakChance) {
+    private void handleAttack(Player player, Creature creature, Item equippedItem, int handProbability, float breakChance) {
         // 所有武器类型都使用同步锁防止重复触发
         synchronized (this) {
             if (isProcessingAttack) {
@@ -167,12 +160,8 @@ public class GodStone extends ItemStone {
                 
                 // 只有当技能可以使用时才发送提示和应用效果
                 if (skill.canUseSkill()) {
-                    // 发送技能触发提示
-                    notifySkillTrigger(player, skill);
-                    
                     // 应用技能效果
-                    Effect effect = new Effect(
-                        player, creature, skill.getSkillTemplate(), 1, 0, godItem
+                    Effect effect = new Effect(player, creature, skill.getSkillTemplate(), 1, 0, godItem
                     );
                     effect.initialize();
                     effect.applyEffect();
@@ -194,46 +183,15 @@ public class GodStone extends ItemStone {
     }
 
     private boolean checkTriggerCondition(int handProbability) {
-        // 将概率值转换为0-1之间的浮点数
-        float baseProbability = handProbability / 1000f;
-        
-        // PRD算法核心：实际概率 = 基础概率 * (计数器+1)
-        float actualProbability = baseProbability * (triggerCounter + 1);
-        
-        // 随机判断是否触发
-        boolean triggered = Rnd.get(0, 1000) <= (int)(actualProbability * 1000);
-        
-        if (triggered) {
-            triggerCounter = 0; // 触发后重置计数器
-        } else {
-            triggerCounter++;   // 未触发时增加计数器
-        }
-        return triggered;
+        return Rnd.get(0, 1000) < handProbability;
     }
 
     private boolean checkBreakCondition(float breakChance) {
-        return godstoneInfo.getBreakable() && 
-               !breakProc && 
-               Rnd.get(1000) < (int)(breakChance * 1000);
+        return godstoneInfo.getBreakable() && !breakProc && Rnd.get(1000) < (int)(breakChance * 1000);
     }
 
     private Skill createSkill(Player player, Creature creature) {
-        return SkillEngine.getInstance().getSkill(
-            player, 
-            godstoneInfo.getSkillid(),
-            godstoneInfo.getSkilllvl(), 
-            player.getTarget(), 
-            godItem
-        );
-    }
-
-    private void notifySkillTrigger(Player player, Skill skill) {
-        PacketSendUtility.sendPacket(
-            player,
-            SM_SYSTEM_MESSAGE.STR_SKILL_PROC_EFFECT_OCCURRED(
-                skill.getSkillTemplate().getNameId()
-            )
-        );
+        return SkillEngine.getInstance().getSkill(player, godstoneInfo.getSkillid(), godstoneInfo.getSkilllvl(), player.getTarget(), godItem);
     }
 
     private void applySkillEffect(Player player, Creature creature, Skill skill) {
@@ -252,9 +210,7 @@ public class GodStone extends ItemStone {
 
     private void notifyBreakMessages(Player player, Item equippedItem) {
         // 立即发送损坏消息
-        PacketSendUtility.sendPacket(player, new SM_SYSTEM_MESSAGE(1402536,
-                new DescriptionId(equippedItem.getNameId()), 
-                new DescriptionId(godItem.getNameId())));
+        PacketSendUtility.sendPacket(player, new SM_SYSTEM_MESSAGE(1402536, new DescriptionId(equippedItem.getNameId()), new DescriptionId(godItem.getNameId())));
         
         // 定时消息提醒（保持原有时间间隔）
         sendScheduledMessages(player, equippedItem);
@@ -262,25 +218,13 @@ public class GodStone extends ItemStone {
 
     private void sendScheduledMessages(Player player, Item equippedItem) {
         // 10分钟后提醒
-        PacketSendUtility.playerSendPacketTime(player, 
-            new SM_SYSTEM_MESSAGE(1402237,
-                new DescriptionId(equippedItem.getNameId()), 
-                new DescriptionId(godItem.getNameId())), 
-            600000);
+        PacketSendUtility.playerSendPacketTime(player, new SM_SYSTEM_MESSAGE(1402237, new DescriptionId(equippedItem.getNameId()), new DescriptionId(godItem.getNameId())), 600000);
         
         // 5分钟后提醒
-        PacketSendUtility.playerSendPacketTime(player,
-            new SM_SYSTEM_MESSAGE(1402537,
-                new DescriptionId(equippedItem.getNameId()),
-                new DescriptionId(godItem.getNameId()), 5), 
-            300000);
+        PacketSendUtility.playerSendPacketTime(player, new SM_SYSTEM_MESSAGE(1402537, new DescriptionId(equippedItem.getNameId()), new DescriptionId(godItem.getNameId()), 5), 300000);
         
         // 60秒前提醒
-        PacketSendUtility.playerSendPacketTime(player,
-            new SM_SYSTEM_MESSAGE(1402538,
-                new DescriptionId(equippedItem.getNameId()),
-                new DescriptionId(godItem.getNameId()), 60), 
-            540000);
+        PacketSendUtility.playerSendPacketTime(player, new SM_SYSTEM_MESSAGE(1402538, new DescriptionId(equippedItem.getNameId()), new DescriptionId(godItem.getNameId()), 60), 540000);
     }
 
     private void scheduleItemRemoval(Player player, Item equippedItem) {
@@ -290,8 +234,7 @@ public class GodStone extends ItemStone {
             setPersistentState(PersistentState.DELETED);
             ItemPacketService.updateItemAfterInfoChange(player, equippedItem);
             DAOManager.getDAO(InventoryDAO.class).store(equippedItem, player);
-            PacketSendUtility.sendPacket(player, 
-                new SM_INVENTORY_UPDATE_ITEM(player, equippedItem));
+            PacketSendUtility.sendPacket(player, new SM_INVENTORY_UPDATE_ITEM(player, equippedItem));
         }, 600000); // 10分钟后执行
     }
 

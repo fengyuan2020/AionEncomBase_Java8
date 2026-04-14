@@ -16,19 +16,24 @@
  */
 package admincommands;
 
+import com.aionemu.gameserver.model.DescriptionId;
 import com.aionemu.gameserver.configs.administration.CommandsConfig;
 import com.aionemu.gameserver.dataholders.DataManager;
 import com.aionemu.gameserver.model.gameobjects.Item;
 import com.aionemu.gameserver.model.gameobjects.PersistentState;
 import com.aionemu.gameserver.model.gameobjects.VisibleObject;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
+import com.aionemu.gameserver.model.gameobjects.PersistentState;
+import com.aionemu.gameserver.services.SkillLearnService;
 import com.aionemu.gameserver.model.items.ManaStone;
 import com.aionemu.gameserver.model.stats.listeners.ItemEquipmentListener;
 import com.aionemu.gameserver.model.templates.item.ArmorType;
 import com.aionemu.gameserver.model.templates.item.GodstoneInfo;
 import com.aionemu.gameserver.model.templates.item.ItemTemplate;
 import com.aionemu.gameserver.model.templates.item.ItemType;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_INVENTORY_UPDATE_ITEM;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_STATS_INFO;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_SYSTEM_MESSAGE;
 import com.aionemu.gameserver.services.item.ItemPacketService;
 import com.aionemu.gameserver.services.item.ItemSocketService;
 import com.aionemu.gameserver.utils.PacketSendUtility;
@@ -39,8 +44,8 @@ import com.aionemu.gameserver.world.World;
 
 import java.lang.reflect.Field;
 
-public class Equip extends AdminCommand
-{
+public class Equip extends AdminCommand {
+
 	public Equip() {
 		super("equip");
 	}
@@ -233,19 +238,41 @@ public class Equip extends AdminCommand
 					enchant = 25;
 				} if (enchant < 0) {
 					enchant = 0;
-				} if (enchant > targetItem.getItemTemplate().getMaxEnchantLevel()) {
-					targetItem.setAmplification(true);
-				} if (enchant > 20) {
-					int skillId = getRndSkills(targetItem);
-					targetItem.setAmplificationSkill(skillId);
 				}
+
+                if (enchant < 20 && targetItem.getAmplificationSkill() != 0) {
+                   int oldSkillId = targetItem.getAmplificationSkill();
+                   if (targetItem.isEquipped() && player.getSkillList().isSkillPresent(oldSkillId)) {
+                      SkillLearnService.removeSkill(player, oldSkillId);
+                      player.getController().updatePassiveStats();
+                   }
+                   targetItem.setAmplificationSkill(0);
+                   targetItem.setAmplification(false);
+                }
+            
+                if (enchant >= 20) {
+                    targetItem.setAmplification(true);
+                    if (targetItem.getAmplificationSkill() == 0) {
+                        int skillId = getRndSkills(targetItem);
+                        targetItem.setAmplificationSkill(skillId);
+			            targetItem.setPersistentState(PersistentState.UPDATE_REQUIRED);
+			            PacketSendUtility.sendPacket(player, new SM_INVENTORY_UPDATE_ITEM(player, targetItem));
+			            PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_EXCEED_SKILL_ENCHANT(new DescriptionId(targetItem.getNameId()), targetItem.getEnchantLevel(), getRndSkills(targetItem)));
+                        if (targetItem.isEquipped()) {
+                            player.getSkillList().addSkill(player, skillId, 1);
+                            player.getController().updatePassiveStats();
+                        }
+                    }
+                }
 				targetItem.setEnchantLevel(enchant);
+
 				if (targetItem.isEquipped()) {
 					player.getGameStats().updateStatsVisually();
 				}
 				ItemPacketService.updateItemAfterInfoChange(player, targetItem);
 			}
-		} if (player == admin) {
+		}
+        if (player == admin) {
 			PacketSendUtility.sendMessage(player, "All equipped items were enchanted to level " + enchant);
 		} else {
 			PacketSendUtility.sendMessage(admin, "All equipped items by the Player " + player.getName() + " were enchanted to " + enchant);

@@ -1,6 +1,4 @@
 /*
-
- *
  *  Encom is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -124,8 +122,7 @@ public class EnchantService {
 			number = Rnd.get(880, 1000);
 			break;
 		}
-		// Extracting Archdaeva equipment will give Enchantment Stone Dust and Archdaeva
-		// crafting materials.
+		// Extracting Archdaeva equipment will give Enchantment Stone Dust and Archdaeva crafting materials.
 		// add custom for Disable Enchantment Stone Broke Item
 		if (targetItem.isArchDaevaItem() && EnchantsConfig.ENABLE_ARCHDAEVA_ITEM_BROKE) {
 			ItemService.addItem(player, RndArray.get(archDaevaStoneItems), 1);
@@ -163,18 +160,14 @@ public class EnchantService {
 		final int parentObjectId = parentItem.getObjectId();
 		final int parentNameId = parentItem.getNameId();
 		final int targetEnchantLvl = targetItem.getEnchantLevel();
-		PacketSendUtility.broadcastPacket(player,
-				new SM_ITEM_USAGE_ANIMATION(player.getObjectId(), parentItem.getObjectId(), parentItemId, 5000, 0, 0),
-				true);
+		PacketSendUtility.broadcastPacket(player, new SM_ITEM_USAGE_ANIMATION(player.getObjectId(), parentItem.getObjectId(), parentItemId, 5000, 0, 0), true);
 		final ItemUseObserver observer = new ItemUseObserver() {
 			@Override
 			public void abort() {
 				player.getController().cancelTask(TaskId.ITEM_USE);
 				player.removeItemCoolDown(parentItem.getItemTemplate().getUseLimits().getDelayId());
-				PacketSendUtility.sendPacket(player,
-						SM_SYSTEM_MESSAGE.STR_MSG_STIGMA_ENCHANT_CANCEL(new DescriptionId(parentNameId)));
-				PacketSendUtility.broadcastPacket(player,
-						new SM_ITEM_USAGE_ANIMATION(player.getObjectId(), parentObjectId, parentItemId, 0, 2, 0), true);
+				PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_STIGMA_ENCHANT_CANCEL(new DescriptionId(parentNameId)));
+				PacketSendUtility.broadcastPacket(player, new SM_ITEM_USAGE_ANIMATION(player.getObjectId(), parentObjectId, parentItemId, 0, 2, 0), true);
 				player.getObserveController().removeObserver(this);
 			}
 		};
@@ -184,26 +177,20 @@ public class EnchantService {
 			public void run() {
 				if (isEstimaSuccess) {
 					player.getObserveController().removeObserver(observer);
-					PacketSendUtility.broadcastPacket(player,
-							new SM_ITEM_USAGE_ANIMATION(player.getObjectId(), parentObjectId, parentItemId, 0, 1, 1),
-							true);
+					PacketSendUtility.broadcastPacket(player, new SM_ITEM_USAGE_ANIMATION(player.getObjectId(), parentObjectId, parentItemId, 0, 1, 1), true);
 					player.getInventory().decreaseByObjectId(parentObjectId, 1);
 					targetItem.setEnchantLevel(targetEnchantLvl + 1);
-					PacketSendUtility.sendPacket(player,
-							SM_SYSTEM_MESSAGE.STR_MSG_STIGMA_ENCHANT_SUCCESS(new DescriptionId(parentNameId)));
+					PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_STIGMA_ENCHANT_SUCCESS(new DescriptionId(parentNameId)));
 				} else {
 					player.getInventory().decreaseByObjectId(parentObjectId, 1);
 					targetItem.setEnchantLevel(0);
 					PacketSendUtility.sendPacket(player, new SM_INVENTORY_UPDATE_ITEM(player, targetItem));
-					PacketSendUtility.sendPacket(player,
-							SM_SYSTEM_MESSAGE.STR_MSG_STIGMA_ENCHANT_FAIL(new DescriptionId(parentNameId)));
+					PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_STIGMA_ENCHANT_FAIL(new DescriptionId(parentNameId)));
 				}
 				player.getObserveController().removeObserver(observer);
 				PacketSendUtility.sendPacket(player, new SM_INVENTORY_UPDATE_ITEM(player, targetItem));
 				ItemPacketService.updateItemAfterInfoChange(player, targetItem);
-				PacketSendUtility.broadcastPacketAndReceive(player,
-						new SM_ITEM_USAGE_ANIMATION(player.getObjectId(), parentItem.getObjectId(),
-								parentItem.getItemTemplate().getTemplateId(), 0, isEstimaSuccess ? 1 : 2, 0));
+				PacketSendUtility.broadcastPacketAndReceive(player, new SM_ITEM_USAGE_ANIMATION(player.getObjectId(), parentItem.getObjectId(), parentItem.getItemTemplate().getTemplateId(), 0, isEstimaSuccess ? 1 : 2, 0));
 			}
 		}, 5000));
 	}
@@ -297,14 +284,13 @@ public class EnchantService {
 			result = true;
 		}
 		if (player.getAccessLevel() > 0) {
-			PacketSendUtility.sendMessage(player,
-					(result ? "Success" : "Fail") + " Rnd:" + random + " Luck:" + success);
+			PacketSendUtility.sendMessage(player, (result ? "Success" : "Fail") + " Rnd:" + random + " Luck:" + success);
 		}
 		return result;
 	}
 
-	public static void enchantItemAct(Player player, Item parentItem, Item targetItem, Item supplementItem,
-			int currentEnchant, boolean result) {
+	public static void enchantItemAct(Player player, Item parentItem, Item targetItem, Item supplementItem, int currentEnchant, boolean result) {
+        int oldEnchant = currentEnchant; 
 		int addLevel = Rnd.get(1, 2);
 		int critLevel = Rnd.get(1, 2);
 		int EnchantKinah = EnchantService.EnchantKinah(targetItem);
@@ -371,17 +357,10 @@ public class EnchantService {
 			case UNIQUE:
 			case EPIC:
 			case MYTHIC:
-				if (currentEnchant > 15 && !targetItem.isAmplified()) {
-					currentEnchant = 15;
-				} else if (!EnchantsConfig.ENABLE_ARCHDAEVA_ITEM_BROKE && targetItem.isAmplified()
-						&& parentItem.getItemId() >= 166020000 && parentItem.getItemId() <= 166020005
-						&& parentItem.getItemId() >= 166000196 && parentItem.getItemId() <= 166000197) {
+				if (!EnchantsConfig.ENABLE_ARCHDAEVA_ITEM_BROKE && targetItem.isAmplified() && parentItem.getItemId() >= 166020000 && parentItem.getItemId() <= 166020005 && parentItem.getItemId() >= 166000196 && parentItem.getItemId() <= 166000197) {
 					currentEnchant += 1;
-				} else if (targetItem.isAmplified() && parentItem.getItemId() >= 166022000
-						&& parentItem.getItemId() <= 166022007) {
+				} else if (targetItem.isAmplified() && parentItem.getItemId() >= 166022000 && parentItem.getItemId() <= 166022007) {
 					currentEnchant += critLevel;
-				} else if (currentEnchant == 15 && !targetItem.isAmplified()) {
-					return;
 				} else if (currentEnchant + addLevel <= 15) {
 					currentEnchant += addLevel;
 				} else if (((addLevel - 1) > 1) && ((currentEnchant + addLevel - 1) <= 15)) {
@@ -406,8 +385,7 @@ public class EnchantService {
 				targetItem.setAmplificationSkill(0);
 				if (player.getSkillList().isSkillPresent(skillId)) {
 					SkillLearnService.removeSkill(player, skillId);
-					PacketSendUtility.sendPacket(player,
-							SM_SYSTEM_MESSAGE.STR_MSG_EXCEED_SKILL_DELETE(new DescriptionId(targetItem.getNameId())));
+					PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_EXCEED_SKILL_DELETE(new DescriptionId(targetItem.getNameId())));
 				}
 			} else if (currentEnchant >= 10 && currentEnchant <= 25 && !targetItem.isAmplified()) {
 				currentEnchant = 10;
@@ -420,8 +398,7 @@ public class EnchantService {
 		/**
 		 * New Amplified Start MaxEnchant Auto Amplified True
 		 */
-		if (!targetItem.isAmplified()
-				&& targetItem.getEnchantLevel() == targetItem.getItemTemplate().getMaxEnchantLevel()) {
+		if (!targetItem.isAmplified() && targetItem.getEnchantLevel() == targetItem.getItemTemplate().getMaxEnchantLevel()) {
 			targetItem.setAmplification(true);
 		}
 		if (targetItem.isEquipped()) {
@@ -433,18 +410,14 @@ public class EnchantService {
 		} else {
 			player.getInventory().setPersistentState(PersistentState.UPDATE_REQUIRED);
 		}
-		// Strengthen Topped Item 4.7.5
-		// http://aionpowerbook.com/powerbook/5.5_-_Enchanting_System
-		if (targetItem.isAmplified() && targetItem.getEnchantLevel() == 16) {
+		// Strengthen Topped Item 4.7.5 http://aionpowerbook.com/powerbook/5.5_-_Enchanting_System
+		if (targetItem.isAmplified() && targetItem.getEnchantLevel() == 20) {
 			targetItem.setAmplificationSkill(getRndSkills(targetItem));
 			targetItem.setPersistentState(PersistentState.UPDATE_REQUIRED);
 			PacketSendUtility.sendPacket(player, new SM_INVENTORY_UPDATE_ITEM(player, targetItem));
-			PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_EXCEED_SKILL_ENCHANT(
-					new DescriptionId(targetItem.getNameId()), targetItem.getEnchantLevel(), getRndSkills(targetItem)));
+			PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_EXCEED_SKILL_ENCHANT(new DescriptionId(targetItem.getNameId()), targetItem.getEnchantLevel(), getRndSkills(targetItem)));
 			/**
-			 * after we have recived amplification skill we need to add stats to passive
-			 * skills4Glove same as just to not re equip item - add skill to skill list but
-			 * iteam must be equiped
+			 * after we have recived amplification skill we need to add stats to passive skills4Glove same as just to not re equip item - add skill to skill list but iteam must be equiped
 			 */
 			if (targetItem.isEquipped()) {
 				player.getSkillList().addSkill(player, targetItem.getAmplificationSkill(), 1);
@@ -459,29 +432,23 @@ public class EnchantService {
 			}
 		}
 		if (result) {
+            int realIncrease = currentEnchant - oldEnchant; 
 			if (critLevel != 0) {
-				PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE
-						.STR_MSG_ENCHANT_ITEM_SUCCEED_NEW(new DescriptionId(targetItem.getNameId()), critLevel));
+                PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_ENCHANT_ITEM_SUCCEED_NEW(new DescriptionId(targetItem.getNameId()), realIncrease));
 			} else {
-				PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE
-						.STR_MSG_ENCHANT_ITEM_SUCCEED_NEW(new DescriptionId(targetItem.getNameId()), addLevel));
+                PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_ENCHANT_ITEM_SUCCEED_NEW(new DescriptionId(targetItem.getNameId()), realIncrease));
 			}
-			if (targetItem.isAmplified()
-					&& targetItem.getEnchantLevel() == targetItem.getItemTemplate().getMaxEnchantLevel()) {
-				PacketSendUtility.sendPacket(player,
-						SM_SYSTEM_MESSAGE.STR_MSG_CAN_EXCEED_ENCHANT_LEVEL(new DescriptionId(targetItem.getNameId())));
+			if (targetItem.isAmplified() && targetItem.getEnchantLevel() == targetItem.getItemTemplate().getMaxEnchantLevel()) {
+				PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_CAN_EXCEED_ENCHANT_LEVEL(new DescriptionId(targetItem.getNameId())));
 			}
 		} else {
 
-			if (targetItem.isArchDaevaItem() && targetItem.isEquipped() && !isArchdaevaReformedDanuar(targetItem)
-					&& !isArchdaevaRemodeledDanuar(targetItem) && !isArchdaevaRestructuredDanuar(targetItem)
-					&& !isGrayWolfAccessories(targetItem) && !isEnhancedAncientFallusha(targetItem)) {
+			if (targetItem.isArchDaevaItem() && targetItem.isEquipped() && !isArchdaevaReformedDanuar(targetItem) && !isArchdaevaRemodeledDanuar(targetItem) && !isArchdaevaRestructuredDanuar(targetItem) && !isGrayWolfAccessories(targetItem) && !isEnhancedAncientFallusha(targetItem)) {
 				if (EnchantsConfig.ENABLE_ARCHDAEVA_ITEM_BROKE)
 					player.getEquipment().unEquipItem(targetItem.getObjectId(), targetItem.getEquipmentSlot());
 
 				if (targetItem.hasGodStone() && EnchantsConfig.ENABLE_ARCHDAEVA_ITEM_BROKE) {
-					// If the enchant fails, there is a chance that the player will receive their
-					// "Manastones & Godstones" back.
+					// If the enchant fails, there is a chance that the player will receive their "Manastones & Godstones" back.
 					ItemService.addItem(player, targetItem.getGodStone().getItemId(), 1);
 					for (ManaStone manaStone : targetItem.getItemStones()) {
 						ItemService.addItem(player, manaStone.getItemId(), 1);
@@ -490,8 +457,7 @@ public class EnchantService {
 					ItemService.addItem(player, RndArray.get(archDaevaStoneItems), 1);
 				}
 
-				// If the enchant fails, the player will receive "Enchantment Stone Dust" &
-				// "Archdaeva Crafting Materials"
+				// If the enchant fails, the player will receive "Enchantment Stone Dust" && "Archdaeva Crafting Materials"
 				else {
 					if (EnchantsConfig.ENABLE_ARCHDAEVA_ITEM_BROKE) {
 						ItemService.addItem(player, 188100335, 500); // Enchantment Stone Dust.
@@ -500,35 +466,26 @@ public class EnchantService {
 				}
 
 				if (EnchantsConfig.ENABLE_ARCHDAEVA_ITEM_BROKE) {
-					PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE
-							.STR_MSG_ENCHANT_TYPE1_ENCHANT_FAIL(new DescriptionId(targetItem.getNameId())));
+					PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_ENCHANT_TYPE1_ENCHANT_FAIL(new DescriptionId(targetItem.getNameId())));
 				}
-				PacketSendUtility.sendPacket(player,
-						SM_SYSTEM_MESSAGE.STR_ENCHANT_ITEM_FAILED(new DescriptionId(targetItem.getNameId())));
+				PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_ENCHANT_ITEM_FAILED(new DescriptionId(targetItem.getNameId())));
 
 				if (EnchantsConfig.ENABLE_ARCHDAEVA_ITEM_BROKE) {
-					if (!player.getInventory().decreaseByObjectId(targetItem.getObjectId(), 1)
-							&& targetItem.getBonusNumber() < 100) {
+					if (!player.getInventory().decreaseByObjectId(targetItem.getObjectId(), 1) && targetItem.getBonusNumber() < 100) {
 					}
 					PacketSendUtility.sendPacket(player, new SM_INVENTORY_UPDATE_ITEM(player, targetItem));
 					player.getGameStats().updateStatsVisually();
 				}
 			}
-			// If a player enchant a archdaeva equipment in inventory, archdaeva equipment
-			// will be destroyed.
-			// The player receive any "Enchantment Stone Dust" & "Archdaeva Crafting
-			// Materials"
+			// If a player enchant a archdaeva equipment in inventory, archdaeva equipment will be destroyed.
+			// The player receive any "Enchantment Stone Dust" & "Archdaeva Crafting Materials"
 			else if (targetItem.isArchDaevaItem() && EnchantsConfig.ENABLE_ARCHDAEVA_ITEM_BROKE) {
-				PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE
-						.STR_MSG_ENCHANT_TYPE1_ENCHANT_FAIL(new DescriptionId(targetItem.getNameId())));
-				PacketSendUtility.sendPacket(player,
-						SM_SYSTEM_MESSAGE.STR_ENCHANT_ITEM_FAILED(new DescriptionId(targetItem.getNameId())));
-				if (!player.getInventory().decreaseByObjectId(targetItem.getObjectId(), 1)
-						&& targetItem.getBonusNumber() < 100) {
+				PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_ENCHANT_TYPE1_ENCHANT_FAIL(new DescriptionId(targetItem.getNameId())));
+				PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_ENCHANT_ITEM_FAILED(new DescriptionId(targetItem.getNameId())));
+				if (!player.getInventory().decreaseByObjectId(targetItem.getObjectId(), 1) && targetItem.getBonusNumber() < 100) {
 				}
 			} else {
-				PacketSendUtility.sendPacket(player,
-						SM_SYSTEM_MESSAGE.STR_ENCHANT_ITEM_FAILED(new DescriptionId(targetItem.getNameId())));
+				PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_ENCHANT_ITEM_FAILED(new DescriptionId(targetItem.getNameId())));
 			}
 		}
 	}
@@ -691,8 +648,7 @@ public class EnchantService {
 		}
 	}
 
-	public static boolean socketManastone(Player player, Item parentItem, Item targetItem, Item supplementItem,
-			int targetWeapon) {
+	public static boolean socketManastone(Player player, Item parentItem, Item targetItem, Item supplementItem, int targetWeapon) {
 		int targetItemLevel = 1;
 		if (targetWeapon == 1) {
 			targetItemLevel = targetItem.getItemTemplate().getLevel();
@@ -778,13 +734,11 @@ public class EnchantService {
 		return result;
 	}
 
-	public static void socketManastoneAct(Player player, Item parentItem, Item targetItem, Item supplementItem,
-			int targetWeapon, boolean result) {
+	public static void socketManastoneAct(Player player, Item parentItem, Item targetItem, Item supplementItem, int targetWeapon, boolean result) {
 		player.updateSupplements();
 		int manastoneKinah = 17161;
 		if (player.getInventory().decreaseByObjectId(parentItem.getObjectId(), 1) && result) {
-			PacketSendUtility.sendPacket(player,
-					SM_SYSTEM_MESSAGE.STR_GIVE_ITEM_OPTION_SUCCEED(new DescriptionId(targetItem.getNameId())));
+			PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_GIVE_ITEM_OPTION_SUCCEED(new DescriptionId(targetItem.getNameId())));
 			if (player.getInventory().getKinah() < manastoneKinah) {
 				PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_NOT_ENOUGH_MONEY);
 				return;
@@ -793,23 +747,20 @@ public class EnchantService {
 				player.getInventory().decreaseKinah(manastoneKinah);
 			}
 			if (targetWeapon == 1) {
-				ManaStone manaStone = ItemSocketService.addManaStone(targetItem,
-						parentItem.getItemTemplate().getTemplateId());
+				ManaStone manaStone = ItemSocketService.addManaStone(targetItem, parentItem.getItemTemplate().getTemplateId());
 				if (targetItem.isEquipped()) {
 					ItemEquipmentListener.addStoneStats(targetItem, manaStone, player.getGameStats());
 					player.getGameStats().updateStatsAndSpeedVisually();
 				}
 			} else {
-				ManaStone manaStone = ItemSocketService.addFusionStone(targetItem,
-						parentItem.getItemTemplate().getTemplateId());
+				ManaStone manaStone = ItemSocketService.addFusionStone(targetItem, parentItem.getItemTemplate().getTemplateId());
 				if (targetItem.isEquipped()) {
 					ItemEquipmentListener.addStoneStats(targetItem, manaStone, player.getGameStats());
 					player.getGameStats().updateStatsAndSpeedVisually();
 				}
 			}
 		} else {
-			PacketSendUtility.sendPacket(player,
-					SM_SYSTEM_MESSAGE.STR_GIVE_ITEM_OPTION_FAILED(new DescriptionId(targetItem.getNameId())));
+			PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_GIVE_ITEM_OPTION_FAILED(new DescriptionId(targetItem.getNameId())));
 		}
 		ItemPacketService.updateItemAfterInfoChange(player, targetItem);
 	}
@@ -817,26 +768,22 @@ public class EnchantService {
 	public static void onBraceletEquip(Player player, Item item, boolean isEquipped) {
 		List<IStatFunction> modifiers = new ArrayList<IStatFunction>();
 		int braceletTableId = item.getItemTemplate().getTemperingTableId();
-		ItemEnchantTemplate iet = DataManager.ITEM_ENCHANT_DATA.getEnchantTemplate(EnchantType.AUTHORIZE,
-				braceletTableId);
+		ItemEnchantTemplate iet = DataManager.ITEM_ENCHANT_DATA.getEnchantTemplate(EnchantType.AUTHORIZE, braceletTableId);
 		int defPoint1 = 0;
 		int defPoint2 = 0;
 		int atkPoint = 0;
 		if (isEquipped) {
 			for (StatFunction a : item.getItemTemplate().getModifiers()) {
-				if (a.getName() == StatEnum.PVP_DEFEND_RATIO_PHYSICAL
-						|| a.getName() == StatEnum.PVP_DEFEND_RATIO_MAGICAL) {
+				if (a.getName() == StatEnum.PVP_DEFEND_RATIO_PHYSICAL || a.getName() == StatEnum.PVP_DEFEND_RATIO_MAGICAL) {
 					defPoint1 = a.getValue();
 				}
 				for (ItemEnchantBonus ieb : iet.getItemEnchant()) {
 					if (item.getAuthorize() == ieb.getLevel()) {
 						for (StatFunction sf : ieb.getModifiers().getModifiers()) {
-							if (sf.getName() == StatEnum.PVP_DEFEND_RATIO_PHYSICAL
-									|| sf.getName() == StatEnum.PVP_DEFEND_RATIO_MAGICAL) {
+							if (sf.getName() == StatEnum.PVP_DEFEND_RATIO_PHYSICAL || sf.getName() == StatEnum.PVP_DEFEND_RATIO_MAGICAL) {
 								defPoint2 = sf.getValue();
 							}
-							if (sf.getName() == StatEnum.PVP_ATTACK_RATIO_PHYSICAL
-									|| sf.getName() == StatEnum.PVP_ATTACK_RATIO_MAGICAL) {
+							if (sf.getName() == StatEnum.PVP_ATTACK_RATIO_PHYSICAL || sf.getName() == StatEnum.PVP_ATTACK_RATIO_MAGICAL) {
 								atkPoint = sf.getValue();
 							}
 						}
@@ -1062,17 +1009,14 @@ public class EnchantService {
 					modifiers.add(new StatEnchantFunction(item, StatEnum.MAXHP, 0));
 					modifiers.add(new StatEnchantFunction(item, StatEnum.PHYSICAL_CRITICAL_RESIST, 0));
 				}
-			} else if (item.getItemTemplate().isAccessory() || item.getItemTemplate().isArmor()
-					|| item.getItemTemplate().isWeapon()) {
+			} else if (item.getItemTemplate().isAccessory() || item.getItemTemplate().isArmor() || item.getItemTemplate().isWeapon()) {
 				if (item.getItemTemplate().getTemperingTableId() > 0) {
-					ItemEnchantTemplate ie = DataManager.ITEM_ENCHANT_DATA.getEnchantTemplate(EnchantType.AUTHORIZE,
-							item.getItemTemplate().getTemperingTableId());
+					ItemEnchantTemplate ie = DataManager.ITEM_ENCHANT_DATA.getEnchantTemplate(EnchantType.AUTHORIZE, item.getItemTemplate().getTemperingTableId());
 					if (item.getAuthorize() > 0) {
 						try {
 							modifiers.addAll(ie.getStats(item.getAuthorize()));
 						} catch (Exception localException2) {
-							log.error("Cant add tempering modifiers for item: " + item.getItemId() + " , "
-									+ ie.getStats(item.getAuthorize()));
+							log.error("Cant add tempering modifiers for item: " + item.getItemId() + " , " + ie.getStats(item.getAuthorize()));
 						}
 					}
 				} else {
@@ -1105,8 +1049,7 @@ public class EnchantService {
 
 	public static int EnchantLevel(Item item) {
 		if (item.getItemTemplate().isWeapon() || item.getItemTemplate().getArmorType() == ArmorType.SHIELD) {
-			if (item.getEnchantLevel() >= item.getItemTemplate().getMaxEnchantLevel() && item.getEnchantLevel() < 16
-					|| item.getItemTemplate().getMaxEnchantLevel() == 0) {
+			if (item.getEnchantLevel() >= item.getItemTemplate().getMaxEnchantLevel() && item.getEnchantLevel() < 16 || item.getItemTemplate().getMaxEnchantLevel() == 0) {
 				return 1;
 			} else if (item.getEnchantLevel() >= 16) {
 				return 4;
@@ -1134,10 +1077,8 @@ public class EnchantService {
 	}
 
 	/**
-	 * - If Enchanting fails, the item is not destroyed and following rules apply. -
-	 * 0~10: -1 Enchanting level - 11~14: Enchanting level drops to +10 - 15~19:
-	 * Enchanting level drops to +15 - 20 and higher: Enchanting level drops to +20
-	 * - https://aionpowerbook.com/powerbook/KR_-_Update_September_20th_2017
+	 * - If Enchanting fails, the item is not destroyed and following rules apply. - 0~10: -1 Enchanting level - 11~14: Enchanting level drops to +10 - 15~19:
+	 * Enchanting level drops to +15 - 20 and higher: Enchanting level drops to +20 - https://aionpowerbook.com/powerbook/KR_-_Update_September_20th_2017
 	 */
 	public static boolean isEnhancedAncientFallusha(Item targetItem) {
 		switch (targetItem.getItemId()) {
@@ -1264,11 +1205,9 @@ public class EnchantService {
 	}
 
 	/**
-	 * - Gray Wolf Accessories will not be destroyed when the upgrading process
-	 * fails and will reset to +0. - Gray Wolf Accessories cannot be traded and can
+	 * - Gray Wolf Accessories will not be destroyed when the upgrading process fails and will reset to +0. - Gray Wolf Accessories cannot be traded and can
 	 * only be wrapped once when the Upgrade level reaches +10. - Upgrading Gray
-	 * Wolf Accessories increases PvE abilities. -
-	 * https://aionpowerbook.com/powerbook/KR_-_Update_September_20th_2017
+	 * Wolf Accessories increases PvE abilities. - https://aionpowerbook.com/powerbook/KR_-_Update_September_20th_2017
 	 */
 	public static boolean isGrayWolfAccessories(Item targetItem) {
 		switch (targetItem.getItemId()) {
@@ -1295,8 +1234,7 @@ public class EnchantService {
 	}
 
 	/**
-	 * - Archdaeva's Reformed Danuar - Archdaeva's Remodeled Danuar - Archdaeva's
-	 * Restructured Danuar - Destroy Enchant: NEVER!!!
+	 * - Archdaeva's Reformed Danuar - Archdaeva's Remodeled Danuar - Archdaeva's Restructured Danuar - Destroy Enchant: NEVER!!!
 	 */
 	public static boolean isArchdaevaReformedDanuar(Item targetItem) {
 		switch (targetItem.getItemId()) {
@@ -1410,8 +1348,7 @@ public class EnchantService {
 		int Enchant = 0;
 		Equipment equip = player.getEquipment();
 		for (Item item : equip.getEquippedItemsWithoutStigmaOld()) {
-			if (item.getItemTemplate().isWeapon() || item.getItemTemplate().isArmor()
-					|| item.getItemTemplate().getItemSlot() == 32768) {
+			if (item.getItemTemplate().isWeapon() || item.getItemTemplate().isArmor() || item.getItemTemplate().getItemSlot() == 32768) {
 				if (item.getEnchantLevel() >= 16) {
 					Enchant++;
 				}
@@ -1437,29 +1374,22 @@ public class EnchantService {
 		}
 	}
 
-	public static void reductItemAct(Player player, Item parentItem, Item targetItem, int currentReduction,
-			boolean result, int count) {
+	public static void reductItemAct(Player player, Item parentItem, Item targetItem, int currentReduction, boolean result, int count) {
 		if (!result) {
-			PacketSendUtility.broadcastPacketAndReceive(player,
-					new SM_ITEM_USAGE_ANIMATION(player.getObjectId().intValue(), player.getObjectId().intValue(),
-							parentItem.getObjectId().intValue(), parentItem.getItemId(), 0, 2, 0));
+			PacketSendUtility.broadcastPacketAndReceive(player, new SM_ITEM_USAGE_ANIMATION(player.getObjectId().intValue(), player.getObjectId().intValue(), parentItem.getObjectId().intValue(), parentItem.getItemId(), 0, 2, 0));
 			// The reduction of %0‘s recommended level failed.
 			PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_EQUIPLEVEL_ADJ_FAIL(targetItem.getNameId()));
 		} else {
-			PacketSendUtility.broadcastPacketAndReceive(player,
-					new SM_ITEM_USAGE_ANIMATION(player.getObjectId().intValue(), player.getObjectId().intValue(),
-							parentItem.getObjectId().intValue(), parentItem.getItemId(), 0, 1, 0));
+			PacketSendUtility.broadcastPacketAndReceive(player, new SM_ITEM_USAGE_ANIMATION(player.getObjectId().intValue(), player.getObjectId().intValue(), parentItem.getObjectId().intValue(), parentItem.getItemId(), 0, 1, 0));
 			if (currentReduction + count > 5) {
 				targetItem.setReductionLevel(5);
 			} else {
 				targetItem.setReductionLevel(currentReduction + count);
-				PacketSendUtility.sendPacket(player,
-						SM_SYSTEM_MESSAGE.STR_MSG_EQUIPLEVEL_ADJ_SUCCEED(targetItem.getNameId(), count));
+				PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_EQUIPLEVEL_ADJ_SUCCEED(targetItem.getNameId(), count));
 			}
 			if (targetItem.getReductionLevel() == 5) {
 				// The max. recommended level reduction for %0 has been reached.
-				PacketSendUtility.sendPacket(player,
-						SM_SYSTEM_MESSAGE.STR_MSG_EQUIPLEVEL_ADJ_SUCCEED_MAX(targetItem.getNameId()));
+				PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_EQUIPLEVEL_ADJ_SUCCEED_MAX(targetItem.getNameId()));
 			}
 		}
 		PacketSendUtility.sendPacket(player, new SM_INVENTORY_UPDATE_ITEM(player, targetItem));

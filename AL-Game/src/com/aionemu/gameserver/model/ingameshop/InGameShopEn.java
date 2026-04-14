@@ -179,7 +179,7 @@ public class InGameShopEn {
 			activeRequests.add(request);
 		if (AdvCustomConfig.GAMESHOP_LIMIT) {
 			if (item.getCategory() == AdvCustomConfig.GAMESHOP_CATEGORY) {
-				lastUsage.put(player.getObjectId(), new Long(System.currentTimeMillis()));
+				lastUsage.put(player.getObjectId(), System.currentTimeMillis());
 			}
 		}
 	}

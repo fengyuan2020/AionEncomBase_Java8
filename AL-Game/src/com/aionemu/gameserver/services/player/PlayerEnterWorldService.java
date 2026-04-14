@@ -149,7 +149,6 @@ import javolution.util.FastList;
 public final class PlayerEnterWorldService {
 
 	private static final Logger log = LoggerFactory.getLogger("GAMECONNECTION_LOG");
-	// private static final String serverIntro = "";
 	private static final String serverInfo;
 	private static final String alInfo;
 	private static final Set<Integer> pendingEnterWorld = new HashSet<Integer>();
@@ -164,8 +163,7 @@ public final class PlayerEnterWorldService {
 		infoBuffer = "";
 		if (GSConfig.SERVER_MOTD_DISPLAYREV) {
 			alBuffer += "----------------------------\n";
-			alBuffer += "Server Revision: "
-					+ String.format(" ", new Object[] { new Version(GameServer.class).getRevision() }) + "\n";
+			alBuffer += "Server Revision: " + String.format(" ", new Object[] { new Version(GameServer.class).getRevision() }) + "\n";
 		}
 		serverInfo = infoBuffer;
 		alInfo = alBuffer;
@@ -261,23 +259,20 @@ public final class PlayerEnterWorldService {
 				PlayerCommonData pcd = player.getCommonData();
 				long secondsOffline = (System.currentTimeMillis() / 1000) - lastOnline / 1000;
 				if (pcd.isReadyForSalvationPoints()) {
-					// The level of Energy of Salvation will now be maintained up to 1 hour after
-					// disconnect.
+					// The level of Energy of Salvation will now be maintained up to 1 hour after disconnect.
 					if (secondsOffline > 60 * 60) {
 						player.getCommonData().resetSalvationPoints();
 					}
 				}
 				if (pcd.isReadyForBerdinStar()) {
-					// The level of "Berdin's Star" will now be maintained up to 4 hour after
-					// disconnect.
+					// The level of "Berdin's Star" will now be maintained up to 4 hour after disconnect.
 					if (secondsOffline > 240 * 60) {
 						pcd.checkBerdinStarPercent();
 						player.getCommonData().setBerdinStar(0);
 					}
 				}
 				if (pcd.isReadyForAbyssFavor()) {
-					// The level of "Abyss Favor" will now be maintained up to 1 hour after
-					// disconnect.
+					// The level of "Abyss Favor" will now be maintained up to 1 hour after disconnect.
 					if (secondsOffline > 60 * 60) {
 						pcd.checkAbyssFavorPercent();
 						player.getCommonData().setAbyssFavor(0);
@@ -401,16 +396,14 @@ public final class PlayerEnterWorldService {
 			client.sendPacket(new SM_YOUTUBE_VIDEO());
 
 			/**
-			 * If a user logs out in any hostile territory, they will be transported back to
-			 * the last registered Obelisk.
+			 * If a user logs out in any hostile territory, they will be transported back to the last registered Obelisk.
 			 */
 			if (CustomConfig.ENABLE_RECONNECT_TO_BIND_POINT) {
 				TeleportService2.moveToBindLocation(player, true);
 			}
 			/**
 			 * http://static.ncsoft.com/aion/store/PatchNotes/AION_Patch_Notes_071316.pdf If
-			 * a user logs out in hostile territory in Iluma/Norsvold, they will be
-			 * transported back to the last registered Obelisk.
+			 * a user logs out in hostile territory in Iluma/Norsvold, they will be transported back to the last registered Obelisk.
 			 */
 			TeleportService2.onLogOutOppositeMap(player);
 			// TeleportService2.sendSetBindPoint(player);
@@ -449,14 +442,6 @@ public final class PlayerEnterWorldService {
 			// Abyss Rank
 			client.sendPacket(new SM_ABYSS_RANK(player.getAbyssRank()));
 
-			// Intro message
-			// PacketSendUtility.sendWhiteMessage(player, serverName);
-			// PacketSendUtility.sendYellowMessage(player, serverIntro);
-			// PacketSendUtility.sendBrightYellowMessage(player, serverInfo);
-			// PacketSendUtility.sendWhiteMessage(player, alInfo);
-			// "\uE026" //Timer.
-			// "\uE027" //Speaker.
-
 			player.setRates(Rates.getRatesFor(client.getAccount().getMembership()));
 			if (CustomConfig.PREMIUM_NOTIFY_ENABLE) {
 				showPremiumAccountInfo(client, account);
@@ -478,7 +463,6 @@ public final class PlayerEnterWorldService {
 						PacketSendUtility.sendMessage(player, ">> Connection in Invulnerable mode <<");
 					}
 					if (AdminConfig.INVISIBLE_GM_CONNECTION) {
-						player.getEffectController().setAbnormal(AbnormalState.HIDE.getId());
 						player.setVisualState(CreatureVisualState.HIDE3);
 						PacketSendUtility.broadcastPacket(player, new SM_PLAYER_STATE(player), true);
 						PacketSendUtility.sendMessage(player, ">> Connection in Invisible mode <<");
@@ -592,12 +576,9 @@ public final class PlayerEnterWorldService {
 			// GloryPointLoseMsg(player);
 			F2pService.getInstance().onEnterWorld(player);
 			// Aura Of Growth.
-			// Players can gain additional XP from hunting, gathering or crafting by
-			// obtaining Growth Aura.
-			// Growth Aura can be obtained from hunting monsters, acquiring essence, and
-			// through login and quest rewards.
-			// For more information on Growth Aura, check the Character XP Status Bar Tool
-			// Tip.
+			// Players can gain additional XP from hunting, gathering or crafting by obtaining Growth Aura.
+			// Growth Aura can be obtained from hunting monsters, acquiring essence, and through login and quest rewards.
+			// For more information on Growth Aura, check the Character XP Status Bar Tool Tip.
 			PacketSendUtility.playerSendPacketTime(player, SM_SYSTEM_MESSAGE.STR_MSG_CHARGE_EXP_POINT, 60000);
 			// "Auto PowerShard ON"
 			if (player.getEquipment().isPowerShardEquipped() && CustomConfig.ENABLE_AUTO_POWERSHARD) {

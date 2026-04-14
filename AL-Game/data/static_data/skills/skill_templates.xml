@@ -60479,7 +60479,7 @@
       <idianchargeweapon/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SYSTEM_SKILL_SIGNET1" signetid="8305" signetlvl="3" value="40" e="1" hoptype="DAMAGE"/>
+      <carvesignet critprobmod2="100" signet="SYSTEM_SKILL_SIGNET1" signetid="8305" signetlvlstart="1" signetlvl="3" value="40" e="1" hoptype="DAMAGE"/>
     </effects>
     <actions>
       <mpuse value="39" delta="-1"/>
@@ -60496,7 +60496,7 @@
       <idianchargeweapon/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SYSTEM_SKILL_SIGNET1" signetid="8305" signetlvl="3" value="45" e="1" hoptype="DAMAGE"/>
+      <carvesignet critprobmod2="100" signet="SYSTEM_SKILL_SIGNET1" signetid="8305" signetlvlstart="1" signetlvl="3" value="45" e="1" hoptype="DAMAGE"/>
     </effects>
     <actions>
       <mpuse value="42" delta="-1"/>
@@ -60513,7 +60513,7 @@
       <idianchargeweapon/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SYSTEM_SKILL_SIGNET1" signetid="8305" signetlvl="3" value="50" e="1" basiclvl="20" hoptype="DAMAGE"/>
+      <carvesignet critprobmod2="100" signet="SYSTEM_SKILL_SIGNET1" signetid="8305" signetlvlstart="1" signetlvl="3" value="50" e="1" basiclvl="20" hoptype="DAMAGE"/>
     </effects>
     <actions>
       <mpuse value="45" delta="-1"/>
@@ -60530,7 +60530,7 @@
       <idianchargeweapon/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SYSTEM_SKILL_SIGNET1" signetid="8305" signetlvl="3" value="55" e="1" basiclvl="20" hoptype="DAMAGE"/>
+      <carvesignet critprobmod2="100" signet="SYSTEM_SKILL_SIGNET1" signetid="8305" signetlvlstart="1" signetlvl="3" value="55" e="1" basiclvl="20" hoptype="DAMAGE"/>
     </effects>
     <actions>
       <mpuse value="48" delta="-1"/>
@@ -60547,7 +60547,7 @@
       <idianchargeweapon/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SYSTEM_SKILL_SIGNET1" signetid="8305" signetlvl="3" value="60" e="1" basiclvl="40" hoptype="DAMAGE"/>
+      <carvesignet critprobmod2="100" signet="SYSTEM_SKILL_SIGNET1" signetid="8305" signetlvlstart="1" signetlvl="3" value="60" e="1" basiclvl="40" hoptype="DAMAGE"/>
     </effects>
     <actions>
       <mpuse value="52" delta="-2"/>
@@ -60564,7 +60564,7 @@
       <idianchargeweapon/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SYSTEM_SKILL_SIGNET1" signetid="8305" signetlvl="3" value="65" e="1" basiclvl="40" hoptype="DAMAGE"/>
+      <carvesignet critprobmod2="100" signet="SYSTEM_SKILL_SIGNET1" signetid="8305" signetlvlstart="1" signetlvl="3" value="65" e="1" basiclvl="40" hoptype="DAMAGE"/>
     </effects>
     <actions>
       <mpuse value="55" delta="-2"/>
@@ -60581,7 +60581,7 @@
       <idianchargeweapon/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SYSTEM_SKILL_SIGNET1" signetid="8305" signetlvl="3" value="70" e="1" basiclvl="60" hoptype="DAMAGE"/>
+      <carvesignet critprobmod2="100" signet="SYSTEM_SKILL_SIGNET1" signetid="8305" signetlvlstart="1" signetlvl="3" value="70" e="1" basiclvl="60" hoptype="DAMAGE"/>
     </effects>
     <actions>
       <mpuse value="58" delta="-2"/>
@@ -60598,7 +60598,7 @@
       <idianchargeweapon/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SYSTEM_SKILL_SIGNET1" signetid="8305" signetlvl="3" value="75" e="1" basiclvl="80" hoptype="DAMAGE"/>
+      <carvesignet critprobmod2="100" signet="SYSTEM_SKILL_SIGNET1" signetid="8305" signetlvlstart="1" signetlvl="3" value="75" e="1" basiclvl="80" hoptype="DAMAGE"/>
     </effects>
     <actions>
       <mpuse value="59" delta="-2"/>
@@ -60834,7 +60834,7 @@
       <idianchargeweapon/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvl="3" value="298" delta="17" e="1" hoptype="DAMAGE">
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvlstart="1" signetlvl="3" value="298" delta="17" e="1" hoptype="DAMAGE">
         <modifiers>
           <targetrace race="TYPE_B" value="26"/>
         </modifiers>
@@ -60852,7 +60852,7 @@
       <idianchargeweapon/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvl="3" value="343" delta="20" e="1" hoptype="DAMAGE">
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvlstart="1" signetlvl="3" value="343" delta="20" e="1" hoptype="DAMAGE">
         <modifiers>
           <targetrace race="TYPE_B" value="30"/>
         </modifiers>
@@ -60870,7 +60870,7 @@
       <idianchargeweapon/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvl="3" value="389" delta="22" e="1" basiclvl="20" hoptype="DAMAGE">
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvlstart="1" signetlvl="3" value="389" delta="22" e="1" basiclvl="20" hoptype="DAMAGE">
         <modifiers>
           <targetrace race="TYPE_B" value="34"/>
         </modifiers>
@@ -60888,7 +60888,7 @@
       <idianchargeweapon/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvl="3" value="433" delta="25" e="1" basiclvl="20" hoptype="DAMAGE">
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvlstart="1" signetlvl="3" value="433" delta="25" e="1" basiclvl="20" hoptype="DAMAGE">
         <modifiers>
           <targetrace race="TYPE_B" value="38"/>
         </modifiers>
@@ -60906,7 +60906,7 @@
       <idianchargeweapon/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvl="3" value="479" delta="27" e="1" basiclvl="40" hoptype="DAMAGE">
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvlstart="1" signetlvl="3" value="479" delta="27" e="1" basiclvl="40" hoptype="DAMAGE">
         <modifiers>
           <targetrace race="TYPE_B" value="42"/>
         </modifiers>
@@ -60924,7 +60924,7 @@
       <idianchargeweapon/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvl="3" value="524" delta="30" e="1" basiclvl="40" hoptype="DAMAGE">
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvlstart="1" signetlvl="3" value="524" delta="30" e="1" basiclvl="40" hoptype="DAMAGE">
         <modifiers>
           <targetrace race="TYPE_B" value="46"/>
         </modifiers>
@@ -60942,7 +60942,7 @@
       <idianchargeweapon/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvl="3" value="570" delta="32" e="1" basiclvl="60" hoptype="DAMAGE">
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvlstart="1" signetlvl="3" value="570" delta="32" e="1" basiclvl="60" hoptype="DAMAGE">
         <modifiers>
           <targetrace race="TYPE_B" value="50"/>
         </modifiers>
@@ -60960,7 +60960,7 @@
       <idianchargeweapon/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvl="3" value="615" delta="35" e="1" basiclvl="60" hoptype="DAMAGE">
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvlstart="1" signetlvl="3" value="615" delta="35" e="1" basiclvl="60" hoptype="DAMAGE">
         <modifiers>
           <targetrace race="TYPE_B" value="54"/>
         </modifiers>
@@ -60978,7 +60978,7 @@
       <idianchargeweapon/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvl="3" value="699" delta="37" e="1" basiclvl="60" hoptype="DAMAGE">
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvlstart="1" signetlvl="3" value="699" delta="37" e="1" basiclvl="60" hoptype="DAMAGE">
         <modifiers>
           <targetrace race="TYPE_B" value="60"/>
         </modifiers>
@@ -62959,7 +62959,7 @@
       <idianchargeweapon/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvlstart="3" signetlvl="3" value="12" delta="10" e="1" hoptype="DAMAGE">
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvlstart="1" signetlvl="3" value="12" delta="10" e="1" hoptype="DAMAGE">
         <modifiers>
           <targetrace race="TYPE_A" value="2"/>
         </modifiers>
@@ -62977,7 +62977,7 @@
       <idianchargeweapon/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvlstart="2" signetlvl="2" value="16" delta="10" e="1" hoptype="DAMAGE">
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvlstart="1" signetlvl="3" value="16" delta="10" e="1" hoptype="DAMAGE">
         <modifiers>
           <targetrace race="TYPE_A" value="3"/>
         </modifiers>
@@ -62995,7 +62995,7 @@
       <idianchargeweapon/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvlstart="2" signetlvl="2" value="21" delta="10" e="1" basiclvl="20" hoptype="DAMAGE">
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvlstart="1" signetlvl="3" value="21" delta="10" e="1" basiclvl="20" hoptype="DAMAGE">
         <modifiers>
           <targetrace race="TYPE_A" value="4"/>
         </modifiers>
@@ -63013,7 +63013,7 @@
       <idianchargeweapon/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvlstart="2" signetlvl="2" value="25" delta="10" e="1" basiclvl="20" hoptype="DAMAGE">
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvlstart="1" signetlvl="3" value="25" delta="10" e="1" basiclvl="20" hoptype="DAMAGE">
         <modifiers>
           <targetrace race="TYPE_A" value="6"/>
         </modifiers>
@@ -63031,7 +63031,7 @@
       <idianchargeweapon/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvlstart="2" signetlvl="2" value="30" delta="10" e="1" basiclvl="40" hoptype="DAMAGE">
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvlstart="1" signetlvl="3" value="30" delta="10" e="1" basiclvl="40" hoptype="DAMAGE">
         <modifiers>
           <targetrace race="TYPE_A" value="7"/>
         </modifiers>
@@ -63049,7 +63049,7 @@
       <idianchargeweapon/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvlstart="2" signetlvl="2" value="34" delta="10" e="1" basiclvl="40" hoptype="DAMAGE">
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvlstart="1" signetlvl="3" value="34" delta="10" e="1" basiclvl="40" hoptype="DAMAGE">
         <modifiers>
           <targetrace race="TYPE_A" value="9"/>
         </modifiers>
@@ -63067,7 +63067,7 @@
       <idianchargeweapon/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvlstart="2" signetlvl="2" value="29" delta="20" e="1" basiclvl="60" hoptype="DAMAGE">
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvlstart="1" signetlvl="3" value="29" delta="20" e="1" basiclvl="60" hoptype="DAMAGE">
         <modifiers>
           <targetrace race="TYPE_A" value="10"/>
         </modifiers>
@@ -63085,7 +63085,7 @@
       <idianchargeweapon/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvlstart="2" signetlvl="2" value="33" delta="20" e="1" basiclvl="60" hoptype="DAMAGE">
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvlstart="1" signetlvl="3" value="33" delta="20" e="1" basiclvl="60" hoptype="DAMAGE">
         <modifiers>
           <targetrace race="TYPE_A" value="12"/>
         </modifiers>
@@ -63103,7 +63103,7 @@
       <idianchargeweapon/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvlstart="2" signetlvl="2" value="38" delta="20" e="1" basiclvl="80" hoptype="DAMAGE">
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvlstart="1" signetlvl="3" value="38" delta="20" e="1" basiclvl="80" hoptype="DAMAGE">
         <modifiers>
           <targetrace race="TYPE_A" value="13"/>
         </modifiers>
@@ -63121,7 +63121,7 @@
       <idianchargeweapon/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvlstart="2" signetlvl="2" value="42" delta="20" e="1" basiclvl="80" hoptype="DAMAGE">
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvlstart="1" signetlvl="3" value="42" delta="20" e="1" basiclvl="80" hoptype="DAMAGE">
         <modifiers>
           <targetrace race="TYPE_A" value="15"/>
         </modifiers>
@@ -63139,7 +63139,7 @@
       <idianchargeweapon/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvlstart="2" signetlvl="2" value="49" delta="20" e="1" basiclvl="80" hoptype="DAMAGE">
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvlstart="1" signetlvl="3" value="49" delta="20" e="1" basiclvl="80" hoptype="DAMAGE">
         <modifiers>
           <targetrace race="TYPE_A" value="16"/>
         </modifiers>
@@ -63157,7 +63157,7 @@
       <idianchargeweapon/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvlstart="1" signetlvl="1" value="28" delta="3" e="1" hoptype="DAMAGE"/>
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvlstart="1" signetlvl="3" value="28" delta="3" e="1" hoptype="DAMAGE"/>
     </effects>
     <motion name="signet2" speed="85"/>
   </skill_template>
@@ -63171,7 +63171,7 @@
       <idianchargeweapon/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvlstart="1" signetlvl="1" value="34" delta="3" e="1" hoptype="DAMAGE"/>
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvlstart="1" signetlvl="3" value="34" delta="3" e="1" hoptype="DAMAGE"/>
     </effects>
     <motion name="signet2" speed="85"/>
   </skill_template>
@@ -63185,7 +63185,7 @@
       <idianchargeweapon/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvlstart="1" signetlvl="1" value="41" delta="3" e="1" basiclvl="40" hoptype="DAMAGE"/>
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvlstart="1" signetlvl="3" value="41" delta="3" e="1" basiclvl="40" hoptype="DAMAGE"/>
     </effects>
     <motion name="signet2" speed="85"/>
   </skill_template>
@@ -63199,7 +63199,7 @@
       <idianchargeweapon/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvlstart="1" signetlvl="1" value="47" delta="3" e="1" basiclvl="40" hoptype="DAMAGE"/>
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvlstart="1" signetlvl="3" value="47" delta="3" e="1" basiclvl="40" hoptype="DAMAGE"/>
     </effects>
     <motion name="signet2" speed="85"/>
   </skill_template>
@@ -63213,7 +63213,7 @@
       <idianchargeweapon/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvlstart="1" signetlvl="1" value="53" delta="3" e="1" basiclvl="80" hoptype="DAMAGE"/>
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvlstart="1" signetlvl="3" value="53" delta="3" e="1" basiclvl="80" hoptype="DAMAGE"/>
     </effects>
     <motion name="signet2" speed="85"/>
   </skill_template>
@@ -63227,7 +63227,7 @@
       <idianchargeweapon/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvlstart="1" signetlvl="1" value="59" delta="3" e="1" basiclvl="80" hoptype="DAMAGE"/>
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvlstart="1" signetlvl="3" value="59" delta="3" e="1" basiclvl="80" hoptype="DAMAGE"/>
     </effects>
     <motion name="signet2" speed="85"/>
   </skill_template>
@@ -63241,7 +63241,7 @@
       <idianchargeweapon/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvlstart="1" signetlvl="1" value="65" delta="3" e="1" basiclvl="120" hoptype="DAMAGE"/>
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvlstart="1" signetlvl="3" value="65" delta="3" e="1" basiclvl="120" hoptype="DAMAGE"/>
     </effects>
     <motion name="signet2" speed="85"/>
   </skill_template>
@@ -63255,7 +63255,7 @@
       <idianchargeweapon/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvlstart="1" signetlvl="1" value="74" delta="3" e="1" basiclvl="140" hoptype="DAMAGE"/>
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8305" signetlvlstart="1" signetlvl="3" value="74" delta="3" e="1" basiclvl="140" hoptype="DAMAGE"/>
     </effects>
     <motion name="signet2" speed="85"/>
   </skill_template>
@@ -63569,7 +63569,7 @@
       <playermove allow="false"/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="2" signetlvl="2" value="65" delta="5" e="1" hoptype="DAMAGE">
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="1" signetlvl="5" value="65" delta="5" e="1" hoptype="DAMAGE">
         <subeffect skill_id="8219"/>
       </carvesignet>
     </effects>
@@ -63590,7 +63590,7 @@
       <playermove allow="false"/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="2" signetlvl="2" value="76" delta="7" e="1" hoptype="DAMAGE">
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="1" signetlvl="5" value="76" delta="7" e="1" hoptype="DAMAGE">
         <subeffect skill_id="8219"/>
       </carvesignet>
     </effects>
@@ -63611,7 +63611,7 @@
       <playermove allow="false"/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="2" signetlvl="2" value="88" delta="7" e="1" basiclvl="20" hoptype="DAMAGE">
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="1" signetlvl="5" value="88" delta="7" e="1" basiclvl="20" hoptype="DAMAGE">
         <subeffect skill_id="8219"/>
       </carvesignet>
     </effects>
@@ -63632,7 +63632,7 @@
       <playermove allow="false"/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="2" signetlvl="2" value="98" delta="10" e="1" basiclvl="20" hoptype="DAMAGE">
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="1" signetlvl="5" value="98" delta="10" e="1" basiclvl="20" hoptype="DAMAGE">
         <subeffect skill_id="8219"/>
       </carvesignet>
     </effects>
@@ -63653,7 +63653,7 @@
       <playermove allow="false"/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="2" signetlvl="2" value="108" delta="12" e="1" basiclvl="40" hoptype="DAMAGE">
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="1" signetlvl="5" value="108" delta="12" e="1" basiclvl="40" hoptype="DAMAGE">
         <subeffect skill_id="8219"/>
       </carvesignet>
     </effects>
@@ -63674,7 +63674,7 @@
       <playermove allow="false"/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="2" signetlvl="2" value="121" delta="12" e="1" basiclvl="40" hoptype="DAMAGE">
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="1" signetlvl="5" value="121" delta="12" e="1" basiclvl="40" hoptype="DAMAGE">
         <subeffect skill_id="8219"/>
       </carvesignet>
     </effects>
@@ -63695,7 +63695,7 @@
       <playermove allow="false"/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="2" signetlvl="2" value="131" delta="15" e="1" basiclvl="60" hoptype="DAMAGE">
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="1" signetlvl="5" value="131" delta="15" e="1" basiclvl="60" hoptype="DAMAGE">
         <subeffect skill_id="8219"/>
       </carvesignet>
     </effects>
@@ -63716,7 +63716,7 @@
       <playermove allow="false"/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="2" signetlvl="2" value="143" delta="15" e="1" basiclvl="60" hoptype="DAMAGE">
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="1" signetlvl="5" value="143" delta="15" e="1" basiclvl="60" hoptype="DAMAGE">
         <subeffect skill_id="8219"/>
       </carvesignet>
     </effects>
@@ -63737,7 +63737,7 @@
       <playermove allow="false"/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="2" signetlvl="2" value="154" delta="17" e="1" basiclvl="60" hoptype="DAMAGE">
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="1" signetlvl="5" value="154" delta="17" e="1" basiclvl="60" hoptype="DAMAGE">
         <subeffect skill_id="8219"/>
       </carvesignet>
     </effects>
@@ -63758,7 +63758,7 @@
       <playermove allow="false"/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="2" signetlvl="2" value="174" delta="20" e="1" basiclvl="60" hoptype="DAMAGE">
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="1" signetlvl="5" value="174" delta="20" e="1" basiclvl="60" hoptype="DAMAGE">
         <subeffect skill_id="8219"/>
       </carvesignet>
     </effects>
@@ -63779,7 +63779,7 @@
       <playermove allow="false"/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="1" signetlvl="1" value="100" delta="10" e="1" hoptype="DAMAGE">
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="1" signetlvl="5" value="100" delta="10" e="1" hoptype="DAMAGE">
         <subeffect skill_id="8219"/>
         <modifiers>
           <targetrace race="TYPE_C" value="8"/>
@@ -63803,7 +63803,7 @@
       <playermove allow="false"/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="1" signetlvl="1" value="112" delta="12" e="1" hoptype="DAMAGE">
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="1" signetlvl="5" value="112" delta="12" e="1" hoptype="DAMAGE">
         <subeffect skill_id="8219"/>
         <modifiers>
           <targetrace race="TYPE_C" value="10"/>
@@ -63827,7 +63827,7 @@
       <playermove allow="false"/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="1" signetlvl="1" value="127" delta="12" e="1" basiclvl="10" hoptype="DAMAGE">
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="1" signetlvl="5" value="127" delta="12" e="1" basiclvl="10" hoptype="DAMAGE">
         <subeffect skill_id="8219"/>
         <modifiers>
           <targetrace race="TYPE_C" value="10"/>
@@ -63851,7 +63851,7 @@
       <playermove allow="false"/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="1" signetlvl="1" value="138" delta="15" e="1" basiclvl="10" hoptype="DAMAGE">
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="1" signetlvl="5" value="138" delta="15" e="1" basiclvl="10" hoptype="DAMAGE">
         <subeffect skill_id="8219"/>
         <modifiers>
           <targetrace race="TYPE_C" value="12"/>
@@ -63875,7 +63875,7 @@
       <playermove allow="false"/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="1" signetlvl="1" value="151" delta="17" e="1" basiclvl="20" hoptype="DAMAGE">
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="1" signetlvl="5" value="151" delta="17" e="1" basiclvl="20" hoptype="DAMAGE">
         <subeffect skill_id="8219"/>
         <modifiers>
           <targetrace race="TYPE_C" value="14"/>
@@ -63899,7 +63899,7 @@
       <playermove allow="false"/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="1" signetlvl="1" value="165" delta="17" e="1" basiclvl="20" hoptype="DAMAGE">
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="1" signetlvl="5" value="165" delta="17" e="1" basiclvl="20" hoptype="DAMAGE">
         <subeffect skill_id="8219"/>
         <modifiers>
           <targetrace race="TYPE_C" value="14"/>
@@ -63923,7 +63923,7 @@
       <playermove allow="false"/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="1" signetlvl="1" value="177" delta="20" e="1" basiclvl="30" hoptype="DAMAGE">
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="1" signetlvl="5" value="177" delta="20" e="1" basiclvl="30" hoptype="DAMAGE">
         <subeffect skill_id="8219"/>
         <modifiers>
           <targetrace race="TYPE_C" value="16"/>
@@ -63947,7 +63947,7 @@
       <playermove allow="false"/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="1" signetlvl="1" value="201" delta="22" e="1" basiclvl="40" hoptype="DAMAGE">
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="1" signetlvl="5" value="201" delta="22" e="1" basiclvl="40" hoptype="DAMAGE">
         <subeffect skill_id="8219"/>
         <modifiers>
           <targetrace race="TYPE_C" value="18"/>
@@ -63971,7 +63971,7 @@
       <playermove allow="false"/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="1" signetlvl="1" value="142" delta="15" e="1" hoptype="DAMAGE">
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="1" signetlvl="5" value="142" delta="15" e="1" hoptype="DAMAGE">
         <modifiers>
           <targetrace race="TYPE_C" value="12"/>
         </modifiers>
@@ -63994,7 +63994,7 @@
       <playermove allow="false"/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="1" signetlvl="1" value="155" delta="17" e="1" hoptype="DAMAGE">
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="1" signetlvl="5" value="155" delta="17" e="1" hoptype="DAMAGE">
         <modifiers>
           <targetrace race="TYPE_C" value="14"/>
         </modifiers>
@@ -64017,7 +64017,7 @@
       <playermove allow="false"/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="1" signetlvl="1" value="171" delta="17" e="1" hoptype="DAMAGE">
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="1" signetlvl="5" value="171" delta="17" e="1" hoptype="DAMAGE">
         <modifiers>
           <targetrace race="TYPE_C" value="14"/>
         </modifiers>
@@ -64040,7 +64040,7 @@
       <playermove allow="false"/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="1" signetlvl="1" value="184" delta="20" e="1" hoptype="DAMAGE">
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="1" signetlvl="5" value="184" delta="20" e="1" hoptype="DAMAGE">
         <modifiers>
           <targetrace race="TYPE_C" value="16"/>
         </modifiers>
@@ -64063,7 +64063,7 @@
       <playermove allow="false"/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="1" signetlvl="1" value="198" delta="22" e="1" hoptype="DAMAGE">
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="1" signetlvl="5" value="198" delta="22" e="1" hoptype="DAMAGE">
         <modifiers>
           <targetrace race="TYPE_C" value="18"/>
         </modifiers>
@@ -64086,7 +64086,7 @@
       <playermove allow="false"/>
     </useconditions>
     <effects>
-      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="1" signetlvl="1" value="217" delta="25" e="1" hoptype="DAMAGE">
+      <carvesignet critprobmod2="100" signet="SIGNET1" signetid="8307" signetlvlstart="1" signetlvl="5" value="217" delta="25" e="1" hoptype="DAMAGE">
         <modifiers>
           <targetrace race="TYPE_C" value="20"/>
         </modifiers>

@@ -1,6 +1,4 @@
 /*
-
- *
  *  Encom is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -78,7 +76,7 @@ public class IuService {
 				}
 			}, CustomConfig.IU_SCHEDULE);
 		} else {
-			log.info("[IuService] Concert Grounds is disabled in config...");
+			//log.info("[IuService] Concert Grounds is disabled in config...");
 			iu = Collections.emptyMap();
 		}
 	}
@@ -148,44 +146,25 @@ public class IuService {
 				@Override
 				public void visit(Player player) {
 					// The entrance to the Live Party Concert Hall appeared.
-					PacketSendUtility.playerSendPacketTime(player, SM_SYSTEM_MESSAGE.STR_MSG_EVENT_DIRECT_PORTAL_OPEN,
-							0);
-					// The entrance to the Live Party Concert Hall closes in 90 minutes. Escape will
-					// engage.
-					PacketSendUtility.playerSendPacketTime(player,
-							SM_SYSTEM_MESSAGE.STR_MSG_EVENT_DIRECT_PORTAL_CLOSE_TIMER_90M, 1800000);
-					// The entrance to the Live Party Concert Hall closes in 60 minutes. Escape will
-					// engage.
-					PacketSendUtility.playerSendPacketTime(player,
-							SM_SYSTEM_MESSAGE.STR_MSG_EVENT_DIRECT_PORTAL_CLOSE_TIMER_60M, 3600000);
-					// The entrance to the Live Party Concert Hall closes in 30 minutes. Escape will
-					// engage.
-					PacketSendUtility.playerSendPacketTime(player,
-							SM_SYSTEM_MESSAGE.STR_MSG_EVENT_DIRECT_PORTAL_CLOSE_TIMER_30M, 5400000);
-					// The entrance to the Live Party Concert Hall closes in 15 minutes. Escape will
-					// engage.
-					PacketSendUtility.playerSendPacketTime(player,
-							SM_SYSTEM_MESSAGE.STR_MSG_EVENT_DIRECT_PORTAL_CLOSE_TIMER_15M, 6300000);
-					// The entrance to the Live Party Concert Hall closes in 10 minutes. Escape will
-					// engage.
-					PacketSendUtility.playerSendPacketTime(player,
-							SM_SYSTEM_MESSAGE.STR_MSG_EVENT_DIRECT_PORTAL_CLOSE_TIMER_10M, 6600000);
-					// The entrance to the Live Party Concert Hall closes in 5 minutes. Escape will
-					// engage.
-					PacketSendUtility.playerSendPacketTime(player,
-							SM_SYSTEM_MESSAGE.STR_MSG_EVENT_DIRECT_PORTAL_CLOSE_TIMER_5M, 6900000);
-					// The entrance to the Live Party Concert Hall closes in 3 minutes. Escape will
-					// engage.
-					PacketSendUtility.playerSendPacketTime(player,
-							SM_SYSTEM_MESSAGE.STR_MSG_EVENT_DIRECT_PORTAL_CLOSE_TIMER_3M, 7020000);
-					// The entrance to the Live Party Concert Hall closes in 2 minutes. Escape will
-					// engage.
-					PacketSendUtility.playerSendPacketTime(player,
-							SM_SYSTEM_MESSAGE.STR_MSG_EVENT_DIRECT_PORTAL_CLOSE_TIMER_2M, 7080000);
-					// The entrance to the Live Party Concert Hall closes in 1 minutes. Escape will
-					// engage.
-					PacketSendUtility.playerSendPacketTime(player,
-							SM_SYSTEM_MESSAGE.STR_MSG_EVENT_DIRECT_PORTAL_CLOSE_TIMER_1M, 7140000);
+					PacketSendUtility.playerSendPacketTime(player, SM_SYSTEM_MESSAGE.STR_MSG_EVENT_DIRECT_PORTAL_OPEN, 0);
+					// The entrance to the Live Party Concert Hall closes in 90 minutes. Escape will engage.
+					PacketSendUtility.playerSendPacketTime(player, SM_SYSTEM_MESSAGE.STR_MSG_EVENT_DIRECT_PORTAL_CLOSE_TIMER_90M, 1800000);
+					// The entrance to the Live Party Concert Hall closes in 60 minutes. Escape will engage.
+					PacketSendUtility.playerSendPacketTime(player, SM_SYSTEM_MESSAGE.STR_MSG_EVENT_DIRECT_PORTAL_CLOSE_TIMER_60M, 3600000);
+					// The entrance to the Live Party Concert Hall closes in 30 minutes. Escape will engage.
+					PacketSendUtility.playerSendPacketTime(player, SM_SYSTEM_MESSAGE.STR_MSG_EVENT_DIRECT_PORTAL_CLOSE_TIMER_30M, 5400000);
+					// The entrance to the Live Party Concert Hall closes in 15 minutes. Escape will engage.
+					PacketSendUtility.playerSendPacketTime(player, SM_SYSTEM_MESSAGE.STR_MSG_EVENT_DIRECT_PORTAL_CLOSE_TIMER_15M, 6300000);
+					// The entrance to the Live Party Concert Hall closes in 10 minutes. Escape will engage.
+					PacketSendUtility.playerSendPacketTime(player, SM_SYSTEM_MESSAGE.STR_MSG_EVENT_DIRECT_PORTAL_CLOSE_TIMER_10M, 6600000);
+					// The entrance to the Live Party Concert Hall closes in 5 minutes. Escape will engage.
+					PacketSendUtility.playerSendPacketTime(player, SM_SYSTEM_MESSAGE.STR_MSG_EVENT_DIRECT_PORTAL_CLOSE_TIMER_5M, 6900000);
+					// The entrance to the Live Party Concert Hall closes in 3 minutes. Escape will engage.
+					PacketSendUtility.playerSendPacketTime(player, SM_SYSTEM_MESSAGE.STR_MSG_EVENT_DIRECT_PORTAL_CLOSE_TIMER_3M, 7020000);
+					// The entrance to the Live Party Concert Hall closes in 2 minutes. Escape will engage.
+					PacketSendUtility.playerSendPacketTime(player, SM_SYSTEM_MESSAGE.STR_MSG_EVENT_DIRECT_PORTAL_CLOSE_TIMER_2M, 7080000);
+					// The entrance to the Live Party Concert Hall closes in 1 minutes. Escape will engage.
+					PacketSendUtility.playerSendPacketTime(player, SM_SYSTEM_MESSAGE.STR_MSG_EVENT_DIRECT_PORTAL_CLOSE_TIMER_1M, 7140000);
 				}
 			});
 			return true;
