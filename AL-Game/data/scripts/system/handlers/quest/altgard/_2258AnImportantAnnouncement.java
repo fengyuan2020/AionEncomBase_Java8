@@ -31,7 +31,11 @@ public class _2258AnImportantAnnouncement extends QuestHandler {
 			if (targetId == 203650) {
 				if (dialog == QuestDialog.START_DIALOG) {
 					return sendQuestDialog(env, 1011);
-				} else if (dialog == QuestDialog.ACCEPT_QUEST) {
+				}
+                else if (dialog == QuestDialog.ASK_ACCEPTION) {
+					return sendQuestDialog(env, 4);
+				}
+                else if (dialog == QuestDialog.ACCEPT_QUEST) {
 					return sendQuestStartDialog(env, 182203239, 1);
 				}
 			}

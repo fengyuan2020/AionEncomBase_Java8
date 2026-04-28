@@ -1,6 +1,4 @@
 /*
-
- *
  *  Encom is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -42,10 +40,8 @@ public class ReportToMany extends QuestHandler {
 	private final int endDialog;
 	private final int maxVar;
 	private final FastMap<Integer, NpcInfos> npcInfos;
-	private boolean mission;
 
-	public ReportToMany(int questId, int startItem, List<Integer> startNpcIds, List<Integer> endNpcIds,
-			FastMap<Integer, NpcInfos> npcInfos, int startDialog, int endDialog, int maxVar, boolean mission) {
+	public ReportToMany(int questId, int startItem, List<Integer> startNpcIds, List<Integer> endNpcIds, FastMap<Integer, NpcInfos> npcInfos, int startDialog, int endDialog, int maxVar) {
 		super(questId);
 		this.startItem = startItem;
 		if (startNpcIds != null) {
@@ -60,14 +56,10 @@ public class ReportToMany extends QuestHandler {
 		this.startDialog = startDialog;
 		this.endDialog = endDialog;
 		this.maxVar = maxVar;
-		this.mission = mission;
 	}
 
 	@Override
 	public void register() {
-		if (mission) {
-			qe.registerOnLevelUp(getQuestId());
-		}
 		if (startItem != 0) {
 			qe.registerQuestItem(startItem, getQuestId());
 		} else {
@@ -129,18 +121,17 @@ public class ReportToMany extends QuestHandler {
 						sendQuestDialog(env, targetNpcInfo.getQuestDialog() + 1);
 						return playQuestMovie(env, targetNpcInfo.getMovie());
 					} else if (dialog.id() == closeDialog) {
-						if ((dialog != QuestDialog.CHECK_COLLECTED_ITEMS
-								&& dialog != QuestDialog.CHECK_COLLECTED_ITEMS_SIMPLE)
-								|| QuestService.collectItemCheck(env, true)) {
+						if ((dialog != QuestDialog.CHECK_COLLECTED_ITEMS && dialog != QuestDialog.CHECK_COLLECTED_ITEMS_SIMPLE) || QuestService.collectItemCheck(env, true)) {
 							if (var == maxVar) {
 								qs.setStatus(QuestStatus.REWARD);
+							    updateQuestStatus(env);
 								if (closeDialog == 1009 || closeDialog == 20002 || closeDialog == 39) {
 									return sendQuestDialog(env, 5);
 								}
 							} else {
 								qs.setQuestVarById(0, var + 1);
+							    updateQuestStatus(env);
 							}
-							updateQuestStatus(env);
 						}
 						return sendQuestSelectionDialog(env);
 					}
@@ -181,10 +172,5 @@ public class ReportToMany extends QuestHandler {
 			}
 		}
 		return HandlerResult.UNKNOWN;
-	}
-
-	@Override
-	public boolean onLvlUpEvent(QuestEnv questEnv) {
-		return defaultOnLvlUpEvent(questEnv);
 	}
 }

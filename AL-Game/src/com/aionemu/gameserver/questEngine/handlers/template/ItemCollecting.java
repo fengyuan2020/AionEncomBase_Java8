@@ -1,6 +1,4 @@
 /*
-
- *
  *  Encom is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -39,8 +37,7 @@ public class ItemCollecting extends QuestHandler {
 	private final int startDialogId2;
 	private final int itemId;
 
-	public ItemCollecting(int questId, List<Integer> startNpcIds, int nextNpcId, List<Integer> actionItemIds,
-			List<Integer> endNpcIds, int questMovie, int startDialogId, int startDialogId2, int itemId) {
+	public ItemCollecting(int questId, List<Integer> startNpcIds, int nextNpcId, List<Integer> actionItemIds, List<Integer> endNpcIds, int questMovie, int startDialogId, int startDialogId2, int itemId) {
 		super(questId);
 		startNpcs.addAll(startNpcIds);
 		startNpcs.remove(0);
@@ -136,9 +133,6 @@ public class ItemCollecting extends QuestHandler {
 				}
 				case CHECK_COLLECTED_ITEMS_SIMPLE: {
 					return checkQuestItemsSimple(env, var, var, true, 5, 0, 0);
-				}
-				case FINISH_DIALOG: {
-					return sendQuestSelectionDialog(env);
 				}
 				case SET_REWARD: {
 					qs.setStatus(QuestStatus.REWARD);

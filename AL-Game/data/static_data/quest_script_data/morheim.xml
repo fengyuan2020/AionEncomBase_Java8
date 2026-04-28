@@ -22,6 +22,11 @@
 	<report_to id="4329" start_npc_ids="204344" end_npc_ids="204341" item_id="182204270"/>
 	<report_to id="4330" start_npc_ids="204344" end_npc_ids="204342" item_id="182204271"/>
 	<report_to id="24240" start_npc_ids="204392" end_npc_ids="204379"/>
+
+	<report_to_many id="24120" start_npc_ids="204304" end_npc_ids="802441">
+		<npc_infos npc_id="730038" var="0" quest_dialog="1352"/>
+		<npc_infos npc_id="802441" var="1" quest_dialog="2375" close_dialog="1009"/>
+	</report_to_many>
 	
 	<item_collecting id="2301" start_npc_ids="204399" action_item_ids="296439"/>
 	<item_collecting id="2302" start_npc_ids="204324"/>
@@ -123,7 +128,6 @@
 	<item_collecting id="4332" start_npc_ids="204363"/>
 	<item_collecting id="4333" start_npc_ids="204357"/>
 	<item_collecting id="4334" start_npc_ids="204342"/>
-	<item_collecting id="24120" start_npc_ids="204304"/>
 	<item_collecting id="24122" start_npc_ids="204342"/>
 	<item_collecting id="24123" start_npc_ids="204345"/>
 	<item_collecting id="80006" start_npc_ids="799790"/>

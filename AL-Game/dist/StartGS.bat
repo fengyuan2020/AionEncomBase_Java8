@@ -1,8 +1,8 @@
 @echo off
+chcp 65001 > nul
 TITLE Aion 5.8 - Game Emu Console
 @COLOR 4B
-REM -------------------------------------
-REM Указываем свой путь к JDK8
+REM Specify your path to JDK8
 SET PATH="E:\Java\jdk1.8.0_321\bin"
 
 :START
@@ -12,8 +12,7 @@ echo.
 echo Starting Aion Version 5.8
 echo.
 
-REM -------------------------------------
-REM Оптимальные параметры для ParallelGC
+REM Optimal parameters for ParallelGC
 REM  -XX:+UseParallelGC \          # Enable ParallelGC
 REM  -Xms2048m -Xmx8192m \         # Fixed size of memory allocation
 REM  -XX:+PrintGCDetails \         # Log garbage collection (for debug)
@@ -23,9 +22,9 @@ REM  -Xms8g -Xmx8g \               # More memory if needed
 REM  -XX:MaxGCPauseMillis=200 \    # Desired maximum GC pause (ms)
 REM  -XX:GCTimeRatio=99 \          # Goal: 1% of time for GC (99% for work)
 REM  -XX:ParallelGCThreads=4 \     # Number of GC threads (default = number of CPU cores)
-REM -------------------------------------
 
 java ^
+  -Dfile.encoding=UTF-8 ^
   -Xms2048m -Xmx8192m ^
   -XX:+UseParallelGC ^
   -XX:+UseParallelOldGC ^
@@ -37,7 +36,6 @@ java ^
   -javaagent:./libs/al-commons.jar ^
   -cp ./libs/*;./libs/AL-Game.jar ^
   com.aionemu.gameserver.GameServer
-REM -------------------------------------
 
 if ERRORLEVEL 2 goto restart
 if ERRORLEVEL 1 goto error

@@ -7670,7 +7670,7 @@
       <spot x="1350.890015" y="1904.589966" z="46.125" h="25" random_walk="8"/>
       <spot x="1359.195801" y="1901.407227" z="46.125" h="25" random_walk="8"/>
     </spawn>
-    <spawn npc_id="213930" respawn_time="300">
+    <spawn npc_id="213930" pool="1" respawn_time="300">
       <temporary_spawn spawn_time="0.*.*" despawn_time="8.*.*"/>
       <spot x="2358.629883" y="1888.069946" z="27.414368"/>
       <spot x="2202.967041" y="2263.817139" z="39.208298"/>

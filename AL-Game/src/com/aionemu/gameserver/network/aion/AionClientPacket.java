@@ -1,6 +1,4 @@
 /*
-
- *
  *  Encom is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -40,13 +38,11 @@ public abstract class AionClientPacket extends BaseClientPacket<AionConnection> 
 	private final Set<State> validStates;
 
 	/**
-	 * Constructs new client packet instance. ByBuffer and ClientConnection should
-	 * be later set manually, after using this constructor.
+	 * Constructs new client packet instance. ByBuffer and ClientConnection should be later set manually, after using this constructor.
 	 * 
 	 * @param opcode     packet id
 	 * @param state      connection valid state
-	 * @param restStates rest of connection valid state (optional - if there are
-	 *                   more than one)
+	 * @param restStates rest of connection valid state (optional - if there are more than one)
 	 */
 	protected AionClientPacket(int opcode, State state, State... restStates) {
 		super(opcode);
@@ -74,8 +70,7 @@ public abstract class AionClientPacket extends BaseClientPacket<AionConnection> 
 	}
 
 	/**
-	 * Send new AionServerPacket to connection that is owner of this packet. This
-	 * method is equvalent to: getConnection().sendPacket(msg);
+	 * Send new AionServerPacket to connection that is owner of this packet. This method is equvalent to: getConnection().sendPacket(msg);
 	 * 
 	 * @param msg
 	 */
@@ -116,7 +111,7 @@ public abstract class AionClientPacket extends BaseClientPacket<AionConnection> 
 		boolean valid = validStates.contains(state);
 
 		if (!valid) {
-			log.info(this + " wont be processed cuz its valid state don't match current connection state: " + state);
+			log.debug(this + " wont be processed cuz its valid state don't match current connection state: " + state);
 		}
 		return valid;
 	}

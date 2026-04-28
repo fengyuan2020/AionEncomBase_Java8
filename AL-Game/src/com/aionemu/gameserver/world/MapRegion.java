@@ -1,6 +1,4 @@
 /*
-
- *
  *  Encom is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -30,10 +28,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.aionemu.gameserver.ai2.event.AIEventType;
+import com.aionemu.gameserver.ai2.manager.WalkManager;
+import com.aionemu.gameserver.ai2.NpcAI2;
 import com.aionemu.gameserver.configs.administration.DeveloperConfig;
 import com.aionemu.gameserver.configs.main.SiegeConfig;
 import com.aionemu.gameserver.configs.main.WorldConfig;
 import com.aionemu.gameserver.model.gameobjects.Creature;
+import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.StaticDoor;
 import com.aionemu.gameserver.model.gameobjects.VisibleObject;
 import com.aionemu.gameserver.model.gameobjects.base.BaseNpc;
@@ -178,12 +179,7 @@ public class MapRegion {
 	void add(VisibleObject object) {
 		if (objects.put(object.getObjectId(), object) == null) {
 			if (object instanceof Player) {
-				Player player = (Player) object;
-				playerCount.incrementAndGet();
-				// 飞行传送中的玩家不触发区域激活，避免唤醒大量NPC导致CPU占用过高
-				if (!player.isInState(CreatureState.FLIGHT_TELEPORT)) {
-					checkActiveness(true);
-				}
+				checkActiveness(playerCount.incrementAndGet() > 0);
 			} else if (DeveloperConfig.SPAWN_CHECK) {
 				Iterator<TreeSet<ZoneInstance>> zoneIter = zoneMap.values().iterator();
 				while (zoneIter.hasNext()) {
@@ -197,8 +193,7 @@ public class MapRegion {
 						}
 					}
 				}
-				log.warn("Outside any zones: id=" + object + " > X:" + object.getX() + ",Y:" + object.getY() + ",Z:"
-						+ object.getZ());
+				log.warn("Outside any zones: id=" + object + " > X:" + object.getX() + ",Y:" + object.getY() + ",Z:" + object.getZ());
 			}
 		}
 	}
@@ -211,12 +206,7 @@ public class MapRegion {
 	void remove(VisibleObject object) {
 		if (objects.remove(object.getObjectId()) != null) {
 			if (object instanceof Player) {
-				Player player = (Player) object;
-				playerCount.decrementAndGet();
-				// 飞行传送中的玩家不触发区域停用，因为没有激活过
-				if (!player.isInState(CreatureState.FLIGHT_TELEPORT)) {
-					checkActiveness(playerCount.get() > 0);
-				}
+				checkActiveness(playerCount.decrementAndGet() > 0);
 			}
 		}
 	}
@@ -287,10 +277,16 @@ public class MapRegion {
 	 */
 	private void deactivateObjects() {
 		for (VisibleObject visObject : objects.values()) {
-			if (visObject instanceof Creature && !(SiegeConfig.BALAUR_AUTO_ASSAULT && visObject instanceof SiegeNpc
-					|| !(visObject instanceof BaseNpc))) { // Tweak
+			if (visObject instanceof Creature && !(SiegeConfig.BALAUR_AUTO_ASSAULT && visObject instanceof SiegeNpc || !(visObject instanceof BaseNpc))) { // Tweak
 				Creature creature = (Creature) visObject;
 				creature.getAi2().onGeneralEvent(AIEventType.DEACTIVATE);
+				
+				if (creature instanceof Npc) {
+					Npc npc = (Npc) creature;
+					if (npc.getAi2() instanceof NpcAI2) {
+						WalkManager.stopWalking((NpcAI2) npc.getAi2());
+					}
+				}
 			}
 		}
 	}
@@ -310,8 +306,7 @@ public class MapRegion {
 	}
 
 	public void revalidateZones(Creature creature) {
-		for (Entry<Integer, TreeSet<ZoneInstance>> e = zoneMap.head(),
-				mapEnd = zoneMap.tail(); (e = e.getNext()) != mapEnd;) {
+		for (Entry<Integer, TreeSet<ZoneInstance>> e = zoneMap.head(), mapEnd = zoneMap.tail(); (e = e.getNext()) != mapEnd;) {
 			boolean foundZone = false;
 			int category = e.getKey();
 			TreeSet<ZoneInstance> zones = e.getValue();
@@ -335,8 +330,7 @@ public class MapRegion {
 
 	public List<ZoneInstance> getZones(Creature creature) {
 		List<ZoneInstance> z = new ArrayList<ZoneInstance>();
-		for (Entry<Integer, TreeSet<ZoneInstance>> e = zoneMap.head(),
-				mapEnd = zoneMap.tail(); (e = e.getNext()) != mapEnd;) {
+		for (Entry<Integer, TreeSet<ZoneInstance>> e = zoneMap.head(), mapEnd = zoneMap.tail(); (e = e.getNext()) != mapEnd;) {
 			TreeSet<ZoneInstance> zones = e.getValue();
 			for (ZoneInstance zone : zones) {
 				if (zone.isInsideCreature(creature)) {
@@ -348,8 +342,7 @@ public class MapRegion {
 	}
 
 	public boolean onDie(Creature attacker, Creature target) {
-		for (Entry<Integer, TreeSet<ZoneInstance>> e = zoneMap.head(),
-				mapEnd = zoneMap.tail(); (e = e.getNext()) != mapEnd;) {
+		for (Entry<Integer, TreeSet<ZoneInstance>> e = zoneMap.head(), mapEnd = zoneMap.tail(); (e = e.getNext()) != mapEnd;) {
 			TreeSet<ZoneInstance> zones = e.getValue();
 			for (ZoneInstance zone : zones) {
 				if (zone.isInsideCreature(target)) {
@@ -363,8 +356,7 @@ public class MapRegion {
 	}
 
 	public boolean isInsideZone(ZoneName zoneName, float x, float y, float z) {
-		for (Entry<Integer, TreeSet<ZoneInstance>> e = zoneMap.head(),
-				mapEnd = zoneMap.tail(); (e = e.getNext()) != mapEnd;) {
+		for (Entry<Integer, TreeSet<ZoneInstance>> e = zoneMap.head(), mapEnd = zoneMap.tail(); (e = e.getNext()) != mapEnd;) {
 			TreeSet<ZoneInstance> zones = e.getValue();
 			for (ZoneInstance zone : zones) {
 				if (zone.getZoneTemplate().getName() != zoneName) {
@@ -377,8 +369,7 @@ public class MapRegion {
 	}
 
 	public boolean isInsideZone(ZoneName zoneName, Creature creature) {
-		for (Entry<Integer, TreeSet<ZoneInstance>> e = zoneMap.head(),
-				mapEnd = zoneMap.tail(); (e = e.getNext()) != mapEnd;) {
+		for (Entry<Integer, TreeSet<ZoneInstance>> e = zoneMap.head(), mapEnd = zoneMap.tail(); (e = e.getNext()) != mapEnd;) {
 			TreeSet<ZoneInstance> zones = e.getValue();
 			for (ZoneInstance zone : zones) {
 				if (zone.getZoneTemplate().getName() != zoneName) {
@@ -399,8 +390,7 @@ public class MapRegion {
 	 * @return
 	 */
 	public boolean isInsideItemUseZone(ZoneName zoneName, Creature creature) {
-		for (Entry<Integer, TreeSet<ZoneInstance>> e = zoneMap.head(),
-				mapEnd = zoneMap.tail(); (e = e.getNext()) != mapEnd;) {
+		for (Entry<Integer, TreeSet<ZoneInstance>> e = zoneMap.head(), mapEnd = zoneMap.tail(); (e = e.getNext()) != mapEnd;) {
 			TreeSet<ZoneInstance> zones = e.getValue();
 			for (ZoneInstance zone : zones) {
 				if (!zone.getZoneTemplate().getXmlName().startsWith(zoneName.toString())) {

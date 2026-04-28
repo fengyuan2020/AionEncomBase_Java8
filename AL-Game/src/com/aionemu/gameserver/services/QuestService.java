@@ -1,5 +1,4 @@
 /*
- *
  *  Encom is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -449,9 +448,9 @@ public final class QuestService {
 		Player player = env.getPlayer();
 		QuestTemplate template = questsData.getQuestById(env.getQuestId());
         QuestState qs = player.getQuestStateList().getQuestState(env.getQuestId());
-        if (qs != null && qs.getStatus() != QuestStatus.NONE) {
-			return false;
-		}
+        if (qs != null && qs.getStatus() != QuestStatus.NONE && !qs.canRepeat()) {
+            return false;
+        }
 		if (template == null) {
 			return false;
 		}
@@ -550,11 +549,6 @@ public final class QuestService {
 		}
 		if (warn && template.getNpcFactionId() != 0 && !template.isTimeBased()) {
 			if (!player.getNpcFactions().canStartQuest(template)) {
-				return false;
-			}
-		}
-		if (qs != null && qs.getStatus() != QuestStatus.NONE) {
-			if (!qs.canRepeat()) {
 				return false;
 			}
 		}

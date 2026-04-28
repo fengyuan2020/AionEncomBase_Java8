@@ -1,6 +1,4 @@
 /*
-
- *
  *  Encom is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -60,8 +58,7 @@ public class ReportToManyData extends XMLQuest {
 				maxVar = mi.getVar();
 			}
 		}
-		ReportToMany template = new ReportToMany(id, startItemId, startNpcIds, endNpcIds, NpcInfo, startDialog,
-				endDialog, maxVar, mission);
+		ReportToMany template = new ReportToMany(id, startItemId, startNpcIds, endNpcIds, NpcInfo, startDialog, endDialog, maxVar);
 		questEngine.addQuestHandler(template);
 	}
 }

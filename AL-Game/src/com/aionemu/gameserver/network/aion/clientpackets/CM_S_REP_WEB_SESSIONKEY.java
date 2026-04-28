@@ -1,6 +1,4 @@
 /*
-
- *
  *  Encom is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -41,6 +39,6 @@ public class CM_S_REP_WEB_SESSIONKEY extends AionClientPacket {
 
 	@Override
 	protected void runImpl() {
-		log.info(text);
+		log.debug(text);
 	}
 }

@@ -1,6 +1,4 @@
 /*
-
- *
  *  Encom is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -235,51 +233,57 @@ public class InGameShopEn {
 	}
 
 	public void finishRequest(int requestId, int result, long toll, long luna) {
-		for (IGRequest request : activeRequests)
+		IGRequest foundRequest = null;
+		
+		for (IGRequest request : activeRequests) {
 			if (request.requestId == requestId) {
-				Player player = World.getInstance().findPlayer(request.playerId);
-				if (player != null) {
-					if (result == 1) {
-						PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_INGAMESHOP_ERROR);
-					} else if (result == 2) {
-						IGItem item = getIGItem(request.itemObjId);
-						if (item == null) {
-/* 							PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_INGAMESHOP_ERROR);
-							log.error("player " + player.getName() + " requested " + request.itemObjId + " that was not exists in list."); */
-							return;
-						}
-						PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_INGAMESHOP_NOT_ENOUGH_CASH("Toll"));
-						PacketSendUtility.sendPacket(player, new SM_TOLL_INFO(toll));
-					} else if (result == 3) {
-						IGItem item = getIGItem(request.itemObjId);
-						if (item == null) {
-/* 							PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_INGAMESHOP_ERROR);
-							log.error("player " + player.getName() + " requested " + request.itemObjId + " that was not exists in list."); */
-							return;
-						}
-
-						if (request.gift) {
-							SystemMailService.getInstance().sendMail(player.getName(), request.receiver, "In Game Shop", request.message, item.getItemId(), item.getItemCount(), 0L, 0L, LetterType.BLACKCLOUD);
-							PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_INGAMESHOP_GIFT_SUCCESS);
-							player.getClientConnection().getAccount().setToll(toll);
-							player.getClientConnection().getAccount().setLuna(luna);
-						} else {
-							ItemService.addItem(player, item.getItemId(), item.getItemCount());
-							player.getClientConnection().getAccount().setToll(toll);
-							player.getClientConnection().getAccount().setLuna(luna);
-						}
-
-						item.increaseSales();
-						dao.increaseSales(item.getObjectId(), item.getSalesRanking());
-						PacketSendUtility.sendPacket(player, new SM_TOLL_INFO(toll));
-					} else if (result == 4) {
-						player.getClientConnection().getAccount().setToll(toll);
-						PacketSendUtility.sendPacket(player, new SM_TOLL_INFO(toll));
-					}
-				}
-				activeRequests.remove(request);
+				foundRequest = request;
 				break;
 			}
+		}
+		
+		if (foundRequest == null) {
+			return;
+		}
+		
+		Player player = World.getInstance().findPlayer(foundRequest.playerId);
+		if (player != null) {
+			if (result == 1) {
+				PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_INGAMESHOP_ERROR);
+			} else if (result == 2) {
+				IGItem item = getIGItem(foundRequest.itemObjId);
+				if (item == null) {
+					return;
+				}
+				PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_INGAMESHOP_NOT_ENOUGH_CASH("Toll"));
+				PacketSendUtility.sendPacket(player, new SM_TOLL_INFO(toll));
+			} else if (result == 3) {
+				IGItem item = getIGItem(foundRequest.itemObjId);
+				if (item == null) {
+					return;
+				}
+				
+				if (foundRequest.gift) {
+					SystemMailService.getInstance().sendMail(player.getName(), foundRequest.receiver, "In Game Shop", foundRequest.message, item.getItemId(), item.getItemCount(), 0L, 0L, LetterType.BLACKCLOUD);
+					PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_INGAMESHOP_GIFT_SUCCESS);
+					player.getClientConnection().getAccount().setToll(toll);
+					player.getClientConnection().getAccount().setLuna(luna);
+				} else {
+					ItemService.addItem(player, item.getItemId(), item.getItemCount());
+					player.getClientConnection().getAccount().setToll(toll);
+					player.getClientConnection().getAccount().setLuna(luna);
+				}
+				
+				item.increaseSales();
+				dao.increaseSales(item.getObjectId(), item.getSalesRanking());
+				PacketSendUtility.sendPacket(player, new SM_TOLL_INFO(toll));
+			} else if (result == 4) {
+				player.getClientConnection().getAccount().setToll(toll);
+				PacketSendUtility.sendPacket(player, new SM_TOLL_INFO(toll));
+			}
+		}
+		
+		activeRequests.remove(foundRequest);
 	}
 
 	class DescFilter implements Comparator<Object> {

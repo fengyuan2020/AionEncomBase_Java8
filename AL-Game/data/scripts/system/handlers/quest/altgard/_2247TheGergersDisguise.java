@@ -78,7 +78,7 @@ public class _2247TheGergersDisguise extends QuestHandler {
 						return sendQuestDialog(env, 2375);
 					}
 				case SELECT_REWARD:
-					if (var == 2) {
+					if (var == 1) {
 						removeQuestItem(env, 182203231, 1);
 						qs.setQuestVar(2);
 						qs.setStatus(QuestStatus.REWARD);

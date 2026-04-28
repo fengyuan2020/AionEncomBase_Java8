@@ -60,7 +60,6 @@ import com.aionemu.gameserver.model.gameobjects.Pet;
 import com.aionemu.gameserver.model.gameobjects.Summon;
 import com.aionemu.gameserver.model.gameobjects.SummonedObject;
 import com.aionemu.gameserver.model.gameobjects.Trap;
-import com.aionemu.gameserver.model.gameobjects.VisibleObject;
 import com.aionemu.gameserver.model.gameobjects.player.AbyssRank.AbyssRankUpdateType;
 import com.aionemu.gameserver.model.gameobjects.player.FriendList.Status;
 import com.aionemu.gameserver.model.gameobjects.player.emotion.EmotionList;
@@ -443,8 +442,7 @@ public class Player extends Creature {
 	/**
 	 * Only use for the Size admin command
 	 * 
-	 * @return PlayerAppearance : The saved player's appearance, to rollback his
-	 *         appearance
+	 * @return PlayerAppearance : The saved player's appearance, to rollback his appearance
 	 */
 	public PlayerAppearance getSavedPlayerAppearance() {
 		return savedPlayerAppearance;
@@ -453,8 +451,7 @@ public class Player extends Creature {
 	/**
 	 * Only use for the Size admin command
 	 * 
-	 * @param playerAppearance PlayerAppearance : The saved player's appearance, to
-	 *                         rollback his appearance
+	 * @param playerAppearance PlayerAppearance : The saved player's appearance, to rollback his appearance
 	 */
 	public void setSavedPlayerAppearance(PlayerAppearance savedPlayerAppearance) {
 		this.savedPlayerAppearance = savedPlayerAppearance;
@@ -610,8 +607,8 @@ public class Player extends Creature {
 	}
 
 	/**
-	 * Sets this players friend list. <br/>
-	 * Remember to send the player the <tt>SM_FRIEND_LIST</tt> packet.
+	 * Sets this players friend list.
+	 * Remember to send the player the SM_FRIEND_LIST packet.
 	 * 
 	 * @param list
 	 */
@@ -700,16 +697,6 @@ public class Player extends Creature {
 	}
 
 	/**
-	 * 重写设置目标方法
-	 * 切换目标时重置普攻攻击计时器，确保可以立即对新目标发起攻击
-	 */
-	@Override
-	public void setTarget(VisibleObject creature) {
-		super.setTarget(creature);
-		getController().resetAttackTimer();
-	}
-
-	/**
 	 * @return the inventory
 	 */
 
@@ -772,8 +759,7 @@ public class Player extends Creature {
 	}
 
 	/**
-	 * @param inventory the inventory to set Inventory should be set right after
-	 *                  player object is created
+	 * @param inventory the inventory to set Inventory should be set right after player object is created
 	 */
 	public void setStorage(Storage storage, StorageType storageType) {
 		if (storageType == StorageType.CUBE) {
@@ -1547,8 +1533,7 @@ public class Player extends Creature {
 			if (race == Race.TELEPORTER && tribe == TribeClass.GENERAL)
 				return false;
 			// Elyos Shield generators
-			if ((race == Race.CONSTRUCT || race == Race.BARRIER)
-					&& (tribe == TribeClass.GENERAL || tribe == TribeClass.F4GUARD_LIGHT))
+			if ((race == Race.CONSTRUCT || race == Race.BARRIER) && (tribe == TribeClass.GENERAL || tribe == TribeClass.F4GUARD_LIGHT))
 				return false;
 			break;
 		case ASMODIANS:
@@ -1562,8 +1547,7 @@ public class Player extends Creature {
 			if (race == Race.TELEPORTER && tribe == TribeClass.GENERAL_DARK)
 				return false;
 			// Elyos Shield generators
-			if ((race == Race.CONSTRUCT || race == Race.BARRIER)
-					&& (tribe == TribeClass.GENERAL_DARK || tribe == TribeClass.F4GUARD_DARK)) {
+			if ((race == Race.CONSTRUCT || race == Race.BARRIER) && (tribe == TribeClass.GENERAL_DARK || tribe == TribeClass.F4GUARD_DARK)) {
 				return false;
 			}
 			break;
